@@ -1,0 +1,29 @@
+{
+  "name": "democracyos",
+  "version": "3.0.0-alpha",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DemocracyOS/democracyos.git"
+  },
+  "engines": {
+    "node": "^8"
+  },
+  "scripts": {
+    "test": "NODE_PATH=. NODE_ENV=test mocha --recursive"
+  },
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "mongoose": "^4.13.8",
+    "mongoose-paginate": "^5.0.3",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.14.0",
+    "eslint-config-democracyos": "^2.0.2",
+    "mocha": "^4.1.0",
+    "rewire": "^3.0.2",
+    "sinon": "^4.1.3",
+    "sinon-mongoose": "^2.0.2"
+  }
+}

@@ -1,0 +1,10 @@
+public
+.next
+
+logs
+*.log
+npm-debug.log*
+node_modules/
+
+/*.override.yml
+.env
