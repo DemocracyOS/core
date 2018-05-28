@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file: .env
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongo
+    tty: true
+
+  mongo:
+    image: mongo:3.2
+    ports:
+      - 27017:27017
+    # Optionally mount external data directory
+    volumes:
+      - ~/data3.2:/data/db
