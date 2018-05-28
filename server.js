@@ -1,4 +1,5 @@
-let restify = require('restify')
+const restify = require('restify')
+const routes = require('./api')
 
 const server = restify.createServer({
   name: 'DemocracyOS-api',
@@ -8,9 +9,10 @@ const server = restify.createServer({
 server.use(restify.plugins.acceptParser(server.acceptable))
 server.use(restify.plugins.queryParser())
 server.use(restify.plugins.bodyParser())
+routes.applyRoutes(server)
 
-server.listen(8080, function () {
-  console.log('%s listening at %s', server.name, server.url);
+server.listen(4000, function () {
+  console.log('%s listening at %s', server.name, server.url)
 })
 
 // const express = require('express')
