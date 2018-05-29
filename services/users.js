@@ -1,9 +1,9 @@
-const { log } = require('../logger')
+const log = require('./logger')
 const {
   ErrUserNotLoggedIn,
   ErrNotAdmin,
   ErrNotAdminNorOwner
-} = require('../errors')
+} = require('./errors')
 
 const isLoggedIn = (req, res, next) => {
   log.debug('isLoggedIn middleware')

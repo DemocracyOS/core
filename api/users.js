@@ -1,5 +1,6 @@
 const Router = require('restify-router').Router
-const log = require('../logger')
+const status = require('http-status')
+const log = require('../services/logger')
 const router = new Router()
 const {
   isLoggedIn,
@@ -8,23 +9,11 @@ const {
   isAdminOrOwner,
   allowedFieldsFor
 } = require('../services/users')
-const {
-  OK,
-  FORBIDDEN,
-  CREATED,
-  NO_CONTENT,
-  INTERNAL_SERVER_ERROR
-} = require('http-status')
 const User = require('../db-api/user')
-
-router.get('/pew', (req, res, next) => {
-  res.send('holis')
-  next()
-})
 
 router.post('', async (req, res, next) => {
   try {
-    res.status(FORBIDDEN).end()
+    res.send(status.FORBIDDEN)
   } catch (err) {
     next(err)
   }
@@ -32,64 +21,62 @@ router.post('', async (req, res, next) => {
 
 router.get('', async (req, res, next) => {
   try {
-    const results = await User.list({ filter: req.query.filter, limit: req.query.limit, page: req.query.page, ids: req.query.ids, fields: allowedFieldsFor(req.user) })
-    log.info(results)
-    let payload = {
+    const results = await User.list({ filter: req.query.filter, limit: req.paginate.per_page, page: req.paginate.page, ids: req.query.ids, fields: allowedFieldsFor(req.user) })
+    res.send(status.OK, {
       results: results.docs,
       pagination: {
         count: results.total,
         page: results.page,
         limit: results.limit
       }
-    }
-    // res.contentType = 'json'
-    res.send(payload)
+    })
   } catch (err) {
     next(err)
   }
 })
 
-// router.route('/:id')
-//   .get(
-//     isOwner,
-//     async (req, res, next) => {
-//       try {
-//         const user = await User.get({ id: req.params.id }, allowedFieldsFor(req.user))
-//         res.status(OK).json(user)
-//       } catch (err) {
-//         next(err)
-//       }
-//     })
-//   .put(
-//     isLoggedIn,
-//     isAdminOrOwner,
-//     async (req, res, next) => {
-//       try {
-//         let updatedUser = await User.update({ id: req.params.id, user: req.body })
-//         // If its not an admin, filter unalllowed fields.
-//         updatedUser = updatedUser.toJSON()
-//         let allowed = Object.keys(allowedFieldsFor(req.user))
-//         if (allowed.length) {
-//           Object.keys(updatedUser)
-//             .filter((key) => !allowed.includes(key))
-//             .forEach((key) => delete updatedUser[key])
-//         }
-//         res.status(OK).json(updatedUser)
-//       } catch (err) {
-//         next(err)
-//       }
-//     })
-//   .delete(
-//     isLoggedIn,
-//     isAdmin,
-//     async (req, res, next) => {
-//       try {
-//         await User.remove(req.params.id)
-//         res.status(OK).json({ id: req.params.id })
-//       } catch (err) {
-//         next(err)
-//       }
-//     })
+router.get('/:id',
+  isOwner,
+  async (req, res, next) => {
+    try {
+      const user = await User.get({ id: req.params.id }, allowedFieldsFor(req.user))
+      res.send(status.OK, user)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+router.put('/:id',
+  isLoggedIn,
+  isAdminOrOwner,
+  async (req, res, next) => {
+    try {
+      let updatedUser = await User.update({ id: req.params.id, user: req.body })
+      // If its not an admin, filter unalllowed fields.
+      updatedUser = updatedUser.toJSON()
+      let allowed = Object.keys(allowedFieldsFor(req.user))
+      if (allowed.length) {
+        Object.keys(updatedUser)
+          .filter((key) => !allowed.includes(key))
+          .forEach((key) => delete updatedUser[key])
+      }
+      res.send(status.OK, updatedUser)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+router.del('/:id',
+  isLoggedIn,
+  isAdmin,
+  async (req, res, next) => {
+    try {
+      await User.remove(req.params.id)
+      res.send(status.OK, { id: req.params.id })
+    } catch (err) {
+      next(err)
+    }
+  })
 
 module.exports = router
 

@@ -43,6 +43,7 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "restify": "^7.2.0",
+    "restify-paginate": "0.0.5",
     "restify-router": "^0.5.0",
     "winston": "^2.4.0"
   },

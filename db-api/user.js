@@ -1,6 +1,6 @@
 const { Types: { ObjectId } } = require('mongoose')
-const log = require('../logger')
-const { ErrNotFound } = require('../errors')
+const log = require('../services/logger')
+const { ErrNotFound } = require('../services/errors')
 const User = require('../models/user')
 
 /**
@@ -61,10 +61,8 @@ exports.list = function list ({ filter, limit, page, ids, fields }) {
     })
     query._id = { $in: idsToArray }
   }
-  let result = User
+  return User
     .paginate(query, { select: fields, page, limit })
-  log.info(result)
-  return result
 }
 
 /**

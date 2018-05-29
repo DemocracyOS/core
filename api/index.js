@@ -1,21 +1,19 @@
 const Router = require('restify-router').Router
+const paginate = require('express-paginate')
 const router = new Router()
-const routerV1 = new Router()
+const log = require('../services/logger')
+const errors = require('../services/errors')
+const routerResources = new Router()
 
 // router.add("/api", require("./settings"));
 // router.add("/api", require("./posts"));
 // router.add("/api", require("./users"));
 
-// router.get('/', (req, res, next) => {
-//   res.send('Testing')
-//   next()
-// })
-
-routerV1.add('/users', require('./users'))
+routerResources.add('/users', require('./users'))
 // router_v1.add('/settings', require('./settings'))
 // router_v1.add('/posts', require('./posts'))
 
-router.add('/api/v1', routerV1)
+router.add('/api/v1', routerResources)
 
 module.exports = router
 
@@ -26,14 +24,6 @@ module.exports = router
 // const router = express.Router()
 
 // // Apply paginate middleware to API routes
-// router.use(
-//   function (req, res, next) {
-//     // set default or minimum is 10
-//     if (req.query.limit <= 10) req.query.limit = 10
-//     next()
-//   },
-//   paginate.middleware(10, 50)
-// )
 
 // // API routes
 // router.use('/users', require('../users/api/users'))
