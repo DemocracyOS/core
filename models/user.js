@@ -46,7 +46,6 @@ const User = new mongoose.Schema({
  */
 
 User.index({ email: 1 }, { unique: true })
-// User.index({ username: 1 }, { unique: true })
 
 /**
  * Model's Plugin Extensions

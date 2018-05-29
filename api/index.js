@@ -1,10 +1,21 @@
 const Router = require('restify-router').Router
 const router = new Router()
+const routerV1 = new Router()
 
-router.get('/', (req, res, next) => {
-  res.send('Testing')
-  next()
-})
+// router.add("/api", require("./settings"));
+// router.add("/api", require("./posts"));
+// router.add("/api", require("./users"));
+
+// router.get('/', (req, res, next) => {
+//   res.send('Testing')
+//   next()
+// })
+
+routerV1.add('/users', require('./users'))
+// router_v1.add('/settings', require('./settings'))
+// router_v1.add('/posts', require('./posts'))
+
+router.add('/api/v1', routerV1)
 
 module.exports = router
 

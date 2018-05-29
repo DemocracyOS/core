@@ -1,18 +1,52 @@
 const restify = require('restify')
+const mongoose = require('./mongoose')
 const routes = require('./api')
+const { PORT, SESSION_SECRET, ROOT_URL } = require('./config')
+const { NODE_ENV } = process.env
+const log = require('./logger')
 
 const server = restify.createServer({
   name: 'DemocracyOS-api',
-  version: '1.0.0'
+  version: '1.0.0',
+  log: log
 })
 
 server.use(restify.plugins.acceptParser(server.acceptable))
 server.use(restify.plugins.queryParser())
 server.use(restify.plugins.bodyParser())
-routes.applyRoutes(server)
 
-server.listen(4000, function () {
-  console.log('%s listening at %s', server.name, server.url)
+// server.pre(function (req, res, next) {
+//   server.log.info({ req: req }, 'no req.log in "pre" handler');
+//   next();
+// });
+// server.get('/', function (req, res, next) {
+//   req.log.info('have "req_id" and "route" fields in route handler');
+//   res.send('hi');
+//   next();
+// });
+
+routes.applyRoutes(server)
+server.listen(PORT, function () {
+  // handle errors
+  const db = mongoose.connection
+
+  db.on('error', (err) => {
+    log.error('Mongoose default connection error: ' + err)
+  })
+
+  db.on('disconnected', () => {
+    log.debug('Mongoose default connection disconnected')
+  })
+
+  // db.on('error', (err) => {
+  //   if (err.message.code === 'ETIMEDOUT') {
+  //     console.log('Mongoose default connection error: '  + err)
+  //   }
+  // })
+
+  db.once('open', () => {
+    log.info('%s listening at %s', server.name, server.url)
+  })
 })
 
 // const express = require('express')
@@ -26,11 +60,9 @@ server.listen(4000, function () {
 // const authFunctions = require('../users/auth/functions')
 // const authProviders = require('../users/auth/providers')
 // const { setup } = require('../services/setup')
-// const { PORT, SESSION_SECRET, ROOT_URL } = require('./config')
 // const { middleware: loggerMiddleware, log } = require('./logger')
 // const mongoose = require('./mongoose')
 
-// const { NODE_ENV } = process.env
 // const app = next({
 //   dev: NODE_ENV !== 'production',
 //   quiet: NODE_ENV === 'test'
