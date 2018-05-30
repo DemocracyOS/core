@@ -1,9 +1,11 @@
 const restify = require('restify')
+const compression = require('compression')
+const helmet = require('helmet')
 const mongoose = require('./services/mongoose')
 const routes = require('./api')
 const log = require('./services/logger')
-const { PORT, SESSION_SECRET, ROOT_URL } = require('./config')
-const { NODE_ENV } = process.env
+const { PORT } = require('./config')
+// const { NODE_ENV } = process.env
 
 const server = restify.createServer({
   name: 'DemocracyOS-api',
@@ -11,23 +13,11 @@ const server = restify.createServer({
   log: log
 })
 
-// const paginateOptions = {
-//   // paramsNames: {
-//   //   page: 'page', // Page number param name
-//   //   per_page: 'limit' // Page size param name
-//   // },
-//   defaults: { // Default values
-//     page: 1,
-//     per_page: 10
-//   }
-//   // numbersOnly: false, // Generates the full links or not
-//   // hostname: true // Adds the hostname in the links or not
-// }
-
 server.use(restify.plugins.acceptParser(server.acceptable))
 server.use(restify.plugins.queryParser())
 server.use(restify.plugins.bodyParser())
-// server.use(paginate(server, paginateOptions))
+server.use(helmet())
+server.use(compression())
 routes.applyRoutes(server)
 
 server.listen(PORT, function () {
@@ -52,6 +42,11 @@ server.listen(PORT, function () {
     log.info('%s listening at %s', server.name, server.url)
   })
 })
+
+// ===============================================
+// do not delete, we might need it later
+// ===============================================
+
 
 // const express = require('express')
 // const next = require('next')

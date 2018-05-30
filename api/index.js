@@ -1,24 +1,33 @@
 const Router = require('restify-router').Router
 const paginate = require('express-paginate')
-const router = new Router()
+// Utils
 const log = require('../services/logger')
 const errors = require('../services/errors')
-const routerResources = new Router()
 
+/**
+ * Create Routers
+ */
+const router = new Router() // api/v1 route wrapper
+const routerResources = new Router() // router for every resource
+
+/**
+ * Middleware for pagination
+ */
 router.use(function (req, res, next) {
   if (req.query.limit <= 10) req.query.limit = 10
   res.locals = {}
   next()
-}, paginate.middleware(10, 100), (req, res, next) => { log.info(req); next()})
+}, paginate.middleware(10, 100))
 
-// router.add("/api", require("./settings"));
-// router.add("/api", require("./posts"));
-// router.add("/api", require("./users"));
+// ===============================
+// Resource routes
+// ===============================
 
 routerResources.add('/users', require('./users'))
 // router_v1.add('/settings', require('./settings'))
 // router_v1.add('/posts', require('./posts'))
 
+// Add everything to route wrapper
 router.add('/api/v1', routerResources)
 
 module.exports = router
