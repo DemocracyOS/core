@@ -5,6 +5,12 @@ const log = require('../services/logger')
 const errors = require('../services/errors')
 const routerResources = new Router()
 
+router.use(function (req, res, next) {
+  if (req.query.limit <= 10) req.query.limit = 10
+  res.locals = {}
+  next()
+}, paginate.middleware(10, 100), (req, res, next) => { log.info(req); next()})
+
 // router.add("/api", require("./settings"));
 // router.add("/api", require("./posts"));
 // router.add("/api", require("./users"));

@@ -21,7 +21,7 @@ router.post('', async (req, res, next) => {
 
 router.get('', async (req, res, next) => {
   try {
-    const results = await User.list({ filter: req.query.filter, limit: req.paginate.per_page, page: req.paginate.page, ids: req.query.ids, fields: allowedFieldsFor(req.user) })
+    const results = await User.list({ filter: req.query.filter, limit: req.query.limit, page: req.query.page, ids: req.query.ids, fields: allowedFieldsFor(req.user) })
     res.send(status.OK, {
       results: results.docs,
       pagination: {

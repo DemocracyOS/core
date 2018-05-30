@@ -1,5 +1,4 @@
 const restify = require('restify')
-const paginate = require('restify-paginate')
 const mongoose = require('./services/mongoose')
 const routes = require('./api')
 const log = require('./services/logger')
@@ -12,23 +11,23 @@ const server = restify.createServer({
   log: log
 })
 
-const paginateOptions = {
-  paramsNames: {
-    page: 'page', // Page number param name
-    per_page: 'limit' // Page size param name
-  },
-  defaults: { // Default values
-    page: 1,
-    per_page: 10
-  },
-  numbersOnly: false, // Generates the full links or not
-  hostname: true // Adds the hostname in the links or not
-}
+// const paginateOptions = {
+//   // paramsNames: {
+//   //   page: 'page', // Page number param name
+//   //   per_page: 'limit' // Page size param name
+//   // },
+//   defaults: { // Default values
+//     page: 1,
+//     per_page: 10
+//   }
+//   // numbersOnly: false, // Generates the full links or not
+//   // hostname: true // Adds the hostname in the links or not
+// }
 
 server.use(restify.plugins.acceptParser(server.acceptable))
 server.use(restify.plugins.queryParser())
 server.use(restify.plugins.bodyParser())
-server.use(paginate(server, paginateOptions))
+// server.use(paginate(server, paginateOptions))
 routes.applyRoutes(server)
 
 server.listen(PORT, function () {
