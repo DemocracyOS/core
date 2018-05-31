@@ -1,6 +1,6 @@
 const { Types: { ObjectId } } = require('mongoose')
-const { log } = require('../../main/logger')
-const ReactionRule = require('../models/reaction-rule')
+const log = require('../services/logger')
+const ReactionRule = require('../models/reaction-rules')
 
 /**
  * Create ReactionRule

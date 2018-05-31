@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const mongoosePaginate = require('mongoose-paginate')
-const METHODS = require('../enum/methods')
+const METHODS = require('./reactions-methods')
 /**
  * Define `ReactionRule` Schema
  */

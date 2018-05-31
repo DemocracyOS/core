@@ -9,7 +9,8 @@ const errors = require('../services/errors')
  * Create Routers
  */
 const router = new Router() // api/v1 route wrapper
-const routerResources = new Router() // router for every resource
+const routerV1 = new Router() // router for every resource
+const routerV1Services  = new Router() // router for services
 
 /**
  * Middleware for pagination
@@ -24,11 +25,21 @@ router.use(function (req, res, next) {
 // Resource routes
 // ===============================
 
-routerResources.add('/users', require('./users'))
-routerResources.add('/settings', require('./settings'))
-routerResources.add('/posts', require('./posts'))
+routerV1.add('/users', require('./users'))
+routerV1.add('/settings', require('./settings'))
+routerV1.add('/posts', require('./posts'))
+routerV1.add('/reaction-votes', require('./reaction-votes'))
+routerV1.add('/reaction-rules', require('./reaction-rules'))
+
+// ===============================
+// Resource services
+// ===============================
+
+routerV1Services.add('/reactions', require('./reaction-services'))
+routerV1.add('/services', routerV1Services)
+
 // Add everything to route wrapper
-router.add('/api/v1', routerResources)
+router.add('/api/v1', routerV1)
 
 module.exports = router
 
