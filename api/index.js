@@ -1,5 +1,6 @@
 const Router = require('restify-router').Router
 const paginate = require('express-paginate')
+const status = require('http-status')
 // Utils
 const log = require('../services/logger')
 const errors = require('../services/errors')
@@ -24,13 +25,16 @@ router.use(function (req, res, next) {
 // ===============================
 
 routerResources.add('/users', require('./users'))
-// router_v1.add('/settings', require('./settings'))
-// router_v1.add('/posts', require('./posts'))
-
+routerResources.add('/settings', require('./settings'))
+routerResources.add('/posts', require('./posts'))
 // Add everything to route wrapper
 router.add('/api/v1', routerResources)
 
 module.exports = router
+
+// ===============================
+// Do not delete.. we might need it for references
+// ===============================
 
 // const express = require('express')
 // const paginate = require('express-paginate')

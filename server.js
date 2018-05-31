@@ -7,6 +7,9 @@ const log = require('./services/logger')
 const { PORT } = require('./config')
 // const { NODE_ENV } = process.env
 
+/**
+ * Create the server
+ */
 const server = restify.createServer({
   name: 'DemocracyOS-api',
   version: '1.0.0',
@@ -14,12 +17,25 @@ const server = restify.createServer({
 })
 
 server.use(restify.plugins.acceptParser(server.acceptable))
-server.use(restify.plugins.queryParser())
-server.use(restify.plugins.bodyParser())
-server.use(helmet())
-server.use(compression())
-routes.applyRoutes(server)
+server.use(restify.plugins.queryParser()) // Parse query
+server.use(restify.plugins.bodyParser()) // Parse body
+server.use(helmet()) // Enable HTTP Security headers and others security measures
+server.use(compression()) // Enable compression (gzip and others..)
+routes.applyRoutes(server) // Add restify-router
 
+/**
+ * Error handling
+ */
+server.on('NotFound', function (req, res, err, callback) {
+  // this will get fired first, as it's the most relevant listener
+  log.error('Not found!') // Logs the error
+  return callback()
+})
+
+/**
+ * Everything set?
+ * Go server go!
+ */
 server.listen(PORT, function () {
   // handle errors
   const db = mongoose.connection
@@ -46,7 +62,6 @@ server.listen(PORT, function () {
 // ===============================================
 // do not delete, we might need it later
 // ===============================================
-
 
 // const express = require('express')
 // const next = require('next')

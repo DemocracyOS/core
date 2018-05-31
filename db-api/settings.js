@@ -1,10 +1,10 @@
 const { Types: { ObjectId } } = require('mongoose')
-const { log } = require('../../main/logger')
+const log = require('../services/logger')
 const Setting = require('../models/setting')
 const {
   ErrSettingsInit,
   ErrSettingsNotInit
-} = require('../../main/errors')
+} = require('../services/errors')
 
 /**
  * Create setting
