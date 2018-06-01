@@ -1,17 +1,67 @@
-let restify = require('restify')
+const restify = require('restify')
+const compression = require('compression')
+const helmet = require('helmet')
+const mongoose = require('./services/mongoose')
+const routes = require('./api')
+const log = require('./services/logger')
+const { PORT } = require('./config')
+// const { NODE_ENV } = process.env
 
+/**
+ * Create the server
+ */
 const server = restify.createServer({
   name: 'DemocracyOS-api',
-  version: '1.0.0'
+  version: '1.0.0',
+  log: log
 })
 
 server.use(restify.plugins.acceptParser(server.acceptable))
-server.use(restify.plugins.queryParser())
-server.use(restify.plugins.bodyParser())
+server.use(restify.plugins.queryParser()) // Parse query
+server.use(restify.plugins.bodyParser()) // Parse body
+server.use(helmet()) // Enable HTTP Security headers and others security measures
+server.use(compression()) // Enable compression (gzip and others..)
+routes.applyRoutes(server) // Add restify-router
 
-server.listen(8080, function () {
-  console.log('%s listening at %s', server.name, server.url);
+/**
+ * Error handling
+ */
+server.on('NotFound', function (req, res, err, callback) {
+  // this will get fired first, as it's the most relevant listener
+  log.error('Not found!') // Logs the error
+  return callback()
 })
+
+/**
+ * Everything set?
+ * Go server go!
+ */
+server.listen(PORT, function () {
+  // handle errors
+  const db = mongoose.connection
+
+  db.on('error', (err) => {
+    log.error('Mongoose default connection error: ' + err)
+  })
+
+  db.on('disconnected', () => {
+    log.debug('Mongoose default connection disconnected')
+  })
+
+  // db.on('error', (err) => {
+  //   if (err.message.code === 'ETIMEDOUT') {
+  //     console.log('Mongoose default connection error: '  + err)
+  //   }
+  // })
+
+  db.once('open', () => {
+    log.info('%s listening at %s', server.name, server.url)
+  })
+})
+
+// ===============================================
+// do not delete, we might need it later
+// ===============================================
 
 // const express = require('express')
 // const next = require('next')
@@ -24,11 +74,9 @@ server.listen(8080, function () {
 // const authFunctions = require('../users/auth/functions')
 // const authProviders = require('../users/auth/providers')
 // const { setup } = require('../services/setup')
-// const { PORT, SESSION_SECRET, ROOT_URL } = require('./config')
 // const { middleware: loggerMiddleware, log } = require('./logger')
 // const mongoose = require('./mongoose')
 
-// const { NODE_ENV } = process.env
 // const app = next({
 //   dev: NODE_ENV !== 'production',
 //   quiet: NODE_ENV === 'test'

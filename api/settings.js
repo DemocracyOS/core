@@ -1,72 +1,85 @@
-const express = require('express')
-const {
-  OK,
-  CREATED,
-  NO_CONTENT,
-  INTERNAL_SERVER_ERROR
-} = require('http-status')
-const { log } = require('../../main/logger')
+const Router = require('restify-router').Router
+const status = require('http-status')
+// const log = require('../services/logger')
 const Setting = require('../db-api/settings')
+const router = new Router()
 const {
   isLoggedIn,
   isAdmin
-} = require('../../services/users')
-const router = express.Router()
+} = require('../services/users')
 
-router.route('/')
-  .post(
-    isLoggedIn,
-    isAdmin,
-    async (req, res, next) => {
-      try {
-        const newSetting = await Setting.create(req.body)
-        res.status(CREATED).json({
-          data: newSetting
-        })
-      } catch (err) {
-        next(err)
-      }
-    })
-  .get(async (req, res, next) => {
-    // returns Settings only record
+/**
+ * GET /settings
+ */
+router.get('',
+  async (req, res, next) => {
+  // returns Settings only record
     try {
       const results = await Setting.getOne()
-      res.status(OK).json(results)
+      res.send(status.OK, results)
     } catch (err) {
       next(err)
     }
   })
 
-router.route('/:id')
-  .get(async (req, res, next) => {
+/**
+ * POST /settings
+ */
+router.post('',
+  isLoggedIn,
+  isAdmin,
+  async (req, res, next) => {
     try {
-      const setting = await Setting.get(req.params.id)
-      res.status(OK).json(setting)
+      const newSetting = await Setting.create(req.body)
+      res.send(status.CREATED, {
+        data: newSetting
+      })
     } catch (err) {
       next(err)
     }
   })
-  .put(
-    isLoggedIn,
-    isAdmin,
-    async (req, res, next) => {
-      try {
-        const updatedSetting = await Setting.update({ id: req.params.id, setting: req.body })
-        res.status(OK).json(updatedSetting)
-      } catch (err) {
-        next(err)
-      }
-    })
-  .delete(
-    isLoggedIn,
-    isAdmin,
-    async (req, res, next) => {
-      try {
-        await Setting.remove(req.params.id)
-        res.status(OK).json({ id: req.params.id })
-      } catch (err) {
-        next(err)
-      }
-    })
+
+/**
+ * GET /settings/:id
+ */
+router.get('/:id',
+  async (req, res, next) => {
+    try {
+      const setting = await Setting.get(req.params.id)
+      res.send(status.OK, setting)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+/**
+ * PUT /settings/:id
+ */
+router.put('/:id',
+  isLoggedIn,
+  isAdmin,
+  async (req, res, next) => {
+    try {
+      const updatedSetting = await Setting.update({ id: req.params.id, setting: req.body })
+      res.send(status.OK, updatedSetting)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+/**
+ * DELETE /settings/:id
+ */
+router.del('/:id',
+  isLoggedIn,
+  isAdmin,
+  async (req, res, next) => {
+    try {
+      await Setting.remove(req.params.id)
+      res.send(status.OK, { id: req.params.id })
+    } catch (err) {
+      next(err)
+    }
+  })
 
 module.exports = router

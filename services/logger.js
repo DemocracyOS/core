@@ -1,21 +1,12 @@
-const winston = require('winston')
-const expressWinston = require('express-winston')
+// process.env.NODE_ENV
 
-const log = new winston.Logger({
-  transports: [
-    new winston.transports.Console({
-      level: process.env.NODE_ENV === 'test' ? 'critic' : 'debug',
-      colorize: true,
-      timestamp: function () {
-        return new Date().toISOString()
-      }
-    })
-  ]
+const Logger = require('bunyan')
+const restify = require('restify')
+
+const log = new Logger({
+  name: 'DemocracyOS-api',
+  level: 20,
+  serializers: restify.bunyan.serializers
 })
 
-const middleware = expressWinston.logger({ winstonInstance: log })
-
-module.exports = {
-  log,
-  middleware
-}
+module.exports = log

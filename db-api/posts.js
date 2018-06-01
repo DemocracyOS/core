@@ -1,12 +1,13 @@
 const { Types: { ObjectId } } = require('mongoose')
-const { log } = require('../../main/logger')
+const log = require('../services/logger')
 const Post = require('../models/post')
+
 // Requires custom errors saved in main/errors
 const {
   ErrMissingParam,
   ErrNotFound,
   ErrParamTooLong
-} = require('../../main/errors')
+} = require('../services/errors')
 /**
  * Create user
  * @method create

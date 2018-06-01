@@ -1,21 +1,11 @@
-const express = require('express')
-const {
-  OK,
-  CREATED,
-  NO_CONTENT,
-  FORBIDDEN
-} = require('http-status')
-const ReactionInstance = require('../reactions/db-api/reaction-instance')
-const ReactionRule = require('../reactions/db-api/reaction-rule')
-const ReactionVote = require('../reactions/db-api/reaction-vote')
-// Requires winston lib for log
-const { log } = require('../main/logger')
-// Requires CRUD apis
-const router = express.Router()
-
-const {
-  isLoggedIn
-} = require('./users')
+const Router = require('restify-router').Router
+const status = require('http-status')
+const ReactionInstance = require('../db-api/reaction-instances')
+const ReactionRule = require('../db-api/reaction-rules')
+const ReactionVote = require('../db-api/reaction-votes')
+const router = new Router()
+// const log = require('../services/logger')
+const { isLoggedIn } = require('../services/users')
 
 const dataForLike = function (instance, user) {
   let userParticipants = []
@@ -89,9 +79,9 @@ const createLikeVote = function (userId) {
   }
 }
 
-router.route('/posts/:id/results')
-  // GET reaction-instances
-  .get(async (req, res, next) => {
+// GET reaction-instances
+router.get('/posts/:id/results',
+  async (req, res, next) => {
     try {
       const instances = await ReactionInstance.listResultsByPost({ id: req.params.id })
       let dataArray = []
@@ -113,15 +103,15 @@ router.route('/posts/:id/results')
         dataArray.push(dataInstance)
       })
 
-      res.status(OK).json(dataArray)
+      res.send(status.OK, dataArray)
     } catch (err) {
       next(err)
     }
   })
 
-router.route('/:id/result')
-  // GET reaction-instances
-  .get(async (req, res, next) => {
+// GET reaction-instances
+router.get('/:id/result',
+  async (req, res, next) => {
     try {
       const instance = await ReactionInstance.getResult({ id: req.params.id })
       let data = {}
@@ -138,20 +128,21 @@ router.route('/:id/result')
           break
       }
 
-      res.status(OK).json(data)
+      res.send(status.OK, data)
     } catch (err) {
       next(err)
     }
   })
 
-router.route('/:idInstance/vote')
-  .post(isLoggedIn, async (req, res, next) => {
+router.post('/:idInstance/vote',
+  isLoggedIn,
+  async (req, res, next) => {
     try {
       let reactionInstance = await ReactionInstance.get(req.params.idInstance)
       let reactionRule = await ReactionRule.get('' + reactionInstance.reactionId)
       // Check if the closing date is > than NOW
       if (reactionRule.closingDate !== undefined && reactionRule.closingDate !== null && (new Date() - new Date(reactionRule.closingDate) > 0)) {
-        res.status(FORBIDDEN).json('The voting has closed')
+        res.send(status.FORBIDDEN, 'The voting has closed')
         return
       }
 
@@ -167,19 +158,19 @@ router.route('/:idInstance/vote')
             voteData = createLikeVote(req.user.id)
             break
           default:
-            res.status(FORBIDDEN).json('Reaction Method not found!')
+            res.send(status.FORBIDDEN, 'Reaction Method not found!')
             return
         }
         const savedVote = await ReactionVote.create(voteData)
         reactionInstance.results.push(savedVote._id)
         await ReactionInstance.update({ id: req.params.idInstance, reactionInstance: reactionInstance })
-        res.status(CREATED).json(savedVote)
+        res.send(status.CREATED, savedVote)
         return
       } else {
         // Get the vote
         const reactionVote = await ReactionVote.get(vote._id)
         if (reactionVote.meta.timesVoted >= reactionRule.limit) {
-          res.status(FORBIDDEN).json(reactionVote)
+          res.send(status.FORBIDDEN, reactionVote)
           return
         }
         let dataChange = { meta: reactionVote.meta }
@@ -193,7 +184,7 @@ router.route('/:idInstance/vote')
         // Now save it to the DB
         const savedVote = await ReactionVote.update({ id: reactionVote._id, reactionVote: dataChange })
         // Return response with the updated value
-        res.status(OK).json(savedVote)
+        res.send(status.OK, savedVote)
         return
       }
     } catch (err) {

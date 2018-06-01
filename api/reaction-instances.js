@@ -1,27 +1,19 @@
 const Router = require('restify-router').Router
 const status = require('http-status')
 // const log = require('../services/logger')
-const Post = require('../db-api/posts')
+const ReactionInstance = require('../db-api/reaction-instances')
 const router = new Router()
-const {
-  isLoggedIn,
-  isAdmin
-} = require('../services/users')
+const { isLoggedIn, isAdmin } = require('../services/users')
 
 /**
- * GET /posts
+ * GET /reaction-instances
  */
 router.get('',
+  isLoggedIn,
+  isAdmin,
   async (req, res, next) => {
     try {
-      const results = await Post.list({
-        filter: req.query.filter,
-        sort: req.query.sort,
-        limit: req.query.limit,
-        page: req.query.page,
-        ids: req.query.ids
-      })
-      // Sends the given results with status 200
+      const results = await ReactionInstance.list({ limit: req.query.limit, page: req.query.page })
       res.send(status.OK, {
         results: results.docs,
         pagination: {
@@ -35,55 +27,60 @@ router.get('',
     }
   })
 
-// POST /posts
+/**
+ * POST /reaction-instances
+ */
 router.post('',
   isLoggedIn,
   isAdmin,
   async (req, res, next) => {
     try {
-      const newPost = await Post.create(req.body)
-      res.send(status.CREATED, newPost)
+      const newReactionInstance = await ReactionInstance.create(req.body)
+      res.send(status.CREATED, newReactionInstance)
     } catch (err) {
       next(err)
     }
   })
 
 /**
- * GET /posts/:id
+ * GET /reaction-instances/:id
  */
 router.get('/:id',
+  isLoggedIn,
+  isAdmin,
   async (req, res, next) => {
     try {
-      const post = await Post.get(req.params.id)
-      res.send(status.OK, post)
+      const user = await ReactionInstance.get(req.params.id)
+      res.send(status.OK, user)
     } catch (err) {
       next(err)
     }
   })
+
 /**
- * UPDATE /posts/:id
+ * PUT /reaction-instances/:id
  */
 router.put('/:id',
   isLoggedIn,
   isAdmin,
   async (req, res, next) => {
     try {
-      const updatedPost = await Post.update({ id: req.params.id, post: req.body })
-      res.send(status.OK, updatedPost)
+      const updatedReactionInstance = await ReactionInstance.update({ id: req.params.id, reactionInstance: req.body })
+      res.send(status.OK, updatedReactionInstance)
     } catch (err) {
       next(err)
     }
   })
 
 /**
- * DELETE /posts/:id
+ * DELETE /reaction-instances/:id
  */
 router.del('/:id',
   isLoggedIn,
   isAdmin,
   async (req, res, next) => {
     try {
-      await Post.remove(req.params.id)
+      await ReactionInstance.remove(req.params.id)
       res.send(status.OK, { id: req.params.id })
     } catch (err) {
       next(err)

@@ -1,6 +1,6 @@
 const { Types: { ObjectId } } = require('mongoose')
-const { log } = require('../../main/logger')
-const ReactionVote = require('../models/reaction-vote')
+const log = require('../services/logger')
+const ReactionVote = require('../models/reaction-votes')
 
 /**
  * Create reactionVote

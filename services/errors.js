@@ -18,7 +18,7 @@ class APIError extends Error {
 
     Error.captureStackTrace(this, this.constructor)
 
-    this.status = status
+    this.status = status || 500
     this.translationKey = translationKey
     this.metadata = metadata
   }
@@ -78,4 +78,4 @@ module.exports = {
   ErrUserNotLoggedIn,
   ErrNotAdmin,
   ErrNotAdminNorOwner
-} 
+}

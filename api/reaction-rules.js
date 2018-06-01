@@ -1,27 +1,20 @@
 const Router = require('restify-router').Router
 const status = require('http-status')
 // const log = require('../services/logger')
-const Post = require('../db-api/posts')
+const ReactionRule = require('../db-api/reaction-rules')
 const router = new Router()
-const {
-  isLoggedIn,
-  isAdmin
-} = require('../services/users')
+const { isLoggedIn, isAdmin } = require('../services/users')
 
 /**
- * GET /posts
+ * GET /reaction-rules
  */
 router.get('',
+  isLoggedIn,
+  isAdmin,
   async (req, res, next) => {
     try {
-      const results = await Post.list({
-        filter: req.query.filter,
-        sort: req.query.sort,
-        limit: req.query.limit,
-        page: req.query.page,
-        ids: req.query.ids
-      })
-      // Sends the given results with status 200
+      let results = []
+      results = results = await ReactionRule.list({ filter: req.query.filter, limit: req.query.limit, page: req.query.page, ids: req.query.ids })
       res.send(status.OK, {
         results: results.docs,
         pagination: {
@@ -35,55 +28,60 @@ router.get('',
     }
   })
 
-// POST /posts
+/**
+ * POST /reaction-rules
+ */
 router.post('',
   isLoggedIn,
   isAdmin,
   async (req, res, next) => {
     try {
-      const newPost = await Post.create(req.body)
-      res.send(status.CREATED, newPost)
+      const newReactionRule = await ReactionRule.create(req.body)
+      res.send(status.CREATED, newReactionRule)
     } catch (err) {
       next(err)
     }
   })
 
 /**
- * GET /posts/:id
+ * GET /reaction-rules/:id
  */
 router.get('/:id',
+  isLoggedIn,
+  isAdmin,
   async (req, res, next) => {
     try {
-      const post = await Post.get(req.params.id)
-      res.send(status.OK, post)
+      const user = await ReactionRule.get(req.params.id)
+      res.send(status.OK, user)
     } catch (err) {
       next(err)
     }
   })
+
 /**
- * UPDATE /posts/:id
+ * PUT /reaction-rules/:id
  */
 router.put('/:id',
   isLoggedIn,
   isAdmin,
   async (req, res, next) => {
     try {
-      const updatedPost = await Post.update({ id: req.params.id, post: req.body })
-      res.send(status.OK, updatedPost)
+      const updatedReactionRule = await ReactionRule.update({ id: req.params.id, reactionRule: req.body })
+      res.send(status.OK, updatedReactionRule)
     } catch (err) {
       next(err)
     }
   })
 
 /**
- * DELETE /posts/:id
+ * DELETE /reaction-rules/:id
  */
 router.del('/:id',
   isLoggedIn,
   isAdmin,
   async (req, res, next) => {
     try {
-      await Post.remove(req.params.id)
+      await ReactionRule.remove(req.params.id)
       res.send(status.OK, { id: req.params.id })
     } catch (err) {
       next(err)
