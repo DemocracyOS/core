@@ -1,12 +1,14 @@
 import React from 'react'
 import { Admin, Resource } from 'react-admin'
-import jsonServerProvider from 'ra-data-json-server'
-import { PostList } from './resources/posts'
+// Icons
+import PostIcon from '@material-ui/icons/Book'
 
-const dataProvider = jsonServerProvider('http://jsonplaceholder.typicode.com')
-const App = () => (
+import { PostList } from './resources/posts'
+import dataProvider from './dataProvider'
+
+const App = () => ( 
   <Admin dataProvider={dataProvider}>
-    <Resource name='posts' list={PostList} />
+    <Resource name='posts' list={PostList}icon={PostIcon} />
   </Admin>
 )
 export default App
