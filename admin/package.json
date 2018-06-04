@@ -15,6 +15,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "draft-js": "^0.10.5",
     "react-admin": "^2.0.2"
   },
   "proxy": "http://localhost:3000"

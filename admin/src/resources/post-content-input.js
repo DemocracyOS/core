@@ -1,7 +1,7 @@
 import React from 'react'
 import { Field } from 'redux-form'
 import { Editor, EditorState, RichUtils, convertToRaw, convertFromRaw } from 'draft-js'
-import FlatButton from 'material-ui/FlatButton'
+import FlatButton from '@material-ui/core/Button'
 
 class PostContent extends React.Component {
   constructor (props) {

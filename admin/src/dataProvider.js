@@ -21,6 +21,7 @@ const API_URL = '/api/v1'
 const convertDataProviderRequestToHTTP = (type, resource, params) => {
   switch (type) {
     case GET_LIST: {
+      console.log('GET_LIST')
       const { page, perPage } = params.pagination
       const { field, order } = params.sort
       const query = {
@@ -33,18 +34,21 @@ const convertDataProviderRequestToHTTP = (type, resource, params) => {
       return { url: `${API_URL}/${resource}?${stringify(query)}` }
     }
     case GET_ONE:
+      console.log('GET_ONE')
       if (resource === 'settings' && params === undefined) {
         return { url: `${API_URL}/${resource}` }
       } else {
         return { url: `${API_URL}/${resource}/${params.id}` }
       }
     case GET_MANY: {
+      console.log('GET_MANY')
       const query = {
-        filter: JSON.stringify({ id: params.ids })
+        filter: JSON.stringify({ ids: params.ids })
       }
       return { url: `${API_URL}/${resource}?${stringify(query)}` }
     }
     case GET_MANY_REFERENCE: {
+      console.log('GET_MANY_REFERENCE')
       const { page, perPage } = params.pagination
       const { field, order } = params.sort
       const query = {
@@ -55,6 +59,7 @@ const convertDataProviderRequestToHTTP = (type, resource, params) => {
       return { url: `${API_URL}/${resource}?${stringify(query)}` }
     }
     case UPDATE:
+      console.log('UPDATE')
       return {
         url: `${API_URL}/${resource}/${params.id}`,
         options: { method: 'PUT', body: JSON.stringify(params.data) }
@@ -64,6 +69,7 @@ const convertDataProviderRequestToHTTP = (type, resource, params) => {
         // options.body = JSON.stringify(options.body)
       }
     case CREATE:
+      console.log('CREATE')
       return {
         url: `${API_URL}/${resource}`,
         options: { method: 'POST', body: JSON.stringify(params.data) }
@@ -73,6 +79,7 @@ const convertDataProviderRequestToHTTP = (type, resource, params) => {
         // options.body = JSON.stringify(options.body)
       }
     case DELETE:
+      console.log('DELETE')
       return {
         url: `${API_URL}/${resource}/${params.id}`,
         options: { method: 'DELETE' }
