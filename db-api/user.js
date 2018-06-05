@@ -48,18 +48,20 @@ exports.list = function list ({ filter, limit, page, ids, fields }) {
   let query = {}
   if (filter !== undefined) {
     let filterToJSON = JSON.parse(filter)
-    if (filterToJSON.name || filterToJSON.q) {
-      filterToJSON.name = { $regex: (filterToJSON.name || filterToJSON.q), $options: 'i' }
-      delete filterToJSON.q
+    log.debug(filterToJSON)
+    // if (filterToJSON.name || filterToJSON.q) {
+    //   filterToJSON.name = { $regex: (filterToJSON.name || filterToJSON.q), $options: 'i' }
+    //   delete filterToJSON.q
+    // }
+    // query = filterToJSON
+    if (filter.ids) {
+      log.debug(ids)
+      const idsToArray = JSON.parse(ids)
+      let idsArray = idsToArray.id.map((id) => {
+        return ObjectId(id)
+      })
+      query._id = { $in: idsArray }
     }
-    query = filterToJSON
-  }
-  if (ids) {
-    const idsToArray = JSON.parse(ids)
-    idsToArray.map((id) => {
-      return ObjectId(id)
-    })
-    query._id = { $in: idsToArray }
   }
   return User
     .paginate(query, { select: fields, page, limit })
