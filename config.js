@@ -24,20 +24,18 @@ const CONFIG = {
   ADMIN_EMAIL: process.env.DEMOCRACYOS_ADMIN_EMAIL || null,
 
   // ------------------------------------------------------------------------------
-  //  Identity providers
+  //  Keycloak configuration
   // ------------------------------------------------------------------------------
 
-  FACEBOOK_ID: process.env.DEMOCRACYOS_FACEBOOK_ID || null,
-  FACEBOOK_SECRET: process.env.DEMOCRACYOS_FACEBOOK_SECRET || null,
-  GOOGLE_ID: process.env.DEMOCRACYOS_GOOGLE_ID || null,
-  GOOGLE_SECRET: process.env.DEMOCRACYOS_GOOGLE_SECRET || null,
-  TWITTER_KEY: process.env.DEMOCRACYOS_TWITTER_KEY || null,
-  TWITTER_SECRET: process.env.DEMOCRACYOS_TWITTER_SECRET || null,
-  LINKEDIN_ID: process.env.DEMOCRACYOS_LINKEDIN_ID || null,
-  LINKEDIN_SECRET: process.env.DEMOCRACYOS_LINKEDIN_SECRET || null,
-  INSTAGRAM_ID: process.env.DEMOCRACYOS_INSTAGRAM_ID || null,
-  INSTAGRAM_SECRET: process.env.DEMOCRACYOS_INSTAGRAM_SECRET || null,
-
+  KEYCLOAK_CONFIG: {
+    'realm': process.env.KEYCLOAK_REALM_NAME,
+    'auth-server-url': process.env.KEYCLOAK_AUTH_SERVER_URL,
+    'ssl-required': process.env.KEYCLOAK_SSL_REQUIRED,
+    'resource': process.env.KEYCLOAK_RESOURCE,
+    'public-client': process.env.KEYCLOAK_PUBLIC_CLIENT,
+    'use-resource-role-mappings': true,
+    'confidential-port': process.env.KEYCLOAK_CONFIDENTIAL_FORM || 0
+  },
   // ------------------------------------------------------------------------------
   //  SMTP Server configuration
   // ------------------------------------------------------------------------------

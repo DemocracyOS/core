@@ -1,10 +1,13 @@
 const restify = require('restify')
 const compression = require('compression')
 const helmet = require('helmet')
+const session = require('express-session')
+const mongoStore = require('./services/sessions')
+const keycloak = require('./services/auth')
 const mongoose = require('./services/mongoose')
 const routes = require('./api')
 const log = require('./services/logger')
-const { PORT } = require('./config')
+const { PORT, SESSION_SECRET } = require('./config')
 // const { NODE_ENV } = process.env
 
 /**
@@ -21,6 +24,18 @@ server.use(restify.plugins.queryParser()) // Parse query
 server.use(restify.plugins.bodyParser()) // Parse body
 server.use(helmet()) // Enable HTTP Security headers and others security measures
 server.use(compression()) // Enable compression (gzip and others..)
+server.use(session({
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  store: mongoStore
+}))
+
+server.use(keycloak.middleware({
+  logout: '/logout',
+  admin: '/callback'
+}))
+
 routes.applyRoutes(server) // Add restify-router
 
 /**
