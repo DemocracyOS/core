@@ -1,9 +1,9 @@
-const Router = require('restify-router').Router
+const express = require('express')
 const status = require('http-status')
 const ReactionInstance = require('../db-api/reaction-instances')
 const ReactionRule = require('../db-api/reaction-rules')
 const ReactionVote = require('../db-api/reaction-votes')
-const router = new Router()
+const router = express.Router()
 // const log = require('../services/logger')
 const { isLoggedIn } = require('../services/users')
 
@@ -103,7 +103,7 @@ router.get('/posts/:id/results',
         dataArray.push(dataInstance)
       })
 
-      res.send(status.OK, dataArray)
+      res.status(status.OK).json(dataArray)
     } catch (err) {
       next(err)
     }
@@ -128,7 +128,7 @@ router.get('/:id/result',
           break
       }
 
-      res.send(status.OK, data)
+      res.status(status.OK).json(data)
     } catch (err) {
       next(err)
     }
@@ -142,7 +142,7 @@ router.post('/:idInstance/vote',
       let reactionRule = await ReactionRule.get('' + reactionInstance.reactionId)
       // Check if the closing date is > than NOW
       if (reactionRule.closingDate !== undefined && reactionRule.closingDate !== null && (new Date() - new Date(reactionRule.closingDate) > 0)) {
-        res.send(status.FORBIDDEN, 'The voting has closed')
+        res.status(status.FORBIDDEN).send('The voting has closed')
         return
       }
 
@@ -158,19 +158,19 @@ router.post('/:idInstance/vote',
             voteData = createLikeVote(req.user.id)
             break
           default:
-            res.send(status.FORBIDDEN, 'Reaction Method not found!')
+            res.status(status.FORBIDDEN).send('Reaction Method not found!')
             return
         }
         const savedVote = await ReactionVote.create(voteData)
         reactionInstance.results.push(savedVote._id)
         await ReactionInstance.update({ id: req.params.idInstance, reactionInstance: reactionInstance })
-        res.send(status.CREATED, savedVote)
+        res.status(status.CREATED).json(savedVote)
         return
       } else {
         // Get the vote
         const reactionVote = await ReactionVote.get(vote._id)
         if (reactionVote.meta.timesVoted >= reactionRule.limit) {
-          res.send(status.FORBIDDEN, reactionVote)
+          res.status(status.FORBIDDEN).json(reactionVote)
           return
         }
         let dataChange = { meta: reactionVote.meta }
@@ -184,7 +184,7 @@ router.post('/:idInstance/vote',
         // Now save it to the DB
         const savedVote = await ReactionVote.update({ id: reactionVote._id, reactionVote: dataChange })
         // Return response with the updated value
-        res.send(status.OK, savedVote)
+        res.status(status.OK).json(savedVote)
         return
       }
     } catch (err) {

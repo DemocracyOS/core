@@ -1,12 +1,49 @@
-// process.env.NODE_ENV
+const path = require('path')
+const winston = require('winston')
 
-const Logger = require('bunyan')
-const restify = require('restify')
+const options = {
+  fileInfo: {
+    name: 'LogApp',
+    level: 'info',
+    filename: path.join(__dirname, '..', 'logs', 'app.log'),
+    handleExceptions: true,
+    json: false,
+    maxsize: 5242880, // 5MB
+    maxFiles: 5,
+    colorize: false
+  },
+  fileError: {
+    name: 'LogErrors',
+    level: 'error',
+    filename: path.join(__dirname, '..', 'logs', 'error.log'),
+    handleExceptions: true,
+    json: false,
+    maxsize: 5242880, // 5MB
+    maxFiles: 5,
+    colorize: false
+  },
+  console: {
+    level: process.env.NODE_ENV === 'test' ? 'critic' : 'debug',
+    colorize: true,
+    timestamp: function () {
+      return new Date().toISOString()
+    }
+  }
+}
 
-const log = new Logger({
-  name: 'DemocracyOS-api',
-  level: 20,
-  serializers: restify.bunyan.serializers
+let transportArray = [
+  new winston.transports.Console(options.console)
+]
+
+if (process.env.NODE_ENV !== 'dev' && process.env.NODE_ENV !== 'test') {
+  transportArray.push(
+    new winston.transports.File(options.fileInfo),
+    new winston.transports.File(options.fileError)
+  )
+}
+
+const log = new winston.Logger({
+  transports: transportArray
 })
 
 module.exports = log

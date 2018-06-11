@@ -1,45 +1,49 @@
-const Router = require('restify-router').Router
+const express = require('express')
 const paginate = require('express-paginate')
-const status = require('http-status')
+// const status = require('http-status')
 // Utils
-const log = require('../services/logger')
-const errors = require('../services/errors')
+// const log = require('../services/logger')
+// const errors = require('../services/errors')
 
 /**
  * Create Routers
  */
-const router = new Router() // api/v1 route wrapper
-const routerV1 = new Router() // router for every resource
-const routerV1Services  = new Router() // router for services
+const router = express.Router() // api/v1 route wrapper
+const routerV1 = express.Router() // router for every resource
+const routerV1Services = express.Router() // router for services
 
 /**
  * Middleware for pagination
  */
-router.use(function (req, res, next) {
-  if (req.query.limit <= 10) req.query.limit = 10
-  res.locals = {}
-  next()
-}, paginate.middleware(10, 100))
+router.use(
+  function (req, res, next) {
+    // set default or minimum is 10
+    if (req.query.limit <= 10) req.query.limit = 10
+    next()
+  },
+  paginate.middleware(10, 50)
+)
 
 // ===============================
 // Resource routes
 // ===============================
 
-routerV1.add('/users', require('./users'))
-routerV1.add('/settings', require('./settings'))
-routerV1.add('/posts', require('./posts'))
-routerV1.add('/reaction-votes', require('./reaction-votes'))
-routerV1.add('/reaction-rules', require('./reaction-rules'))
+routerV1.use('/users', require('./users'))
+routerV1.use('/settings', require('./settings'))
+routerV1.use('/posts', require('./posts'))
+routerV1.use('/reaction-votes', require('./reaction-votes'))
+routerV1.use('/reaction-rules', require('./reaction-rules'))
 
 // ===============================
 // Resource services
 // ===============================
 
-routerV1Services.add('/reactions', require('./reaction-services'))
-routerV1.add('/services', routerV1Services)
+routerV1Services.use('/reactions', require('./reaction-services'))
+
+routerV1.use('/services', routerV1Services)
 
 // Add everything to route wrapper
-router.add('/api/v1', routerV1)
+router.use('/api/v1', routerV1)
 
 module.exports = router
 
