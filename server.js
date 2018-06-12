@@ -1,74 +1,155 @@
-const restify = require('restify')
+// const restify = require('restify')
+// const compression = require('compression')
+// const helmet = require('helmet')
+// const session = require('express-session')
+// const routes = require('./api')
+// const { log, middleware: loggerMiddleware } = require('./services/logger')
+// const { PORT, SESSION_SECRET } = require('./config')
+// // const { NODE_ENV } = process.env
+
+// /**
+//  * Create the server
+//  */
+// const server = restify.createServer({
+//   name: 'DemocracyOS-api',
+//   version: '1.0.0',
+//   log: log
+// })
+
+// server.use(restify.plugins.acceptParser(server.acceptable))
+// server.use(restify.plugins.queryParser()) // Parse query
+// server.use(restify.plugins.bodyParser()) // Parse body
+// server.use(helmet()) // Enable HTTP Security headers and others security measures
+// server.use(compression()) // Enable compression (gzip and others..)
+// server.use(session({
+//   secret: SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: true,
+//   store: mongoStore
+// }))
+
+// server.use(keycloak.middleware({
+//   logout: '/logout',
+//   admin: '/callback'
+// }))
+
+// routes.applyRoutes(server) // Add restify-router
+
+// /**
+//  * Error handling
+//  */
+// server.on('NotFound', function (req, res, err, callback) {
+//   // this will get fired first, as it's the most relevant listener
+//   log.error('Not found!') // Logs the error
+//   return callback()
+// })
+
+// /**
+//  * Everything set?
+//  * Go server go!
+//  */
+// server.listen(PORT, function () {
+//   // handle errors
+//   const db = mongoose.connection
+
+//   db.on('error', (err) => {
+//     log.error('Mongoose default connection error: ' + err)
+//   })
+
+//   db.on('disconnected', () => {
+//     log.debug('Mongoose default connection disconnected')
+//   })
+
+//   // db.on('error', (err) => {
+//   //   if (err.message.code === 'ETIMEDOUT') {
+//   //     console.log('Mongoose default connection error: '  + err)
+//   //   }
+//   // })
+
+//   db.once('open', () => {
+//     log.info('%s listening at %s', server.name, server.url)
+//   })
+// })
+
+const express = require('express')
 const compression = require('compression')
 const helmet = require('helmet')
+const session = require('express-session')
+const expressWinston = require('express-winston')
 const mongoose = require('./services/mongoose')
-const routes = require('./api')
+const keycloak = require('./services/auth')
+const mongoStore = require('./services/sessions')
+// const { setup } = require('../services/setup')
+const { PORT, SESSION_SECRET, ROOT_URL } = require('./config')
 const log = require('./services/logger')
-const { PORT } = require('./config')
-// const { NODE_ENV } = process.env
+const { NODE_ENV } = process.env
+const loggerMiddleware = expressWinston.logger({ winstonInstance: log })
 
-/**
- * Create the server
- */
-const server = restify.createServer({
-  name: 'DemocracyOS-api',
-  version: '1.0.0',
-  log: log
-})
+module.exports = (async () => {
+  try {
+    const server = express()
 
-server.use(restify.plugins.acceptParser(server.acceptable))
-server.use(restify.plugins.queryParser()) // Parse query
-server.use(restify.plugins.bodyParser()) // Parse body
-server.use(helmet()) // Enable HTTP Security headers and others security measures
-server.use(compression()) // Enable compression (gzip and others..)
-routes.applyRoutes(server) // Add restify-router
+    // Apply middlewares
+    server.use(helmet())
+    server.use(compression())
+    server.use(express.json())
+    server.use(express.urlencoded({ extended: true }))
+    server.use(loggerMiddleware)
+    server.use(session({
+      secret: SESSION_SECRET,
+      resave: false,
+      saveUninitialized: true,
+      store: mongoStore
+    }))
 
-/**
- * Error handling
- */
-server.on('NotFound', function (req, res, err, callback) {
-  // this will get fired first, as it's the most relevant listener
-  log.error('Not found!') // Logs the error
-  return callback()
-})
+    server.use(keycloak.middleware({ logout: '/logout' }))
 
-/**
- * Everything set?
- * Go server go!
- */
-server.listen(PORT, function () {
-  // handle errors
-  const db = mongoose.connection
+    // Express App
+    // Apply setup service
+    // server.all('/', setup)
 
-  db.on('error', (err) => {
-    log.error('Mongoose default connection error: ' + err)
-  })
+    // Apply API routes
+    server.use('/', require('./api'))
 
-  db.on('disconnected', () => {
-    log.debug('Mongoose default connection disconnected')
-  })
+    // Admin page
+    // expressApp.get('/admin', (req, res) => {
+    //   if (!req.user || req.user.role !== 'admin') {
+    //     app.render(req, res, '/404')
+    //   } else {
+    //     app.render(req, res, '/admin')
+    //   }
+    // })
 
-  // db.on('error', (err) => {
-  //   if (err.message.code === 'ETIMEDOUT') {
-  //     console.log('Mongoose default connection error: '  + err)
-  //   }
-  // })
+    // expressApp.get('/admin/*', (req, res) => {
+    //   if (!req.user || req.user.role !== 'admin') {
+    //     app.render(req, res, '/404')
+    //   } else {
+    //     app.render(req, res, '/admin')
+    //   }
+    // })
 
-  db.once('open', () => {
-    log.info('%s listening at %s', server.name, server.url)
-  })
-})
+    // expressApp.all('*', (req, res) => {
+    //   let nextRequestHandler = app.getRequestHandler()
+    //   return nextRequestHandler(req, res)
+    // })
+
+    return server.listen(PORT, (err) => {
+      if (err) {
+        throw err
+      }
+      log.info('> Ready on http://localhost:' + PORT + ' [' + NODE_ENV + ']')
+    })
+  } catch (err) {
+    log.error('An error occurred, unable to start the server')
+    log.error(err)
+  }
+})()
 
 // ===============================================
 // do not delete, we might need it later
 // ===============================================
 
 // const express = require('express')
-// const next = require('next')
-// const nextAuth = require('next-auth')
-// const compression = require('compression')
-// const helmet = require('helmet')
-// const passport = require('passport')
 // const session = require('express-session')
 // const MongoStore = require('connect-mongo')(session)
 // const authFunctions = require('../users/auth/functions')

@@ -52,7 +52,6 @@ mongoose.set('debug', (coll, method, query, doc, options) => {
 
 module.exports = mongoose
 
-
 // const mongoose = require('mongoose')
 // const log = require('./logger')
 // const { MONGO_URL } = require('./config')

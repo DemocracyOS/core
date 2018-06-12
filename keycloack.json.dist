@@ -1,0 +1,13 @@
+// DOWNLOAD THE KEYCLOACK.JSON
+// FROM THE CLIENT SETTINGS, UNDER THE "INSTALLATION" TAB
+// Drop it in the project root directory. 
+// It will be served as a static file for the client frontend
+
+{
+  "realm": "some-realm",
+  "auth-server-url": "http://localhost:8080/auth",
+  "ssl-required": "external",
+  "resource": "some-client",
+  "public-client": true,
+  "confidential-port": 0
+} 

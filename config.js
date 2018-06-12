@@ -4,6 +4,12 @@
 
 require('dotenv').config()
 
+const fs = require('fs')
+// LOAD KEYCLOAK CONFIG
+let contents = fs.readFileSync('./keycloak.json')
+// Define to JSON type
+let keycloakConfig = JSON.parse(contents)
+
 // ==============================================================================
 //  CONFIG INITIALIZATION
 // ==============================================================================
@@ -24,20 +30,10 @@ const CONFIG = {
   ADMIN_EMAIL: process.env.DEMOCRACYOS_ADMIN_EMAIL || null,
 
   // ------------------------------------------------------------------------------
-  //  Identity providers
+  //  Keycloak configuration
   // ------------------------------------------------------------------------------
 
-  FACEBOOK_ID: process.env.DEMOCRACYOS_FACEBOOK_ID || null,
-  FACEBOOK_SECRET: process.env.DEMOCRACYOS_FACEBOOK_SECRET || null,
-  GOOGLE_ID: process.env.DEMOCRACYOS_GOOGLE_ID || null,
-  GOOGLE_SECRET: process.env.DEMOCRACYOS_GOOGLE_SECRET || null,
-  TWITTER_KEY: process.env.DEMOCRACYOS_TWITTER_KEY || null,
-  TWITTER_SECRET: process.env.DEMOCRACYOS_TWITTER_SECRET || null,
-  LINKEDIN_ID: process.env.DEMOCRACYOS_LINKEDIN_ID || null,
-  LINKEDIN_SECRET: process.env.DEMOCRACYOS_LINKEDIN_SECRET || null,
-  INSTAGRAM_ID: process.env.DEMOCRACYOS_INSTAGRAM_ID || null,
-  INSTAGRAM_SECRET: process.env.DEMOCRACYOS_INSTAGRAM_SECRET || null,
-
+  KEYCLOAK_CONFIG: keycloakConfig,
   // ------------------------------------------------------------------------------
   //  SMTP Server configuration
   // ------------------------------------------------------------------------------

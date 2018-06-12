@@ -1,7 +1,5 @@
-logs
-*.log
 npm-debug.log*
 node_modules
-
 /*.override.yml
 .env
+keycloak.json
