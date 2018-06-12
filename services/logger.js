@@ -23,7 +23,7 @@ const options = {
     colorize: false
   },
   console: {
-    level: process.env.NODE_ENV === 'test' ? 'critic' : 'debug',
+    level: process.env.NODE_ENV === 'test' ? 'critic' : 'silly',
     colorize: true,
     timestamp: function () {
       return new Date().toISOString()

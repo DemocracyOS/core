@@ -4,6 +4,12 @@
 
 require('dotenv').config()
 
+const fs = require('fs')
+// LOAD KEYCLOAK CONFIG
+let contents = fs.readFileSync('./keycloak.json')
+// Define to JSON type
+let keycloakConfig = JSON.parse(contents)
+
 // ==============================================================================
 //  CONFIG INITIALIZATION
 // ==============================================================================
@@ -27,15 +33,7 @@ const CONFIG = {
   //  Keycloak configuration
   // ------------------------------------------------------------------------------
 
-  KEYCLOAK_CONFIG: {
-    'realm': process.env.KEYCLOAK_REALM_NAME,
-    'auth-server-url': process.env.KEYCLOAK_AUTH_SERVER_URL,
-    'ssl-required': process.env.KEYCLOAK_SSL_REQUIRED,
-    'resource': process.env.KEYCLOAK_RESOURCE,
-    'public-client': process.env.KEYCLOAK_PUBLIC_CLIENT,
-    'use-resource-role-mappings': true,
-    'confidential-port': process.env.KEYCLOAK_CONFIDENTIAL_FORM || 0
-  },
+  KEYCLOAK_CONFIG: keycloakConfig,
   // ------------------------------------------------------------------------------
   //  SMTP Server configuration
   // ------------------------------------------------------------------------------

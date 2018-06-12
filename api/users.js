@@ -9,32 +9,40 @@ const {
 } = require('../services/users')
 const User = require('../db-api/user')
 const router = express.Router()
+const auth = require('../services/auth')
+
+function aFunction (token, request) {
+  return token.hasRole('realm:admin')
+}
 
 router.route('/')
 /**
  * GET /users
  */
-  .get(async (req, res, next) => {
-    try {
-      const results = await User.list({
-        filter: req.query.filter,
-        limit: req.query.limit,
-        page: req.query.page,
-        ids: req.query.ids,
-        fields: allowedFieldsFor(req.user)
-      })
-      res.status(status.OK).json({
-        results: results.docs,
-        pagination: {
-          count: results.total,
-          page: results.page,
-          limit: results.limit
-        }
-      })
-    } catch (err) {
-      next(err)
-    }
-  })
+  .get(
+    auth.protect(),
+    auth.protect(aFunction),
+    async (req, res, next) => {
+      try {
+        const results = await User.list({
+          filter: req.query.filter,
+          limit: req.query.limit,
+          page: req.query.page,
+          ids: req.query.ids,
+          fields: allowedFieldsFor(req.user)
+        })
+        res.status(status.OK).json({
+          results: results.docs,
+          pagination: {
+            count: results.total,
+            page: results.page,
+            limit: results.limit
+          }
+        })
+      } catch (err) {
+        next(err)
+      }
+    })
 /**
  * POST /users
  */

@@ -102,10 +102,7 @@ module.exports = (async () => {
       store: mongoStore
     }))
 
-    server.use(keycloak.middleware({
-      logout: '/logout',
-      admin: '/callback'
-    }))
+    server.use(keycloak.middleware({ logout: '/logout' }))
 
     // Express App
     // Apply setup service
