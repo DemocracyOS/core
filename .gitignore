@@ -3,3 +3,4 @@ node_modules
 /*.override.yml
 .env
 keycloak.json
+/docs
