@@ -53,6 +53,11 @@ const ErrSettingsInit = new APIError('Settings is already initialized', {
   status: BAD_REQUEST
 })
 
+const ErrForbidden = new APIError('Resource not available', {
+  translationKey: 'RESOURCE_NOT_AVAILABLE',
+  status: FORBIDDEN
+})
+
 const ErrUserNotLoggedIn = new APIError('User is not logged in', {
   translationKey: 'USER_NOT_LOGGED_IN',
   status: FORBIDDEN
@@ -77,5 +82,6 @@ module.exports = {
   ErrSettingsInit,
   ErrUserNotLoggedIn,
   ErrNotAdmin,
-  ErrNotAdminNorOwner
+  ErrNotAdminNorOwner,
+  ErrForbidden
 }
