@@ -1,6 +1,6 @@
+const path = require('path')
 const express = require('express')
 const paginate = require('express-paginate')
-const path = require('path')
 // const status = require('http-status')
 // Utils
 const log = require('../services/logger')
@@ -30,7 +30,8 @@ router.use(
 // Resource routes
 // ===============================
 
-// routerV1.use('/users', require('../old/api/users'))
+// routerV1.use('/community', require('../api/community'))
+// routerV1.use('/users', require('../api/users'))
 
 // ===============================
 // Resource services
