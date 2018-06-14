@@ -33,17 +33,13 @@ router.use(
 // Resource routes
 // ===============================
 
-routerV1.use('/users', require('./users'))
-routerV1.use('/settings', require('./settings'))
-routerV1.use('/posts', require('./posts'))
-routerV1.use('/reaction-votes', require('./reaction-votes'))
-routerV1.use('/reaction-rules', require('./reaction-rules'))
+// routerV1.use('/users', require('../old/api/users'))
 
 // ===============================
 // Resource services
 // ===============================
 
-routerV1Services.use('/reactions', require('./reaction-services'))
+routerV1Services.use('/reactions', require('../old/api/reaction-services'))
 
 routerV1.use('/services', routerV1Services)
 
