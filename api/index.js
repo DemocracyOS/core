@@ -1,5 +1,6 @@
 const express = require('express')
 const paginate = require('express-paginate')
+const path = require('path')
 // const status = require('http-status')
 // Utils
 const log = require('../services/logger')
@@ -48,6 +49,12 @@ routerV1.use('/services', routerV1Services)
 
 // Add everything to route wrapper
 router.use('/api/v1', routerV1)
+
+// ===============================
+// Documentation services
+// ===============================
+
+router.use('/api/docs', express.static(path.join(__dirname, '../docs')))
 
 // Catch 404 and forward to error handler.
 // router.use((req, res, next) => {

@@ -1,82 +1,9 @@
-// const restify = require('restify')
-// const compression = require('compression')
-// const helmet = require('helmet')
-// const session = require('express-session')
-// const routes = require('./api')
-// const { log, middleware: loggerMiddleware } = require('./services/logger')
-// const { PORT, SESSION_SECRET } = require('./config')
-// // const { NODE_ENV } = process.env
-
-// /**
-//  * Create the server
-//  */
-// const server = restify.createServer({
-//   name: 'DemocracyOS-api',
-//   version: '1.0.0',
-//   log: log
-// })
-
-// server.use(restify.plugins.acceptParser(server.acceptable))
-// server.use(restify.plugins.queryParser()) // Parse query
-// server.use(restify.plugins.bodyParser()) // Parse body
-// server.use(helmet()) // Enable HTTP Security headers and others security measures
-// server.use(compression()) // Enable compression (gzip and others..)
-// server.use(session({
-//   secret: SESSION_SECRET,
-//   resave: false,
-//   saveUninitialized: true,
-//   store: mongoStore
-// }))
-
-// server.use(keycloak.middleware({
-//   logout: '/logout',
-//   admin: '/callback'
-// }))
-
-// routes.applyRoutes(server) // Add restify-router
-
-// /**
-//  * Error handling
-//  */
-// server.on('NotFound', function (req, res, err, callback) {
-//   // this will get fired first, as it's the most relevant listener
-//   log.error('Not found!') // Logs the error
-//   return callback()
-// })
-
-// /**
-//  * Everything set?
-//  * Go server go!
-//  */
-// server.listen(PORT, function () {
-//   // handle errors
-//   const db = mongoose.connection
-
-//   db.on('error', (err) => {
-//     log.error('Mongoose default connection error: ' + err)
-//   })
-
-//   db.on('disconnected', () => {
-//     log.debug('Mongoose default connection disconnected')
-//   })
-
-//   // db.on('error', (err) => {
-//   //   if (err.message.code === 'ETIMEDOUT') {
-//   //     console.log('Mongoose default connection error: '  + err)
-//   //   }
-//   // })
-
-//   db.once('open', () => {
-//     log.info('%s listening at %s', server.name, server.url)
-//   })
-// })
-
 const express = require('express')
 const compression = require('compression')
 const helmet = require('helmet')
 const session = require('express-session')
 const expressWinston = require('express-winston')
-const mongoose = require('./services/mongoose')
+// const mongoose = require('./services/mongoose')
 const keycloak = require('./services/auth')
 const mongoStore = require('./services/sessions')
 // const { setup } = require('../services/setup')
