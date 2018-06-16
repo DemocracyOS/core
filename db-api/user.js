@@ -1,50 +1,28 @@
 const { Types: { ObjectId } } = require('mongoose')
-const log = require('../services/logger')
 const { ErrNotFound } = require('../services/errors')
 const User = require('../models/user')
+const log = require('../services/logger')
 
-/**
- * Create user
- * @method create
- * @param  {object} user
- * @return {promise}
- */
+// Create uset
 
-exports.create = function create(user) {
-  log.debug('user db-api create')
-
+exports.create = function create (user) {
+  log.debug({
+    resource: 'User',
+    type: 'db-api',
+    method: 'create'
+  })
   return (new User(user)).save()
 }
 
-/**
- * Get user by id
- * @method get
- * @param  {object} query
- * @return {promise}
- */
+// Get user
 
-const get = exports.get = function get(query, fields) {
-  log.debug('user db-api get')
-  if (query.id) {
-    let _id = ObjectId(query.id)
-    if (!ObjectId.isValid(_id)) throw new Error('Invalid id')
-    delete query.id
-    query._id = _id
-  }
-  return User.findOne(query).select(fields)
+const get = exports.get = function get ({ id, fields }) {
+  return User.findOne({ _id: ObjectId(id) }).select(fields)
 }
 
-/**
- * Get list of users
- * @method list
- * @param  {object} opts
- * @param  {number} opts.limit
- * @param  {number} opts.page
- * @return {promise}
- */
+// List users
 
-exports.list = function list({ filter, limit, page, ids, fields }) {
-  log.debug('user db-api list')
+exports.list = function list ({ filter, limit, page, ids, fields }) {
   let query = {}
   if (filter !== undefined) {
     let filterToJSON = JSON.parse(filter)
@@ -67,18 +45,9 @@ exports.list = function list({ filter, limit, page, ids, fields }) {
     .paginate(query, { select: fields, page, limit })
 }
 
-/**
- * Update user
- * @method update
- * @param  {object} opts
- * @param  {string} opts.id
- * @param  {object} opts.user
- * @return {promise}
- */
+// Update user
 
-exports.update = function update({ id, user }) {
-  log.debug('user db-api update')
-
+exports.update = function update ({ id, user }) {
   return get({ id })
     .then((_user) => {
       if (!_user) throw ErrNotFound('User to update not found')
@@ -86,16 +55,14 @@ exports.update = function update({ id, user }) {
     })
 }
 
-/**
- * Remove user
- * @method delete
- * @param  {string} id
- * @return {promise}
- */
+// Remove user
 
-exports.remove = function remove(id) {
-  log.debug('user db-api remove')
-
+exports.remove = function remove (id) {
+  log.debug({
+    resource: 'User',
+    type: 'db-api',
+    method: 'remove'
+  })
   return get({ id })
     .then((user) => {
       if (!user) throw ErrNotFound('User to remove not found')

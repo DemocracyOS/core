@@ -30,8 +30,8 @@ router.use(
 // Resource routes
 // ===============================
 
-// routerV1.use('/community', require('../api/community'))
-// routerV1.use('/users', require('../api/users'))
+routerV1.use('/community', require('../api/community'))
+routerV1.use('/users', require('../api/user'))
 
 // ===============================
 // Resource services
@@ -48,11 +48,13 @@ router.use('/api/v1', routerV1)
 // Documentation
 // ===============================
 
-router.use('/docs', (req, res, next) => {
-  if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
-  else next()
-},
-express.static(path.join(__dirname, '../docs')))
+router.use('/docs/api',
+  (req, res, next) => {
+    if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
+    else next()
+  },
+  express.static(path.join(__dirname, '../docs'))
+)
 
 // Catch 404 and forward to error handler.
 router.use((req, res, next) => {

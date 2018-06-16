@@ -6,7 +6,7 @@ const User = new mongoose.Schema({
   username: String,
   name: String,
   avatar: { data: Buffer, contentType: String },
-  init: { type: Boolean, default: false }
+  initialized: { type: Boolean, default: false }
 }, { timestamps: true })
 
 // Model's Plugin Extensions

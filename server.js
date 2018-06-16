@@ -15,7 +15,6 @@ const loggerMiddleware = expressWinston.logger({ winstonInstance: log })
 module.exports = (async () => {
   try {
     const server = express()
-
     // Apply middlewares
     server.use(helmet())
     server.use(compression())

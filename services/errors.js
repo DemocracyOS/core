@@ -43,12 +43,12 @@ const ErrParamTooLong = (field) => new APIError('Paramether is too long', {
   field: field
 })
 
-const ErrSettingsNotInit = new APIError('Settings have not been initialized', {
+const ErrCommunitysNotInit = new APIError('Settings have not been initialized', {
   translationKey: 'SETTINGS_NOT_INIT',
   status: INTERNAL_SERVER_ERROR
 })
 
-const ErrSettingsInit = new APIError('Settings is already initialized', {
+const ErrCommunityInit = new APIError('Settings is already initialized', {
   translationKey: 'SETTINGS_INIT',
   status: BAD_REQUEST
 })
@@ -78,8 +78,8 @@ module.exports = {
   ErrNotFound,
   ErrMissingParam,
   ErrParamTooLong,
-  ErrSettingsNotInit,
-  ErrSettingsInit,
+  ErrCommunitysNotInit,
+  ErrCommunityInit,
   ErrUserNotLoggedIn,
   ErrNotAdmin,
   ErrNotAdminNorOwner,
