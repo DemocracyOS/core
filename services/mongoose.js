@@ -15,16 +15,12 @@ mongoose
   })
 
 // initialize models
-// require('../old/models/user')
-// require('../cms/models/setting')
-// require('../cms/models/post')
-// require('../reactions/models/reaction-rule')
-// require('../reactions/models/reaction-instance')
-// require('../reactions/models/reaction-vote')
+require('../models/user')
+require('../models/community')
 
 const db = mongoose.connection
 
-function shutdown() {
+function shutdown () {
   db.close(function () {
     log.debug('Mongoose default connection disconnected through app termination')
     process.exit(0)

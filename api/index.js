@@ -1,6 +1,7 @@
+const path = require('path')
 const express = require('express')
 const paginate = require('express-paginate')
-const path = require('path')
+const auth = require('../services/auth')
 // const status = require('http-status')
 // Utils
 const log = require('../services/logger')
@@ -30,7 +31,8 @@ router.use(
 // Resource routes
 // ===============================
 
-// routerV1.use('/users', require('../old/api/users'))
+routerV1.use('/community', require('../api/community'))
+routerV1.use('/users', require('../api/user'))
 
 // ===============================
 // Resource services
@@ -47,11 +49,23 @@ router.use('/api/v1', routerV1)
 // Documentation
 // ===============================
 
-router.use('/docs', (req, res, next) => {
-  if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
-  else next()
-},
-express.static(path.join(__dirname, '../docs')))
+router.use('/docs/api',
+  (req, res, next) => {
+    if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
+    else next()
+  },
+  express.static(path.join(__dirname, '../docs'))
+)
+
+// ===============================
+// Admin panel
+// ===============================
+
+router.use('/admin',
+  // Protect with realm role
+  auth.protect('realm:admin'),
+  express.static(path.join(__dirname, '../admin/build'))
+)
 
 // Catch 404 and forward to error handler.
 router.use((req, res, next) => {

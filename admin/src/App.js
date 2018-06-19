@@ -12,8 +12,8 @@ import customRoutes from './utils/custom-routes'
 
 const App = () => (
   <Admin customRoutes={customRoutes} catchAll={NotFound} dataProvider={dataProvider} menu={Menu}>
-    <Resource name='posts' list={PostList} show={PostShow} create={PostCreate} edit={PostEdit} remove={Delete} icon={PostIcon} />
-    <Resource name='users' list={UserList} view={UserView} icon={UserIcon} />
+    {/* <Resource name='posts' list={PostList} show={PostShow} create={PostCreate} edit={PostEdit} remove={Delete} icon={PostIcon} /> */}
+    {/* <Resource name='users' list={UserList} view={UserView} icon={UserIcon} /> */}
   </Admin>
 )
 export default App

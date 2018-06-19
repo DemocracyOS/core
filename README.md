@@ -3,7 +3,7 @@
 Backend for DemocracyOS v3, powered by Restify (RESTful web service framework)
 
 ### Features
-- Restify - RESTful web service framework
+- ExpressJS
 - Pagination (Powered by [express-paginate](https://github.com/expressjs/express-paginate))
 - [helmet](https://github.com/helmetjs/helmet) ready (Middleware - Adds security headers)
 - [compression](https://github.com/expressjs/compression) ready (Middleware)
