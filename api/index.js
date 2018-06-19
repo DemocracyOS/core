@@ -1,6 +1,7 @@
 const path = require('path')
 const express = require('express')
 const paginate = require('express-paginate')
+const auth = require('../services/auth')
 // const status = require('http-status')
 // Utils
 const log = require('../services/logger')
@@ -54,6 +55,16 @@ router.use('/docs/api',
     else next()
   },
   express.static(path.join(__dirname, '../docs'))
+)
+
+// ===============================
+// Admin panel
+// ===============================
+
+router.use('/admin',
+  // Protect with realm role
+  auth.protect('realm:admin'),
+  express.static(path.join(__dirname, '../admin/build'))
 )
 
 // Catch 404 and forward to error handler.
