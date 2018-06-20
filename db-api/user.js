@@ -6,11 +6,6 @@ const log = require('../services/logger')
 // Create uset
 
 exports.create = function create (user) {
-  log.debug({
-    resource: 'User',
-    type: 'db-api',
-    method: 'create'
-  })
   return (new User(user)).save()
 }
 
@@ -21,6 +16,14 @@ const get = exports.get = function get ({ id, fields }) {
 }
 
 // List users
+
+exports.isEmpty = function get() {
+  return User.findOne({})
+    .then((user) => {
+      if (user === null) return true
+      return false
+    })
+}
 
 exports.list = function list ({ filter, limit, page, ids, fields }) {
   let query = {}
@@ -58,11 +61,6 @@ exports.update = function update ({ id, user }) {
 // Remove user
 
 exports.remove = function remove (id) {
-  log.debug({
-    resource: 'User',
-    type: 'db-api',
-    method: 'remove'
-  })
   return get({ id })
     .then((user) => {
       if (!user) throw ErrNotFound('User to remove not found')

@@ -15,8 +15,21 @@ router.route('/')
   .get(
     async (req, res, next) => {
       try {
-        // TODO
-        // res.status(status.OK).json(result)
+        const results = await User.list({
+          filter: req.query.filter,
+          limit: req.query.limit,
+          page: req.query.page,
+          ids: req.query.ids,
+          fields: {}
+        })
+        res.status(status.OK).json({
+          results: results.docs,
+          pagination: {
+            count: results.total,
+            page: results.page,
+            limit: results.limit
+          }
+        })
       } catch (err) {
         next(err)
       }

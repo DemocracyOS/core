@@ -14,7 +14,7 @@ exports.create = function create (community) {
     })
 }
 
-exports.get = function getOne () {
+exports.get = function get () {
   return Community.findOne({})
     .then((community) => {
       if (community === null) throw ErrCommunitysNotInit

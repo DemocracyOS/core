@@ -35,7 +35,7 @@ const convertDataProviderRequestToHTTP = (type, resource, params) => {
     }
     case GET_ONE:
       console.log('GET_ONE')
-      if (resource === 'settings' && params === undefined) {
+      if (resource === 'community' && params === undefined) {
         return { url: `${API_URL}/${resource}` }
       } else {
         return { url: `${API_URL}/${resource}/${params.id}` }
