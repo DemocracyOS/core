@@ -16,12 +16,12 @@ class Success extends React.Component {
           <div className='hero is-link is-fullheight'>
             <div className='hero-body'>
               <div className='container'>
-                <img src='/assets/logo-header.svg' alt='' style={{ marginBottom: '10px' }} />
+                <img src='/assets/logo-header.png' alt='' style={{ marginBottom: '10px', maxWidth: '300px' }} />
                 <h1 className='title'>
                   Your app is ready!
                 </h1>
                 <p className='subtitle'>
-                  Your instance of DemocracyOS is ready to go!
+                  Your are ready to go!
                 </p>
                 <p>Please, restart the server in production mode</p>
               </div>

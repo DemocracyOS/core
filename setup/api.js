@@ -64,8 +64,8 @@ router.route('/init')
         // Create the community, with the reference to the user who created it.
         const dataCommunity = {
           name: req.body.communityName,
-          mainColor: req.body.communityColor,
-          logo: req.body.communityFile,
+          mainColor: req.body.communityColor || '#425cf4',
+          logo: req.body.communityFile || null,
           user: user._id,
           initialized: true
         }
@@ -74,6 +74,7 @@ router.route('/init')
         res.render('success', { name: req.kauth.grant.access_token.content.given_name })
       } catch (e) {
         log.error(e)
+        res.render('error', { message: e.message })
       }
     }
   )

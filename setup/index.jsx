@@ -27,14 +27,14 @@ class Index extends React.Component {
           <div className='hero is-dark'>
             <div className='hero-body'>
               <div className='container'>
-                <img src='/assets/logo-header.svg' alt='' style={{ marginBottom: '10px' }} />
+                <img src='/assets/logo-header.png' alt='' style={{ marginBottom: '10px', maxWidth: '300px' }} />
                 <h1 className='title'>
-                  Setup for DemocracyOs
+                  Setup
                 </h1>
                 <p className='subtitle'>
-                  Welcome {this.props.name}! Thanks for choosing DemocracyOS for your participation instances
+                  Welcome {this.props.name}!
                 </p>
-                <p>Please complete the following fields to start your DemocracyOS instance</p>
+                <p>Please complete the following fields to start the instance</p>
                 <p>Not you? <a href='/logout' className='is-italic'>Logout</a></p>
               </div>
             </div>
@@ -52,10 +52,10 @@ class Index extends React.Component {
                   <label className='label'>Name of your community</label>
                   <div className='control'>
                     <input className='input' type='text' name='communityName' placeholder='Primary input' />
-                    <span className='help'>For example: "Public consult for the goverment of AAAAA"</span>
+                    <span className='help'>For example: "Public consult for AAAAAAAA"</span>
                   </div>
                 </div>
-                <div className='field'>
+                {/* <div className='field'>
                   <label className='label'>Primary color</label>
                   <div className='control'>
                     <input type='color' name='communityColor' value={this.state.colorVal} onChange={this.changeColor} />
@@ -81,15 +81,14 @@ class Index extends React.Component {
                       </label>
                     </div>
                   </div>
-                </div>
+                </div> */}
                 <hr />
                 <h1 className='title'>
                 Administrator
                 </h1>
                 <h1 className='subtitle is-5'>
-                We will create the first user of the community. We have this info from Keycloak (The identity provider).
+                Later, you can complete your profile and add other users as administrators.
                 </h1>
-                <p>Later, you can complete your profile and add other users as administrators.</p>
                 <div className='field is-horizontal'>
                   <div className='field-label is-normal'>
                     <label className='label'>Your name</label>

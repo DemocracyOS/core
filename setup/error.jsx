@@ -16,7 +16,7 @@ class Error extends React.Component {
           <div className='hero is-dark is-fullheight'>
             <div className='hero-body'>
               <div className='container'>
-                <img src='/assets/logo-header.svg' alt='' style={{ marginBottom: '10px' }} />
+                <img src='/assets/logo-header.png' alt='' style={{ marginBottom: '10px', maxWidth: '300px' }} />
                 <h1 className='title'>
                   Error
                 </h1>
