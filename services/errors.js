@@ -44,12 +44,12 @@ const ErrParamTooLong = (field) => new APIError('Paramether is too long', {
 })
 
 const ErrCommunitysNotInit = new APIError('Settings have not been initialized', {
-  translationKey: 'SETTINGS_NOT_INIT',
+  translationKey: 'COMMUNITY_NOT_INIT',
   status: INTERNAL_SERVER_ERROR
 })
 
 const ErrCommunityInit = new APIError('Settings is already initialized', {
-  translationKey: 'SETTINGS_INIT',
+  translationKey: 'COMMUNITYINIT',
   status: BAD_REQUEST
 })
 

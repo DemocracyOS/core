@@ -9,30 +9,30 @@ import {
   TextInput
 } from 'react-admin'
 import restClient from '../utils/data-provider'
-import SettingsColorPicker from './settings-color-picker'
+import CommunityColorPicker from './community-color-picker'
 
-export class SettingsEdit extends React.Component {
+export class CommunityEdit extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      settings: {},
+      community: {},
       open: false,
       status: ''
     }
   }
 
   componentDidMount () {
-    restClient(GET_ONE, 'settings')
+    restClient(GET_ONE, 'community')
       .then((req) => {
-        this.setState({ settings: req.data })
+        this.setState({ community: req.data })
       })
       .catch((err) => {
         console.log(err)
       })
   }
 
-  handleSubmit = (newSettings) => {
-    restClient(UPDATE, 'settings', { id: this.state.settings._id, data: newSettings })
+  handleSubmit = (newCommunity) => {
+    restClient(UPDATE, 'community', { id: this.state.community._id, data: newCommunity })
       .then(() => {
         this.setState({
           open: true,
@@ -58,14 +58,14 @@ export class SettingsEdit extends React.Component {
   render () {
     return (
       <Card>
-        <SimpleForm record={this.state.settings} save={this.handleSubmit}>
-          <ViewTitle title='Settings' />
+        <SimpleForm record={this.state.community} save={this.handleSubmit}>
+          <ViewTitle title='Community' />
           <TextInput source='communityName' label='Community name' />
-          <SettingsColorPicker source='mainColor' addLabel label='Main color' />
+          <CommunityColorPicker source='mainColor' addLabel label='Main color' />
         </SimpleForm>
         <Snackbar
           open={this.state.open}
-          message={this.state.status === 'error' ? 'Error: Can not update. Please try again' : 'Settings updated'}
+          message={this.state.status === 'error' ? 'Error: Can not update. Please try again' : 'Community updated'}
           autoHideDuration={3000}
           onRequestClose={this.handleRequestClose} />
       </Card>

@@ -3,7 +3,7 @@ const mongoosePaginate = require('mongoose-paginate')
 
 const User = new mongoose.Schema({
   authId: String,
-  username: String,
+  email: String,
   name: String,
   avatar: { data: Buffer, contentType: String },
   initialized: { type: Boolean, default: false }

@@ -1,3 +1,4 @@
+const path = require('path')
 const express = require('express')
 const compression = require('compression')
 const helmet = require('helmet')
@@ -19,7 +20,7 @@ module.exports = (async () => {
     server.use(helmet())
     server.use(compression())
     server.use(express.json())
-    server.use(express.urlencoded({ extended: true }))
+    server.use(express.urlencoded({ extended: false }))
     server.use(loggerMiddleware)
     server.use(session({
       secret: SESSION_SECRET,
@@ -35,8 +36,14 @@ module.exports = (async () => {
     // server.all('/', setup)
 
     // Apply API routes
-    server.use('/', require('./api'))
+    if (NODE_ENV === 'setup') server.use('/', require('./setup/api'))
+    else server.use('/', require('./api'))
 
+    if (NODE_ENV === 'setup') {
+      server.set('views', path.join(__dirname, '/setup'))
+      server.set('view engine', 'jsx')
+      server.engine('jsx', require('express-react-views').createEngine())
+    }
     // Admin page
     // expressApp.get('/admin', (req, res) => {
     //   if (!req.user || req.user.role !== 'admin') {

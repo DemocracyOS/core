@@ -12,6 +12,7 @@
     "start": "node server",
     "dev": "nodemon",
     "test": "NODE_ENV=test mocha --recursive --timeout 10000",
+    "setup": "NODE_ENV=setup node server",
     "start-admin": "cd admin && npm run start",
     "build-admin": "cd admin && npm run build",
     "postinstall": "cd admin && npm install",
@@ -25,6 +26,7 @@
     "draft-js": "^0.10.5",
     "express": "^4.16.3",
     "express-paginate": "^0.3.0",
+    "express-react-views": "^0.10.5",
     "express-session": "^1.15.6",
     "express-winston": "^2.5.1",
     "helmet": "^3.12.1",
@@ -34,6 +36,8 @@
     "mongoose-paginate": "^5.0.3",
     "nodemailer": "^4.6.6",
     "prop-types": "^15.6.1",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "winston": "^2.4.3"
   },
   "devDependencies": {
