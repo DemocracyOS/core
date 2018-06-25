@@ -8,13 +8,17 @@ const expressWinston = require('express-winston')
 const keycloak = require('./services/auth')
 const mongoStore = require('./services/sessions')
 // const { setup } = require('../services/setup')
-const { PORT, SESSION_SECRET } = require('./config')
+const config = require('./config')
 const log = require('./services/logger')
 const { NODE_ENV } = process.env
 const loggerMiddleware = expressWinston.logger({ winstonInstance: log })
 
 module.exports = (async () => {
   try {
+    console.log('================================================')
+    console.log('Starting server with the following configuration')
+    console.log(config)
+    console.log('================================================')
     const server = express()
     // Apply middlewares
     server.use(helmet())
@@ -23,7 +27,7 @@ module.exports = (async () => {
     server.use(express.urlencoded({ extended: false }))
     server.use(loggerMiddleware)
     server.use(session({
-      secret: SESSION_SECRET,
+      secret: config.SESSION_SECRET,
       resave: false,
       saveUninitialized: true,
       store: mongoStore
@@ -66,11 +70,11 @@ module.exports = (async () => {
     //   return nextRequestHandler(req, res)
     // })
 
-    return server.listen(PORT, (err) => {
+    return server.listen(config.PORT, (err) => {
       if (err) {
         throw err
       }
-      log.info('> Ready on http://localhost:' + PORT + ' [' + NODE_ENV + ']')
+      log.info('> Ready on http://localhost:' + config.PORT + ' [' + NODE_ENV + ']')
     })
   } catch (err) {
     log.error('An error occurred, unable to start the server')

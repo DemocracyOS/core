@@ -12,7 +12,7 @@ const community = require('../../db-api/community')
 
 describe('Community DB-APIs', () => {
   it('Community.get() should get the only one community', () => {
-
+    
   })
   it('Community.update() should update the only one community', () => {
 

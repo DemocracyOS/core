@@ -1,6 +1,7 @@
 npm-debug.log*
+# Node Modules are installed should not be uploaded
 node_modules
-/*.override.yml
+# Env variables and values should not be uploadad
 .env
-keycloak.json
-/docs
+# The builded API doc is not uploaded to the repo.
+/docs/api

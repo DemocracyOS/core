@@ -4,20 +4,14 @@
 
 require('dotenv').config()
 
-const fs = require('fs')
-// LOAD KEYCLOAK CONFIG
-let contents = fs.readFileSync('./keycloak.json')
-// Define to JSON type
-let keycloakConfig = JSON.parse(contents)
-
 // ==============================================================================
 //  CONFIG INITIALIZATION
 // ==============================================================================
 
 const CONFIG = {
-  MONGO_URL: process.env.DEMOCRACYOS_MONGO_URL,
+  MONGO_URL: '',
 
-  PORT: parseInt(process.env.PORT, 10) || 3000,
+  PORT: parseInt(process.env.DEMOCRACYOS_PORT, 10) || 3000,
 
   DEFAULT_LANG: process.env.DEMOCRACYOS_DEFAULT_LANG || 'en',
 
@@ -25,7 +19,7 @@ const CONFIG = {
 
   SESSION_SECRET: process.env.DEMOCRACYOS_SESSION_SECRET || null,
 
-  ROOT_URL: process.env.DEMOCRACYOS_ROOT_URL || null,
+  ROOT_URL: 'http://' + process.env.DEMOCRACYOS_HOST + ':' + process.env.DEMOCRACYOS_PORT,
 
   ADMIN_EMAIL: process.env.DEMOCRACYOS_ADMIN_EMAIL || null,
 
@@ -33,7 +27,14 @@ const CONFIG = {
   //  Keycloak configuration
   // ------------------------------------------------------------------------------
 
-  KEYCLOAK_CONFIG: keycloakConfig,
+  KEYCLOAK_CONFIG: {
+    'realm': (process.env.NODE_ENV === 'dev' ? process.env.DEMOCRACYOS_AUTH_REALM_DEV : process.env.NODE_ENV === 'test' ? process.env.DEMOCRACYOS_AUTH_REALM_TEST : process.env.DEMOCRACYOS_AUTH_REALM),
+    'auth-server-url': process.env.DEMOCRACYOS_AUTH_SERVER_URL,
+    'ssl-required': 'external',
+    'resource': process.env.DEMOCRACYOS_AUTH_CLIENT,
+    'public-client': true,
+    'confidential-port': 0
+  },
   // ------------------------------------------------------------------------------
   //  SMTP Server configuration
   // ------------------------------------------------------------------------------
@@ -50,8 +51,16 @@ const CONFIG = {
 //  CONFIG VALIDATION
 // ==============================================================================
 
-if (process.env.NODE_ENV === 'test') {
-  CONFIG.MONGO_URL = 'mongodb://localhost/DemocracyOS-test'
+switch (process.env.NODE_ENV){
+  case 'test':
+    CONFIG.MONGO_URL = process.env.DEMOCRACYOS_MONGO_URL_TEST
+    break
+  case 'dev':
+    CONFIG.MONGO_URL = process.env.DEMOCRACYOS_MONGO_URL_DEV
+    break
+  default:
+    CONFIG.MONGO_URL = process.env.DEMOCRACYOS_MONGO_URL
+
 }
 
 if (!CONFIG.SESSION_SECRET) {
