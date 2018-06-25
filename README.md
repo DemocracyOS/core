@@ -1,51 +1,53 @@
 # Backend v3
 
-Backend for DemocracyOS v3, powered by Restify (RESTful web service framework)
+Backend for DemocracyOS v3
 
 ### Features
 - ExpressJS
 - Pagination (Powered by [express-paginate](https://github.com/expressjs/express-paginate))
 - [helmet](https://github.com/helmetjs/helmet) ready (Middleware - Adds security headers)
 - [compression](https://github.com/expressjs/compression) ready (Middleware)
-- MongoDB & Mongoose ready
+- MongoDB & Mongoose
 - Keycloak for user & role management
 - Admin panel, powered by react-admin
-- And more
 
-### Get Started
-First, create copy .env file and make sure to provide a value for `DEMOCRACYOS_MONGO_URL` (Something like `mongodb://localhost/my-democracy-db`).
+## Get Started
 
-Then install the dependencies
+First you should install Keycloak before configuring the app. [Read more here](/docs/config-keycloak.md) on how to setup keycloak for development and testing env.
 
+After that, continue configuring the app by following this steps: [Configuring the App](/docs/config-app.md)
+
+## More info
+
+- Read more about [authentication, authorization and user management](/docs/about-auth.md)
+- On how to read and build the API documentation, go here: [The API Docs](/docs/build-api.md)
+
+## Useful scripts
+
+#### Start in development env
 ```
-$ npm install
-``` 
-
-Now you are ready to start the API backend under [http://localhost:3000](http://localhost:3000)
-
-### Development
-
-To start the API backend, run the following script
-
-```
-$ npm run start
+npm run dev
 ```
 
-If you want to have the admin panel available, open another terminal and run the following script. This will *build* the panel.
-
+#### Launch tests
 ```
-$ npm run build-admin
-```
-
-But if you are going to make some code into the admin panel, then use the development script that enables the developḿent server for the react-admin, with hot reloading and proxy enable to avoid CORS. (Because the react development server uses port 8080).
-
-```
-$ npm run start-admin
+npm run test
 ```
 
-And then go to `/admin`, you will find the admin project there. Remember that you will have to build the admin panel if you want the backend to deliver it.
+#### Launch admin panel in development env
+Starts a react server for the react-admin client, with hot-reload included
+```
+npm run admin:dev
+```
 
----
-Contact me on twitter for support [@guillermocroppi](https://twitter.com/guillermocroppi)
+#### Builds the admin client
+This will be the build that will be served by the server on `/admin`
+```
+npm run admin:build
+```
 
-_Guillermo Croppi - Democracia en Red Developer_ 
+#### Build the API Docs
+This will be the build that will be served by the server on `/docs`
+```
+npm run docs:build
+```
