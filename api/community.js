@@ -2,10 +2,7 @@ const express = require('express')
 const status = require('http-status')
 // const log = require('../services/logger')
 const Community = require('../db-api/community')
-const {
-  isLoggedIn,
-  isAdmin
-} = require('../services/utils')
+const auth = require('../services/auth')
 const router = express.Router()
 
 router.route('/')
@@ -20,24 +17,8 @@ router.route('/')
     async (req, res, next) => {
       // returns Communitys only record
       try {
-        const results = await Community.getOne()
+        const results = await Community.get()
         res.status(status.OK).json(results)
-      } catch (err) {
-        next(err)
-      }
-    })
-
-/**
- * @api {post} /community Create a community
- * @apiDescription Creates a community. If there is a community already, it throws an error.
- * @apiName postCommunity
- * @apiGroup Community
- *
- */
-  .post(
-    async (req, res, next) => {
-      try {
-        // TODO
       } catch (err) {
         next(err)
       }
@@ -50,9 +31,11 @@ router.route('/')
  *
  */
   .put(
+    auth.protect('realm:admin'),
     async (req, res, next) => {
       try {
-        // TODO
+        const updatedCommunity = await Community.update(req.body)
+        res.status(status.OK).json(updatedCommunity)
       } catch (err) {
         next(err)
       }
