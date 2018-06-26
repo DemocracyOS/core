@@ -70,7 +70,7 @@ describe('Community DB-APIs', () => {
     const newName = 'Another Name'
     // Change the community name
     changedSample.name = newName
-    
+
     CommunityMock
       .expects('findOne').withArgs({})
       .chain('exec')
