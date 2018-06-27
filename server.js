@@ -15,7 +15,7 @@ const loggerMiddleware = expressWinston.logger({ winstonInstance: log })
 
 module.exports = (async () => {
   try {
-    if (NODE_ENV != 'test') {
+    if (NODE_ENV !== 'test') {
       console.log('================================================')
       console.log(`Starting server [${NODE_ENV}] with the following config`)
       console.log('================================================')

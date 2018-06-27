@@ -9,7 +9,6 @@ const expect = chai.expect
 chai.use(chaiHttp)
 
 let fakeCommunity = fake.community()
-let newCommunity = null
 // Global variables for testing
 let agent = null // user agent, simulates a browser.
 let keycloakAgent = null // keycloak agent, simulates a browser.
@@ -21,7 +20,7 @@ describe('Community API (/api/v1/community)', () => {
     // Before starting the tests, make sure to prepare the enviroment
     // That is, clean the database, or initialize anything you need before executing the suite of tests
     await Community.remove({})
-    newCommunity = await (new Community(fakeCommunity)).save()
+    await (new Community(fakeCommunity)).save()
   })
 
   describe('As anonymous user', () => {

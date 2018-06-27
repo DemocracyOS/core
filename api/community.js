@@ -23,7 +23,7 @@ router.route('/')
    *       "lastname": "Doe"
    *     }
    * @apiError (500) INTERNAL_SERVER_ERROR The community have not been initialized'
-   * 
+   *
    */
   .get(
     async (req, res, next) => {
