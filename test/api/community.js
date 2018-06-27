@@ -73,19 +73,19 @@ describe('Community API (/api/v1/community)', () => {
         })
     })
     it('PUT (/) should be able to update a community info', async () => {
-      let newCommunity = fakeCommunity
-      newCommunity.name = 'Awesome Community'
+      // let newCommunity = fakeCommunity
+      let newName = 'Awesome Community'
       await agent.put('/api/v1/community')
         .set('Authorization', 'Bearer ' + accessToken)
         .set('X-Requested-With', 'XMLHttpRequest')
         .set('Content-Type', 'application/json')
-        .send(newCommunity)
+        .send({ name: newName })
         .then((res) => {
           expect(res).to.have.status(status.OK)
           /* eslint-disable no-unused-expressions */
           expect(res.body).to.not.be.null
           expect(res.body).to.have.property('name')
-          expect(res.body.name).to.be.equal(newCommunity.name)
+          expect(res.body.name).to.be.equal(newName)
           expect(res.body).to.have.property('mainColor')
           expect(res.body).to.have.property('logo')
           expect(res.body).to.have.property('user')
