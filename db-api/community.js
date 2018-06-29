@@ -31,8 +31,8 @@ exports.get = function get () {
 //     .paginate({}, { page, limit })
 // }
 
-exports.update = function update ({ id, community }) {
-  return Community.findOne({ _id: ObjectId(id) })
+exports.update = function update (community) {
+  return Community.findOne({})
     .then((_community) => Object.assign(_community, community).save())
 }
 

@@ -15,10 +15,13 @@ const loggerMiddleware = expressWinston.logger({ winstonInstance: log })
 
 module.exports = (async () => {
   try {
-    console.log('================================================')
-    console.log('Starting server with the following configuration')
-    console.log(config)
-    console.log('================================================')
+    if (NODE_ENV !== 'test') {
+      console.log('================================================')
+      console.log(`Starting server [${NODE_ENV}] with the following config`)
+      console.log('================================================')
+      console.log(config)
+      console.log('================================================')
+    }
     const server = express()
     // Apply middlewares
     server.use(helmet())

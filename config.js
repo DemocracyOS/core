@@ -8,6 +8,19 @@ require('dotenv').config()
 //  CONFIG INITIALIZATION
 // ==============================================================================
 
+let keycloakRealm = null
+
+switch (process.env.NODE_ENV) {
+  case 'test':
+    keycloakRealm = process.env.DEMOCRACYOS_AUTH_REALM_TEST
+    break
+  case 'dev':
+    keycloakRealm = process.env.DEMOCRACYOS_AUTH_REALM_DEV
+    break
+  default:
+    keycloakRealm = process.env.DEMOCRACYOS_AUTH_REALM
+}
+
 const CONFIG = {
   MONGO_URL: '',
 
@@ -28,12 +41,19 @@ const CONFIG = {
   // ------------------------------------------------------------------------------
 
   KEYCLOAK_CONFIG: {
-    'realm': (process.env.NODE_ENV === 'dev' ? process.env.DEMOCRACYOS_AUTH_REALM_DEV : process.env.NODE_ENV === 'test' ? process.env.DEMOCRACYOS_AUTH_REALM_TEST : process.env.DEMOCRACYOS_AUTH_REALM),
+    'realm': keycloakRealm,
     'auth-server-url': process.env.DEMOCRACYOS_AUTH_SERVER_URL,
     'ssl-required': 'external',
     'resource': process.env.DEMOCRACYOS_AUTH_CLIENT,
     'public-client': true,
     'confidential-port': 0
+  },
+  KEYCLOAK_TOKEN_ENDPOINT: process.env.DEMOCRACYOS_AUTH_SERVER_URL + '/realms/' + keycloakRealm + '/protocol/openid-connect/token',
+  CREDENTIALS_ADMIN_TEST: {
+    'client_id': process.env.DEMOCRACYOS_AUTH_CLIENT,
+    'grant_type': 'password',
+    'username': process.env.DEMOCRACYOS_ADMIN_TEST_USERNAME,
+    'password': process.env.DEMOCRACYOS_ADMIN_TEST_PASSWORD
   },
   // ------------------------------------------------------------------------------
   //  SMTP Server configuration
@@ -44,14 +64,13 @@ const CONFIG = {
   SMTP_PORT: process.env.DEMOCRACYOS_SMTP_PORT || 25,
   SMTP_PASSWORD: process.env.DEMOCRACYOS_SMTP_PASSWORD,
   SMTP_FROM_ADDRESS: process.env.DEMOCRACYOS_SMTP_FROM_ADDRESS
-
 }
 
 // ==============================================================================
 //  CONFIG VALIDATION
 // ==============================================================================
 
-switch (process.env.NODE_ENV){
+switch (process.env.NODE_ENV) {
   case 'test':
     CONFIG.MONGO_URL = process.env.DEMOCRACYOS_MONGO_URL_TEST
     break
@@ -60,7 +79,6 @@ switch (process.env.NODE_ENV){
     break
   default:
     CONFIG.MONGO_URL = process.env.DEMOCRACYOS_MONGO_URL
-
 }
 
 if (!CONFIG.SESSION_SECRET) {
