@@ -1,9 +1,9 @@
 {
-  "name": "democracyos-back",
-  "version": "1.0.0",
+  "name": "core",
+  "version": "3.0.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/DemocracyOS/back.git"
+    "url": "git://github.com/DemocracyOS/core.git"
   },
   "engines": {
     "node": "^8"
@@ -16,7 +16,7 @@
     "admin:dev": "cd admin && npm run start",
     "admin:build": "cd admin && npm run build",
     "docs:build": "./node_modules/.bin/apidoc -i api/ -o docs/api",
-    "postinstall": "cd admin && npm install"
+    "postinstall": "npm run docs:build && cd admin && npm install"
   },
   "dependencies": {
     "accepts": "^1.3.5",
