@@ -1,5 +1,7 @@
 const path = require('path')
 const winston = require('winston')
+const MongoDB = require('winston-mongodb').MongoDB
+const { MONGO_URL } = require('../config')
 
 const options = {
   fileInfo: {
@@ -22,6 +24,11 @@ const options = {
     maxFiles: 5,
     colorize: false
   },
+  mongoDB: {
+    db: MONGO_URL,
+    collection: 'logs',
+    level: 'warning'
+  },
   console: {
     level: process.env.NODE_ENV === 'test' ? 'critic' : 'silly',
     colorize: true,
@@ -32,17 +39,18 @@ const options = {
 }
 
 let transportArray = [
-  new winston.transports.Console(options.console)
+  new winston.transports.Console(options.console),
 ]
 
-if (process.env.NODE_ENV !== 'dev' && process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'prod') {
   transportArray.push(
     new winston.transports.File(options.fileInfo),
-    new winston.transports.File(options.fileError)
+    new winston.transports.File(options.fileError),
+    new (winston.transports.MongoDB)(options.mongoDB)
   )
 }
 
-const log = new winston.Logger({
+let log = new winston.Logger({
   transports: transportArray
 })
 
