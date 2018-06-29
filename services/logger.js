@@ -4,6 +4,7 @@ const MongoDB = require('winston-mongodb').MongoDB
 const { MONGO_URL } = require('../config')
 
 const options = {
+  // Config to persist events on "info" level
   fileInfo: {
     name: 'LogApp',
     level: 'info',
@@ -14,6 +15,7 @@ const options = {
     maxFiles: 5,
     colorize: false
   },
+  // Config to persist events on "error" level
   fileError: {
     name: 'LogErrors',
     level: 'error',
@@ -26,8 +28,9 @@ const options = {
   },
   mongoDB: {
     db: MONGO_URL,
+    name: 'LogMongo',
     collection: 'logs',
-    level: 'warning'
+    level: 'error'
   },
   console: {
     level: process.env.NODE_ENV === 'test' ? 'critic' : 'silly',
@@ -40,15 +43,16 @@ const options = {
 
 let transportArray = [
   new winston.transports.Console(options.console),
+  new (winston.transports.MongoDB)(options.mongoDB)
 ]
 
-if (process.env.NODE_ENV !== 'prod') {
-  transportArray.push(
-    new winston.transports.File(options.fileInfo),
-    new winston.transports.File(options.fileError),
-    new (winston.transports.MongoDB)(options.mongoDB)
-  )
-}
+// If you wish to persists logs into files, you can use this transports for prod env
+// if (process.env.NODE_ENV !== 'prod') {
+//   transportArray.push(
+//     new winston.transports.File(options.fileInfo),
+//     new winston.transports.File(options.fileError),
+//   )
+// }
 
 let log = new winston.Logger({
   transports: transportArray
