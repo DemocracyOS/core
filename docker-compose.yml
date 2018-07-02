@@ -1,5 +1,9 @@
 version: '3'
 
+volumes:
+  mysql_data:
+    driver: local
+
 services:
   app:
     build:
@@ -10,10 +14,12 @@ services:
       - 3000:3000
     depends_on:
       - mongo
+      - mysql
+      - keycloak
     tty: true
 
   mongo:
-    image: mongo:3.2
+    image: mongo:3.6
     ports:
       - 27017:27017
     # Optionally mount external data directory
@@ -23,11 +29,9 @@ services:
   mysql:
       image: mysql:5.7
       volumes:
-        - mysql_data: ~/keycloak_data/vol
+        - mysql_data:/var/lib/mysql
       environment:
-        # Change root password for a stronger one
         MYSQL_ROOT_PASSWORD: root
-        # Change this seetings
         MYSQL_DATABASE: keycloak
         MYSQL_USER: keycloak
         MYSQL_PASSWORD: password
