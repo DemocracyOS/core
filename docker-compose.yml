@@ -5,18 +5,18 @@ volumes:
     driver: local
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    env_file: .env
-    ports:
-      - 3000:3000
-    depends_on:
-      - mongo
-      - mysql
-      - keycloak
-    tty: true
+  # app:
+    # build:
+    #   context: .
+    #   dockerfile: ./Dockerfile
+    # env_file: .env
+    # ports:
+    #   - 3000:3000
+    # depends_on:
+    #   - mongo
+    #   - mysql
+    #   - keycloak
+    # tty: true
 
   mongo:
     image: mongo:3.6
