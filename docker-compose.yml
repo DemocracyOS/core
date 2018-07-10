@@ -83,10 +83,10 @@ services:
       # It is highly recommended that you read the MySQL JDBC driver documentation in order to use it.
       #JDBC_PARAMS: "connectTimeout=30000"
       - PROXY_ADDRESS_FORWARDING=true
-    ports:
-      - "8080:8080"
     depends_on:
       - mysql
+    expose:
+      - "8080"
     labels:
       - "traefik.enable=true"
       - "traefik.backend=keycloak"
