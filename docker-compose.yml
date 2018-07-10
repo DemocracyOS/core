@@ -22,7 +22,7 @@ services:
   app:
     build: .
     image: democracyos/core:latest
-    env_file: .env.dist
+    env_file: .env
     ports:
       - "3000:3000"
     depends_on:
