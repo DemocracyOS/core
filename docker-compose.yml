@@ -70,23 +70,23 @@ services:
   keycloak:
     image: jboss/keycloak
     environment:
-      DB_VENDOR: MYSQL
-      DB_ADDR: mysql
+      - DB_VENDOR=MYSQL
+      - DB_ADDR=mysql
       # Same values than the ones declared in mysql service.
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_PASSWORD: password
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      - DB_PASSWORD=password
       # Change this seetings
-      KEYCLOAK_USER: admin # VERY IMPORTANT!
-      KEYCLOAK_PASSWORD: Pa55w0rd  # VERY IMPORTANT!
-      DB_VENDOR: MYSQL
+      - KEYCLOAK_USER=admin # VERY IMPORTANT!
+      - KEYCLOAK_PASSWORD=Pa55w0rd  # VERY IMPORTANT!
+      - DB_VENDOR=MYSQL
       # Uncomment the line below if you want to specify JDBC parameters.
       # The parameter below is just an example, and it shouldn't be used in production without knowledge.
       # It is highly recommended that you read the MySQL JDBC driver documentation in order to use it.
       #JDBC_PARAMS: "connectTimeout=30000"
-      PROXY_ADDRESS_FORWARDING: true
+      - PROXY_ADDRESS_FORWARDING=true
     ports:
-      - 8080:8080
+      - "8080:8080"
     depends_on:
       - mysql
     labels:
