@@ -19,27 +19,26 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  # app:
-    # build:
-    #   context: .
-    #   dockerfile: ./Dockerfile
-    # env_file: .env
-    # ports:
-    #   - 3000:3000
-    # depends_on:
-    #   - mongo
-    #   - mysql
-    #   - keycloak
-    # tty: true
-    # labels:
-    #   - "traefik.enable=true"
-    #   - "traefik.backend=app"
-    #   - "traefik.docker.network=back-tier"
-    #   - "traefik.frontend.entryPoints=http"
-    #   - "traefik.frontend.rule=Host:localhost;PathPrefix:/api"
-    #   - "traefik.port=3000"
-    # networks:
-    #   - back-tier
+  app:
+    build: .
+    image: democracyos/core:latest
+    env_file: .env.dist
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - mysql
+      - keycloak
+    tty: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=app"
+      - "traefik.docker.network=back-tier"
+      - "traefik.frontend.entryPoints=http"
+      - "traefik.frontend.rule=Host:localhost;PathPrefix:/api"
+      - "traefik.port=3000"
+    networks:
+      - back-tier
 
   mongo:
     image: mongo:3.6
@@ -79,7 +78,6 @@ services:
       # Change this seetings
       - KEYCLOAK_USER=admin # VERY IMPORTANT!
       - KEYCLOAK_PASSWORD=Pa55w0rd  # VERY IMPORTANT!
-      - DB_VENDOR=MYSQL
       # Uncomment the line below if you want to specify JDBC parameters.
       # The parameter below is just an example, and it shouldn't be used in production without knowledge.
       # It is highly recommended that you read the MySQL JDBC driver documentation in order to use it.
