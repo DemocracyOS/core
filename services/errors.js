@@ -73,6 +73,18 @@ const ErrNotAdminNorOwner = new APIError('User don\'t have permission', {
   status: FORBIDDEN
 })
 
+const ErrInvalidJSONSchema = new APIError('JSON Schema is not valid. Probably because of bad format', {
+  translationKey: 'INVALID_JSON_SCHEMA',
+  status: BAD_REQUEST
+})
+
+const ErrInvalidData = new APIError('Data doesn\'t follow the specified JSON Schema.', {
+  translationKey: 'INVALID_DATA_FOR_JSON_SCHEMA',
+  status: BAD_REQUEST
+}
+  
+)
+
 module.exports = {
   APIError,
   ErrNotFound,
@@ -83,5 +95,7 @@ module.exports = {
   ErrUserNotLoggedIn,
   ErrNotAdmin,
   ErrNotAdminNorOwner,
-  ErrForbidden
+  ErrForbidden,
+  ErrInvalidJSONSchema,
+  ErrInvalidData
 }
