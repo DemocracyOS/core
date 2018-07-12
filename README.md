@@ -85,11 +85,11 @@ docker exec core_keycloak_1 keycloak/bin/kcadm.sh create realms -s realm=democra
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh create realms -s realm=democracyos-test -s enabled=true
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh create partialImport -r democracyos-dev -s ifResourceExists=OVERWRITE -o -f /realm-dev.json
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh create partialImport -r democracyos-test -s ifResourceExists=OVERWRITE -o -f /realm-test.json
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh create users -r democracyos-dev -s username=user -s enabled=true
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-dev --username user --new-password 123456
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh create users -r democracyos-test -s username=admin -s enabled=true
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-test --username admin --new-password 123456
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh add-roles --uusername admin --rolename admin -r democracyos-test
-docker exec core_keycloak_1 keycloak/bin/kcadm.sh create users -r democracyos-test -s username=user -s enabled=true
-docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-test --username user --new-password 123456
 ```
 
 ## More info
