@@ -1,6 +1,8 @@
-FROM node:carbon
+FROM node:alpine
 
 WORKDIR /usr/src/app
+
+RUN npm install -g nodemon
 
 COPY package*.json ./
 
