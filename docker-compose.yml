@@ -4,21 +4,7 @@ volumes:
   mysql_data:
     driver: local
 
-services:
-  traefik:
-    image: traefik
-    command: --api --docker
-    labels:
-      - "traefik.enable=false"
-    networks:
-      - front-tier
-      - back-tier
-    ports:
-      - "8000:80"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
+service
   app:
     build: .
     image: democracyos/core:latest
@@ -32,6 +18,7 @@ services:
       - mongo
       - mysql
       - keycloak
+      - traefik
     tty: true
     labels:
       - "traefik.enable=true"
@@ -42,6 +29,20 @@ services:
       - "traefik.port=3000"
     networks:
       - back-tier
+
+  traefik:
+    image: traefik
+    command: --api --docker
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - front-tier
+      - back-tier
+    ports:
+      - "8000:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   mongo:
     image: mongo:3.6
