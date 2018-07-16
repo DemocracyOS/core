@@ -4,7 +4,32 @@ volumes:
   mysql_data:
     driver: local
 
-services:
+service
+  app:
+    build: .
+    image: democracyos/core:latest
+    command: nodemon 
+    volumes: 
+      - .:/usr/src/app
+    env_file: .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - mysql
+      - keycloak
+      - traefik
+    tty: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=app"
+      - "traefik.docker.network=back-tier"
+      - "traefik.frontend.entryPoints=http"
+      - "traefik.frontend.rule=Host:localhost;PathPrefix:/api"
+      - "traefik.port=3000"
+    networks:
+      - back-tier
+
   traefik:
     image: traefik
     command: --api --docker
@@ -18,27 +43,6 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-
-  app:
-    build: .
-    image: democracyos/core:latest
-    env_file: .env
-    ports:
-      - "3000:3000"
-    depends_on:
-      - mongo
-      - mysql
-      - keycloak
-    tty: true
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=app"
-      - "traefik.docker.network=back-tier"
-      - "traefik.frontend.entryPoints=http"
-      - "traefik.frontend.rule=Host:localhost;PathPrefix:/api"
-      - "traefik.port=3000"
-    networks:
-      - back-tier
 
   mongo:
     image: mongo:3.6

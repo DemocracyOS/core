@@ -101,12 +101,25 @@ docker exec core_keycloak_1 keycloak/bin/kcadm.sh add-roles --uusername admin --
 
 #### Start in development env
 ```
-npm run dev
+docker-compose up
 ```
 
 #### Launch tests
+
+To run the test, first we need the services up and running. We will do that in detach mode, but if you want to see the logs, remove the `-d` option
 ```
-npm run test
+docker-compose up -d mysql mongo keycloak traefik
+```
+Now you only have to run the app service by executing the comand `npm run test`. This will create a new container, and it will use the services that are available. Note that keycloak takes some time to be up and running. Finally we will add the `--rm` option so our is removed after run. 
+
+```
+docker-compose run --rm app npm run test
+```
+
+After you are done, remember to stop your services, you can do it by executing `stop`, it will only stop the containers that we started before the run. Note that app is not stoped, cause we removed it after we finished executing the tests.s
+
+```
+docker-compose stop
 ```
 
 #### Launch admin panel in development env
