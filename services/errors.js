@@ -82,7 +82,7 @@ const ErrInvalidData = new APIError('Data doesn\'t follow the specified JSON Sch
   translationKey: 'INVALID_DATA_FOR_JSON_SCHEMA',
   status: BAD_REQUEST
 }
-  
+
 )
 
 module.exports = {
