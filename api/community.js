@@ -1,6 +1,6 @@
 const express = require('express')
 const status = require('http-status')
-// const log = require('../services/logger')
+const log = require('../services/logger')
 const Community = require('../db-api/community')
 const auth = require('../services/auth')
 const router = express.Router()
@@ -35,6 +35,28 @@ router.route('/')
         next(err)
       }
     })
+  .post(
+    // Only available for users with realm role 'admin'
+    auth.protect('realm:admin'),
+    async (req, res, next) => {
+      try {
+        // Create the community, with the reference to the user who created it.
+        const dataCommunity = {
+          name: req.body.name,
+          mainColor: req.body.communityColor || '#425cf4',
+          logo: req.body.communityFile || null,
+          user: null,
+          initialized: true
+        }
+        const newCommunity = await Community.create(dataCommunity)
+        // if everything is ok. Show success
+        res.status(status.OK).json(newCommunity)
+      } catch (e) {
+        log.error(e)
+        res.render('error', { message: e.message })
+      }
+    }
+  )
   /**
    * @api {put} /community Update the community
    * @apiPermission admin
@@ -55,6 +77,7 @@ router.route('/')
         const updatedCommunity = await Community.update(req.body)
         res.status(status.OK).json(updatedCommunity)
       } catch (err) {
+        console.log(err)
         next(err)
       }
     })
