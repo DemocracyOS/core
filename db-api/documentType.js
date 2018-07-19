@@ -1,6 +1,7 @@
 const { Types: { ObjectId } } = require('mongoose')
 const { ErrNotFound } = require('../services/errors')
 const DocumentType = require('../models/documentType')
+const DocumentTypeVersion = require('../models/documentTypeVersion')
 const log = require('../services/logger')
 const validator = require('../services/jsonSchemaValidator')
 
@@ -12,25 +13,17 @@ exports.create = function create (documentType) {
 }
 
 // Get documentType
-const get = exports.get = function get (id) {
-  return DocumentType.findOne({ _id: ObjectId(id) })
+exports.get = function get (id) {
+  return DocumentType.findOne({ _id: ObjectId(id) }).populate('versions')
+}
+
+exports.getVersions = function getVersions () {
+  return DocumentType.getVersions()
 }
 
 // List documentTypes
 exports.list = function list ({ filter, limit, page, ids, fields }) {
   let query = {}
-  // if (filter !== undefined) {
-  //   let filterToJSON = JSON.parse(filter)
-  //   log.debug(filterToJSON)
-  //   if (filter.ids) {
-  //     log.debug(ids)
-  //     const idsToArray = JSON.parse(ids)
-  //     let idsArray = idsToArray.id.map((id) => {
-  //       return ObjectId(id)
-  //     })
-  //     query._id = { $in: idsArray }
-  //   }
-  // }
   return DocumentType
     .paginate(query, { page, limit })
 }

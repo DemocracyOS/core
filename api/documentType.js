@@ -14,15 +14,23 @@ router.route('/')
   .get(
     async (req, res, next) => {
       try {
-        const results = await DocumentType.list()
-        res.status(status.OK).json({
-          results: results.docs,
-          pagination: {
-            count: results.total,
-            page: results.page,
-            limit: results.limit
-          }
-        })
+        // const results = await DocumentType.list({
+        //   filter: req.query.filter,
+        //   limit: req.query.limit,
+        //   page: req.query.page,
+        //   ids: req.query.ids,
+        //   fields: {}
+        // })
+        // res.status(status.OK).json({
+        //   results: results.docs,
+        //   pagination: {
+        //     count: results.total,
+        //     page: results.page,
+        //     limit: results.limit
+        //   }
+        // })
+        const results = DocumentType.getVersions()
+        res.status(status.OK).json(results)
       } catch (err) {
         next(err)
       }
@@ -94,6 +102,7 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         // TODO
+        // Shouldn't delete a document type if there is a document already using it
         // res.status(status.OK).json({ id: req.params.id })
       } catch (err) {
         next(err)
