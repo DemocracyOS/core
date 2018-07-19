@@ -17,19 +17,14 @@ exports.get = function get (id) {
   return DocumentType.findOne({ _id: ObjectId(id) }).populate('versions')
 }
 
-exports.getVersions = function getVersions () {
-  return DocumentType.getVersions()
-}
-
 // List documentTypes
 exports.list = function list ({ filter, limit, page, ids, fields }) {
   let query = {}
   return DocumentType
-    .paginate(query, { page, limit })
+    .paginate(query, { page, limit, populate: 'versions' })
 }
 
 // Update documentType
-
 exports.update = function update ({ id, documentType }) {
   return DocumentType.findOne({ _id: ObjectId(id) })
     .then((_documentType) => {
