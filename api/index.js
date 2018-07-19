@@ -32,6 +32,7 @@ router.use(
 // ===============================
 
 routerV1.use('/community', require('../api/community'))
+routerV1.use('/document-types', require('../api/documentType'))
 routerV1.use('/users', require('../api/user'))
 
 // ===============================
