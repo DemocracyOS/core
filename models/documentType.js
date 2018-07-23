@@ -7,9 +7,16 @@ const DocumentType = new mongoose.Schema({
   name: { type: String, required: true },
   icon: { type: String, required: true },
   description: { type: String, required: true },
-  fields: { type: mongoose.Schema.Types.Mixed }
+  fields: {
+    blocks: [
+      { name: { type: String },
+        fields: [{ type: String }]
+      }
+    ],
+    properties: { type: mongoose.Schema.Types.Mixed },
+    required: [{ type: String }]
+  }
 }, { timestamps: true, toJSON: { virtuals: true } })
-
 
 // http://mongoosejs.com/docs/populate.html#populate-virtuals
 DocumentType.virtual('versions', {
