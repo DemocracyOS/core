@@ -55,7 +55,7 @@ router.use('/docs/api',
     if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
     else next()
   },
-  express.static(path.join(__dirname, '../docs'))
+  express.static(path.join(__dirname, '../docs/api'))
 )
 
 // ===============================
