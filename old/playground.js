@@ -35,6 +35,63 @@ let schema = {
   }
 }
 
+const example = {
+  "name": "CV basic data",
+  "icon": "fa-file-o",
+  "description": "This are data that every CV should have needed for a CV",
+  "fields": {
+    "blocks": [
+      {
+        "name": "Authors contact info",
+        "fields": [
+          "authorEmail",
+          "authorName",
+          "authorSurname"
+        ]
+      },
+      {
+        "name": "Org info",
+        "fields": [
+          "orgEmail",
+          "orgAdress",
+          "orgTel"
+        ]
+      }
+    ],
+    "properties": {
+      "authorName": {
+        "type": "string",
+        "title": "Author's name"
+      },
+      "authorSurname": {
+        "type": "string",
+        "title": "Author's surname"
+      },
+      "authorEmail": {
+        "type": "string",
+        "title": "Author's email"
+      },
+      "orgTel": {
+        "type": "string",
+        "title": "Author's tel"
+      },
+      "orgEmail": {
+        "type": "string",
+        "title": "Author's email"
+      },
+      "orgAdress": {
+        "type": "string",
+        "title": "Author's address"
+      }
+    },
+    "required": [
+      "authorName",
+      "authorSurname",
+      "authorEmail"
+    ]
+  }
+} 
+
 let data = {
   'domicilio': 'San Lorenzo 2516, 9B - Puerta izquierda',
   'num_secretaria': 20,
