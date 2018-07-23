@@ -62,7 +62,7 @@ $ npm install
 First make sure you have the containers running `$ docker-compose up -d`
 
 Now we will connect to the Keycloak Admin CLI. To execute a command to our keycloak container, place `$ docker exec <container_name> <command...>`
-First we need to authenticate. The `kcadm config credentials` starts an authenticated session. This approach maintains an authenticated session between the kcadm command invocations by saving the obtained access token and the associated refresh token. It may also maintain other secrets in a private configuration file.
+First we need to authenticate. The `kcadm config credentials` starts an authenticated session. This approach maintains an authenticated session between the kcadm command invocations by saving the obtained access token and the associated refresh token. It may also maintain other secrets in a private configuration file. By the way, don't worry, you dont have to change the `localhost:8080`, remember that you're inside the container, you dont need to change the port if you have a custom port for the host.
 
 How you run it with `docker exec`:
 
@@ -79,14 +79,17 @@ You should get just one logged message: `Logging into http://localhost:8080/auth
 Now we have to create the realms for test enviroment and dev enviroment
 
 ```
-docker cp realm-dev.json core_keycloak_1:/realm-dev.json
-docker cp realm-test.json core_keycloak_1:/realm-test.json
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh create realms -s realm=democracyos-dev -s enabled=true
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh create realms -s realm=democracyos-test -s enabled=true
-docker exec core_keycloak_1 keycloak/bin/kcadm.sh create partialImport -r democracyos-dev -s ifResourceExists=OVERWRITE -o -f /realm-dev.json
-docker exec core_keycloak_1 keycloak/bin/kcadm.sh create partialImport -r democracyos-test -s ifResourceExists=OVERWRITE -o -f /realm-test.json
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh create partialImport -r democracyos-dev -s ifResourceExists=OVERWRITE -o -f /var/realm-dev.json
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh create partialImport -r democracyos-test -s ifResourceExists=OVERWRITE -o -f /var/realm-test.json
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh create users -r democracyos-dev -s username=user -s enabled=true
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-dev --username user --new-password 123456
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh create users -r democracyos-dev -s username=admin -s enabled=true
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-dev --username admin --new-password 123456
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh add-roles --uusername admin --rolename admin -r democracyos-dev
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh create users -r democracyos-test -s username=user -s enabled=true
+docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-test --username user --new-password 123456
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh create users -r democracyos-test -s username=admin -s enabled=true
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-test --username admin --new-password 123456
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh add-roles --uusername admin --rolename admin -r democracyos-test

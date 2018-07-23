@@ -32,6 +32,7 @@ router.use(
 // ===============================
 
 routerV1.use('/community', require('../api/community'))
+routerV1.use('/document-types', require('../api/documentType'))
 routerV1.use('/users', require('../api/user'))
 
 // ===============================
@@ -54,7 +55,7 @@ router.use('/docs/api',
     if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
     else next()
   },
-  express.static(path.join(__dirname, '../docs'))
+  express.static(path.join(__dirname, '../docs/api'))
 )
 
 // ===============================

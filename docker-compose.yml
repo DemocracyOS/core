@@ -4,7 +4,7 @@ volumes:
   mysql_data:
     driver: local
 
-service
+services:
   app:
     build: .
     image: democracyos/core:latest
@@ -89,8 +89,11 @@ service
       - PROXY_ADDRESS_FORWARDING=true
     depends_on:
       - mysql
-    expose:
-      - "8080"
+    volumes:
+      - ./realm-dev.json:/var/realm-dev.json
+      - ./realm-test.json:/var/realm-test.json
+    ports:
+      - "4000:8080"
     labels:
       - "traefik.enable=true"
       - "traefik.backend=keycloak"

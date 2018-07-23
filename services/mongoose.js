@@ -18,6 +18,8 @@ mongoose
 // Don't forget to add all your models!
 require('../models/user')
 require('../models/community')
+require('../models/documentType')
+require('../models/documentTypeVersion')
 
 const db = mongoose.connection
 
