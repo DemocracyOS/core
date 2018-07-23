@@ -47,7 +47,7 @@ exports.update = function update ({ id, documentType }) {
 // Remove documentType
 
 exports.remove = function remove (id) {
-  return DocumentType.get({ id })
+  return DocumentType.findOne({ _id: ObjectId(id) })
     .then((documentType) => {
       if (!documentType) throw ErrNotFound('DocumentType to remove not found')
       return documentType.remove()
