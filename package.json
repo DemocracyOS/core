@@ -11,6 +11,7 @@
   "scripts": {
     "start": "node server",
     "dev": "nodemon",
+    "init": "node seed",
     "test": "NODE_ENV=test mocha --recursive --timeout 10000",
     "setup": "NODE_ENV=setup node server",
     "admin:dev": "cd admin && npm run start",

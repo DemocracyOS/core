@@ -15,7 +15,7 @@ mongoose
   })
 
 // Initialize models
-// Don't forget to add all your models!
+// Don't forget to add models
 require('../models/user')
 require('../models/community')
 require('../models/documentType')
