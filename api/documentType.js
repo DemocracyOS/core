@@ -9,10 +9,9 @@ const log = require('../services/logger')
 router.route('/')
   /**
    * @api {get} /document-types List
-   * @apiDescription Returns a list of available document types. Only brings the latests versions of the document types. If you need the versions of each document type, add the query parameter `versions=true`
-   * @apiName getDocumentTypes
+   * @apiDescription Returns the only one documentType available. It brings the latest version of it.`
+   * @apiName getDocumentType
    * @apiGroup DocumentType
-   * @apiParam {boolean} versions Query parameter. Optional. Retrieves all the versions of all the available document Types if `true`
    */
   .get(
     async (req, res, next) => {
@@ -24,10 +23,12 @@ router.route('/')
       }
     })
   /**
-   * @api {post} /document-types Create
-   * @apiDescription Creates a new documentType
-   * @apiName postDocumentType
+   * @api {put} /document-types/:id Update
+   * @apiDescription Updates a documentType. A new version is created and available for use.
+   * @apiName putDocumentType
    * @apiGroup DocumentType
+   *
+   * @apiParam {Number} id The documentType id
    */
   .put(
     auth.protect('realm:admin'),
