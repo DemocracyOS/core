@@ -40,45 +40,57 @@
 //     });
 //   }
 // });
+// const log = require('./services/logger')
+// const config = require('./services/mongoose')
+// const mongoose = require('./services/mongoose')
 
-const { SETUP } = require('./config')
-const log = require('./services/logger')
-const config = require('./services/mongoose')
-const mongoose = require('./services/mongoose')
+const mongoose = require('mongoose')
 const Community = require('./models/community')
 const dbCommunity = require('./db-api/community')
 const DocumentType = require('./models/documentType')
 const dbDocumentType = require('./db-api/documentType')
 const DocumentTypeVersion = require('./models/documentTypeVersion')
-// const dbDocumentTypeVersion = require('./db-api/documentTypeVersion')
+const dbDocumentTypeVersion = require('./db-api/documentTypeVersion')
+const config = require('./config')
+// const log = require('./logger')
 const { NODE_ENV } = process.env
 
-const main = async () => {
+// Error Definitions
+class NoEnvDefined extends Error { }
+class DatabaseNotEmpty extends Error { }
+
+async function checkDB () {
+  console.info('* Checking if database has data on it')
+  let community = await Community.findOne({})
+  if (community) throw new DatabaseNotEmpty('X-- There is at least one community already on the DB')
+  let documentType = await DocumentType.findOne({})
+  if (documentType) throw new DatabaseNotEmpty('X-- There is at least one document type already on the DB')
+  let documentTypeVersions = await DocumentTypeVersion.findOne({})
+  if (documentTypeVersions) throw new DatabaseNotEmpty('X-- There is at least one version of a document type already on the DB')
+  console.log('--> OK')
+}
+
+async function checkEnv () {
+  console.log(`* Checking if ENV is defined... [${NODE_ENV}] defined`)
+  if (NODE_ENV === undefined) throw new NoEnvDefined('X-- You need to run the script with NODE_ENV, like "dev" or "prod"')
+  console.log('--> OK')
+}
+
+async function startSetup () {
   try {
-    console.log('================================================')
-    console.log(`Starting server [${NODE_ENV}] with the following config`)
-    console.log('=================s===============================')
-    console.log(SETUP)
-    console.log('================================================')
-    log.info('Cleaning database models for setup...')
-    await Community.remove({})
-    log.info('Communities were cleaned')
-    await DocumentType.remove({})
-    log.info('DocumentTypes were cleaned')
-    await DocumentTypeVersion.remove({})
-    log.info('DocumentTypes versions were cleaned')
-    console.log('================================================')
-    log.info('Creating community...')
+    await checkDB()
+    console.log('* Creating community...')
     await dbCommunity.create({
-      name: SETUP.COMMUNITY_NAME,
-      mainColor: SETUP.COMMUNITY_COLOR,
+      name: config.SETUP.COMMUNITY_NAME,
+      mainColor: config.SETUP.COMMUNITY_COLOR,
       logo: null,
       user: null,
       initialized: true
     })
-    log.info('Creating document Type...')
+    console.log('--> OK')
+    console.log('* Creating document type...')
     await dbDocumentType.create({
-      name: SETUP.DOCUMENT_TYPE_NAME,
+      name: config.SETUP.DOCUMENT_TYPE_NAME,
       icon: 'fa-file',
       description: '- To be filled -',
       fields: {
@@ -104,12 +116,41 @@ const main = async () => {
         ]
       }
     })
-    log.info('Setup finished!')
-    process.exit(0)
+    console.log('--> OK')
+    console.log('--> Setup finished!')
+    process.exit(0) // Success
   } catch (err) {
-    log.error('An error occurred, setup stopped unexpectly')
-    log.error(err)
+    console.log(err.message)
+    console.error('X-- Setup stopped unexpectly')
+    process.exit(1) // Error
   }
 }
 
-main()
+async function execute () {
+  try {
+    await checkEnv()
+    console.log(`* Connecting to the database...`)
+    mongoose
+      .connect(config.MONGO_URL)
+      .then(() => {
+        console.log('--> OK')
+        startSetup()
+      })
+      .catch((err) => {
+        console.error(err)
+        console.error('X-- Setup stopped unexpectly')
+        process.exit(1)
+      })
+  } catch (err) {
+    console.log(err.message)
+    console.error('X-- Setup stopped unexpectly')
+    process.exit(1) // Error
+  }
+}
+
+mongoose.Promise = global.Promise
+
+console.log(`DemocracyOS - v3 core`)
+console.log(`Seeding mongodb with init values.`)
+console.log('================================================')
+execute()
