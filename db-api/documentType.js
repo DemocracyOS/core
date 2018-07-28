@@ -15,41 +15,21 @@ exports.create = function create (documentType) {
 }
 
 // Get documentType
-exports.get = function get (id, versions) {
-  if (versions) {
-    return DocumentType.findOne({ _id: ObjectId(id) }).populate('versions')
-  }
-  return DocumentType.findOne({ _id: ObjectId(id) })
-}
-
-// List documentTypes
-exports.list = function list ({ limit, page, versions }) {
-  let query = {}
-  let options = { page, limit }
-  if (versions) options.populate = 'versions'
-  return DocumentType
-    .paginate(query, options)
+exports.get = function get () {
+  return DocumentType.findOne({})
 }
 
 // Update documentType
-exports.update = function update ({ id, documentType }) {
-  validator.isSchemaValid({
-    properties: documentType.fields.properties,
-    required: documentType.fields.required
-  })
-  return DocumentType.findOne({ _id: ObjectId(id) })
+exports.update = function update (documentType) {
+  if (documentType.fields) {
+    validator.isSchemaValid({
+      properties: documentType.fields.properties,
+      required: documentType.fields.required
+    })
+  }
+  return DocumentType.findOne({})
     .then((_documentType) => {
       if (!_documentType) throw ErrNotFound('DocumentType to update not found')
       return Object.assign(_documentType, documentType).save()
-    })
-}
-
-// Remove documentType
-
-exports.remove = function remove (id) {
-  return DocumentType.findOne({ _id: ObjectId(id) })
-    .then((documentType) => {
-      if (!documentType) throw ErrNotFound('DocumentType to remove not found')
-      return documentType.remove()
     })
 }
