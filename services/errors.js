@@ -81,9 +81,7 @@ const ErrInvalidJSONSchema = (metadata) => new APIError('JSON Schema is not vali
 const ErrInvalidData = new APIError('Data doesn\'t follow the specified JSON Schema.', {
   translationKey: 'INVALID_DATA_FOR_JSON_SCHEMA',
   status: BAD_REQUEST
-}
-
-)
+})
 
 module.exports = {
   APIError,
