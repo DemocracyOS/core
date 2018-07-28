@@ -95,6 +95,27 @@ docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-te
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh add-roles --uusername admin --rolename admin -r democracyos-test
 ```
 
+#### To setup the app
+Before doing anything, make sure you have your `.env` file. Copy the `.env.dist` in a `.env` file and define the values. 
+
+```
+COMMUNITY_NAME=A community
+COMMUNITY_COLOR_HEX=3177cc
+DOCUMENT_TYPE_NAME=A simple type
+```
+
+Run the following services
+```
+docker-compose up mongo
+```
+
+Then run the seed script. It will create the initial documents inside mongo. But remember to define the NODE_ENV of the installation, so it seeds the correct database. For example, for dev environment, add `NODE_ENV=dev` before running the npm script.
+```
+NODE_ENV=dev npm run init
+```
+
+If everything is ok, the app will be ready to go!
+
 ## More info
 
 - Read more about [authentication, authorization and user management](/docs/about-auth.md)
@@ -102,12 +123,13 @@ docker exec core_keycloak_1 keycloak/bin/kcadm.sh add-roles --uusername admin --
 
 ## Useful scripts
 
-#### Start in development env
+
+#### Start development env
 ```
 docker-compose up
 ```
 
-#### Launch tests
+#### Testing: How to lunch the test script
 
 To run the test, first we need the services up and running. We will do that in detach mode, but if you want to see the logs, remove the `-d` option
 ```
