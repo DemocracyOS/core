@@ -27,7 +27,6 @@ const DocumentType = new mongoose.Schema({
 let updateCurrentVersion = function (next) {
   // Following mongoose-version logic.
   // Before saving, if it is a new document for the collection, define currentVersion to 0
-  console.log(this)
   if (this.isNew) {
     this.currentVersion = 0
     next()

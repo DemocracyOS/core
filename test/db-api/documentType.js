@@ -47,7 +47,7 @@ describe('DocumentType DB-APIs', () => {
     const DocumentTypeMock = sinon.mock(DocumentType)
 
     DocumentTypeMock
-      .expects('findOne').withArgs({ _id: ObjectId('5a5e29d948a9cc2fbeed02fa') })
+      .expects('findOne').withArgs()
       .chain('exec')
       .resolves(documentTypeSample)
 
@@ -70,11 +70,11 @@ describe('DocumentType DB-APIs', () => {
     }
 
     DocumentTypeMock
-      .expects('findOne').withArgs({ _id: ObjectId('5a5e29d948a9cc2fbeed02fa') })
+      .expects('findOne').withArgs()
       .chain('exec')
       .resolves({ save })
 
-    return documentType.update({ id: '5a5e29d948a9cc2fbeed02fa', documentType: changedSample })
+    return documentType.update(changedSample)
       .then((result) => {
         DocumentTypeMock.verify()
         DocumentTypeMock.restore()
@@ -82,22 +82,6 @@ describe('DocumentType DB-APIs', () => {
         expect(Object.keys(result.fields.properties).length).to.be.equal(Object.keys(changedSample.fields.properties).length)
         expect(result.fields.properties['newField']).to.be.an('object')
         expect(result.fields.properties['newField'].type).to.be.equal('boolean')
-      })
-  })
-  it('DocumentType.remove() should remove a documentType', () => {
-    const DocumentTypeMock = sinon.mock(DocumentType)
-    const remove = sinon.spy()
-
-    DocumentTypeMock
-      .expects('findOne').withArgs({ _id: ObjectId('5a5e29d948a9cc2fbeed02fa') })
-      .chain('exec')
-      .resolves({ remove })
-
-    return documentType.remove('5a5e29d948a9cc2fbeed02fa')
-      .then(() => {
-        DocumentTypeMock.verify()
-        DocumentTypeMock.restore()
-        sinon.assert.calledOnce(remove)
       })
   })
 })
