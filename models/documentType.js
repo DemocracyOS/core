@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 const version = require('mongoose-version')
 const mongoosePaginate = require('mongoose-paginate')
-const DocumentTypeVersion = require('./documentTypeVersion')
 const ignoredPaths = ['name', 'icon', 'description', 'updatedAt']
 
 // Define `Community` Schema
@@ -23,18 +22,7 @@ const DocumentType = new mongoose.Schema({
 }, {
   timestamps: true,
   versionKey: false
-/*, toJSON: { virtuals: true } */
 })
-
-// http://mongoosejs.com/docs/populate.html#populate-virtuals
-// DocumentType.virtual('versionContainer', {
-//   ref: 'DocumentTypeVersion', // The model to use
-//   localField: '_id', // Find people where `localField`
-//   foreignField: 'refId', // is equal to `foreignField`
-//   // If `justOne` is true, 'versions' will be a single doc as opposed to
-//   // an array. `justOne` is false by default.
-//   justOne: true
-// })
 
 let updateCurrentVersion = function (next) {
   // Following mongoose-version logic.
@@ -61,9 +49,6 @@ let updateCurrentVersion = function (next) {
     }
   }
 }
-// let show = async function (doc) {
-//   doc.currentVersion = doc.toJSON().versionContainer.__v
-// }
 
 DocumentType
   .pre('save', updateCurrentVersion)
