@@ -5,7 +5,9 @@ const Error = require('./errors')
 
 const isSchemaValid = (schema) => {
   let validSchema = ajv.validateSchema(schema)
-  if (!validSchema) throw Error.ErrInvalidJSONSchema
+  // console.log('Is this valid? ' + validSchema)
+  // console.log(ajv.errorsText(validSchema.errors, { separator: '\n' }))
+  if (!validSchema) throw Error.ErrInvalidJSONSchema(ajv.errors)
 }
 
 const isDataValid = (schema, data) => {

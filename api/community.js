@@ -1,6 +1,6 @@
 const express = require('express')
 const status = require('http-status')
-// const log = require('../services/logger')
+const log = require('../services/logger')
 const Community = require('../db-api/community')
 const auth = require('../services/auth')
 const router = express.Router()

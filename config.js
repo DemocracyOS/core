@@ -63,7 +63,12 @@ const CONFIG = {
   SMTP_USERNAME: process.env.DEMOCRACYOS_SMTP_USERNAME,
   SMTP_PORT: process.env.DEMOCRACYOS_SMTP_PORT || 25,
   SMTP_PASSWORD: process.env.DEMOCRACYOS_SMTP_PASSWORD,
-  SMTP_FROM_ADDRESS: process.env.DEMOCRACYOS_SMTP_FROM_ADDRESS
+  SMTP_FROM_ADDRESS: process.env.DEMOCRACYOS_SMTP_FROM_ADDRESS,
+  SETUP: {
+    COMMUNITY_NAME: process.env.COMMUNITY_NAME,
+    COMMUNITY_COLOR: '#' + process.env.COMMUNITY_COLOR_HEX,
+    DOCUMENT_TYPE_NAME: process.env.DOCUMENT_TYPE_NAME
+  }
 }
 
 // ==============================================================================
@@ -97,5 +102,7 @@ if (!CONFIG.SMTP_HOST || !CONFIG.SMTP_USERNAME || !CONFIG.SMTP_PASSWORD) {
     `An SMTP provider must be set to handle emails. \nMissing variables: ${missing}`
   )
 }
+
+
 
 module.exports = CONFIG
