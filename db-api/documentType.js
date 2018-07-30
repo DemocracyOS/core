@@ -4,16 +4,6 @@ const DocumentType = require('../models/documentType')
 // const log = require('../services/logger')
 const validator = require('../services/jsonSchemaValidator')
 
-// Create documentType
-
-exports.create = function create (documentType) {
-  validator.isSchemaValid({
-    properties: documentType.fields.properties,
-    required: documentType.fields.required
-  })
-  return (new DocumentType(documentType)).save()
-}
-
 // Get documentType
 exports.get = function get () {
   return DocumentType.findOne({})

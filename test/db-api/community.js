@@ -18,35 +18,6 @@ const communitySample = {
 
 describe('Community DB-APIs', () => {
   // ===================================================
-  it('Community.create() should create a community', () => {
-    // require module with rewire to override its internal Settings reference
-    const community = rewire('../../db-api/community')
-    // replace Setting constructor for a spy
-    const CommunityMock = sinon.spy()
-
-    // add a findOne method that only returns null
-    CommunityMock.findOne = () => { return Promise.resolve(null) }
-
-    // add a save method that only returns the data
-    CommunityMock.prototype.save = () => { return Promise.resolve(communitySample) }
-
-    // create a spy for the findOne method
-    sinon.spy(CommunityMock.findOne)
-    // create a spy for the save method
-    const save = sinon.spy(CommunityMock.prototype, 'save')
-
-    // override Setting inside `db-api/community`
-    community.__set__('Community', CommunityMock)
-    // call create method
-    return community.create(communitySample)
-      .then((result) => {
-        sinon.assert.calledWithNew(CommunityMock)
-        sinon.assert.calledWith(CommunityMock, communitySample)
-        sinon.assert.calledOnce(save)
-        expect(result).to.equal(communitySample)
-      })
-  })
-  // ===================================================
   it('Community.get() should get the only community created in the database', () => {
     const CommunityMock = sinon.mock(Community)
 

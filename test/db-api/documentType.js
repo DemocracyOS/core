@@ -14,35 +14,6 @@ let mockedId = null
 
 describe('DocumentType DB-APIs', () => {
   // ===================================================
-  it('DocumentType.create() should create a documentType', () => {
-    // require module with rewire to override its internal Settings reference
-    const documentType = rewire('../../db-api/documentType')
-    // replace Setting constructor for a spy
-    const DocumentTypeMock = sinon.spy()
-
-    // add a findOne method that only returns null
-    DocumentTypeMock.findOne = () => { return Promise.resolve(null) }
-
-    // add a save method that only returns the data
-    DocumentTypeMock.prototype.save = () => { return Promise.resolve(documentTypeSample) }
-
-    // create a spy for the findOne method
-    sinon.spy(DocumentTypeMock.findOne)
-    // create a spy for the save method
-    const save = sinon.spy(DocumentTypeMock.prototype, 'save')
-
-    // override Setting inside `db-api/documentType`
-    documentType.__set__('DocumentType', DocumentTypeMock)
-    // call create method
-    return documentType.create(documentTypeSample)
-      .then((result) => {
-        sinon.assert.calledWithNew(DocumentTypeMock)
-        sinon.assert.calledWith(DocumentTypeMock, documentTypeSample)
-        sinon.assert.calledOnce(save)
-        expect(result).to.equal(documentTypeSample)
-      })
-  })
-  // ===================================================
   it('DocumentType.get() should get the only documentType created in the database', () => {
     const DocumentTypeMock = sinon.mock(DocumentType)
 
