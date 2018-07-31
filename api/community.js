@@ -49,7 +49,7 @@ router.route('/')
    * @apiParam {Boolean} initialized   If the community is ready..
    */
   .put(
-    auth.protect('realm:admin'),
+    auth.keycloak.protect('realm:admin'),
     async (req, res, next) => {
       try {
         const updatedCommunity = await Community.update(req.body)

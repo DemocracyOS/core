@@ -5,7 +5,7 @@ const helmet = require('helmet')
 const session = require('express-session')
 const expressWinston = require('express-winston')
 // const mongoose = require('./services/mongoose')
-const keycloak = require('./services/auth')
+const { keycloak } = require('./services/auth')
 const mongoStore = require('./services/sessions')
 // const { setup } = require('../services/setup')
 const config = require('./config')
@@ -50,4 +50,3 @@ module.exports = (async () => {
     log.error(err)
   }
 })()
-

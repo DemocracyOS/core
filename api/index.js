@@ -65,7 +65,7 @@ router.use('/docs/api',
 
 router.use('/admin',
   // Protect with realm role
-  auth.protect('realm:admin'),
+  auth.keycloak.protect('realm:admin'),
   express.static(path.join(__dirname, '../admin/build'))
 )
 

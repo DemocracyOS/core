@@ -48,7 +48,7 @@ router.route('/')
    * @apiPermission admin
    */
   .put(
-    auth.protect('realm:admin'),
+    auth.keycloak.protect('realm:admin'),
     async (req, res, next) => {
       try {
         const updatedDocumentType = await DocumentType.update(req.body)
