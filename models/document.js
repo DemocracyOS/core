@@ -10,7 +10,7 @@ const Document = new mongoose.Schema({
   documentType: { type: mongoose.Schema.Types.ObjectId, ref: 'DocumentType' },
   documentTypeVersion: { type: Number, required: true },
   content: {
-    title: { type: String, required: true },
+    title: { type: String, required: true, maxlength: 120 },
     brief: { type: String, required: false },
     fields: { type: mongoose.Schema.Types.Mixed }
   }
