@@ -3,7 +3,7 @@ const express = require('express')
 const Document = require('../db-api/document')
 const router = express.Router()
 const auth = require('../services/auth')
-const { isAdmin } = require('../services/utils')
+const errors = require('../services/errors')
 const log = require('../services/logger')
 // const {
 //   ErrMissingParam,
@@ -19,12 +19,9 @@ router.route('/')
   .get(
     async (req, res, next) => {
       try {
-        const results = await Document.list({
-          filter: req.query.filter,
+        const results = await Document.list({}, {
           limit: req.query.limit,
-          page: req.query.page,
-          ids: req.query.ids,
-          fields: {}
+          page: req.query.page
         })
         res.status(status.OK).json({
           results: results.docs,
@@ -44,7 +41,7 @@ router.route('/')
    * @apiGroup Document
    */
   .post(
-    auth.protect('realm:colaborator'),
+    auth.keycloak.protect('realm:colaborator'),
     async (req, res, next) => {
       try {
         const newDocument = await Document.create(req.body)
@@ -64,8 +61,29 @@ router.route('/:id')
   .get(
     async (req, res, next) => {
       try {
-        // TODO
-        // res.status(status.OK).json(document)
+        let document = null
+        // Does the request comes from a collaborator?
+        if (auth.isAuthenticated(req) && auth.hasRealmRole(req, 'colaborator')) {
+          // It does, get the document, no matter if published or not.
+          document = await Document.get({ _id: req.params.id })
+          // If it doesnt exists, return null
+          if(!document) res.status(status.OK).json(document)
+          // What if its a draft? Only the author should be able to see it
+          if (!document.published) {
+            // It's a draft, check if the author is the user who requested it.
+            if (document.authorId === auth.getUserId(req)) {
+              // True! Deliver the document
+              res.status(status.OK).json(document)
+            } else {
+              // No, Then the user shouldn't be asking for this document.
+              throw errors.ErrForbidden
+            }
+          }
+        } else {
+          // No. The request shoulw retrieve a public document then. Published documents are public.
+          document = await Document.get({ _id: req.params.id, published: true })
+        }
+        res.status(status.OK).json(document)
       } catch (err) {
         next(err)
       }

@@ -16,13 +16,12 @@ exports.create = async function create (document) {
 }
 
 // Get document
-exports.get = function get () {
-  return Document.findOne({})
+exports.get = function get (query) {
+  return Document.findOne(query)
 }
 
 // List documents
-exports.list = function list ({ limit, page, ids }) {
-  let query = {}
+exports.list = function list (query, { limit, page }) {
   return Document
     .paginate(query, { page, limit })
 }
