@@ -10,9 +10,18 @@ const isSchemaValid = (schema) => {
   if (!validSchema) throw Error.ErrInvalidJSONSchema(ajv.errors)
 }
 
-const isDataValid = (schema, data) => {
-  let validData = ajv.compile(schema).validate(data)
-  if (!validData) throw Error.ErrInvalidData
+const isDataValid = (docTypeFields, data) => {
+  console.log(docTypeFields)
+  console.log(data)
+  let validate = ajv.compile({
+    properties: docTypeFields.properties,
+    additionalProperties: false,
+    required: docTypeFields.required
+  })
+  let valid = validate(data)
+  console.log('Is this valid data? ' + valid)
+  if (!valid) throw Error.ErrInvalidData(validate.errors)
+  return true;
 }
 
 module.exports = {
