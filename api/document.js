@@ -41,7 +41,7 @@ router.route('/')
    * @apiGroup Document
    */
   .post(
-    auth.keycloak.protect('realm:colaborator'),
+    auth.keycloak.protect('realm:responsible'),
     async (req, res, next) => {
       try {
         const newDocument = await Document.create(req.body)
@@ -62,12 +62,12 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         let document = null
-        // Does the request comes from a collaborator?
-        if (auth.isAuthenticated(req) && auth.hasRealmRole(req, 'colaborator')) {
+        // Does the request comes from a responsible?
+        if (auth.isAuthenticated(req) && auth.hasRealmRole(req, 'responsible')) {
           // It does, get the document, no matter if published or not.
           document = await Document.get({ _id: req.params.id })
           // If it doesnt exists, return null
-          if(!document) res.status(status.OK).json(document)
+          if (!document) res.status(status.OK).json(document)
           // What if its a draft? Only the author should be able to see it
           if (!document.published) {
             // It's a draft, check if the author is the user who requested it.
@@ -80,7 +80,7 @@ router.route('/:id')
             }
           }
         } else {
-          // No. The request shoulw retrieve a public document then. Published documents are public.
+          // The request doesn't come from a possible author, then it should return a document if it exists and if it is published.
           document = await Document.get({ _id: req.params.id, published: true })
         }
         res.status(status.OK).json(document)
