@@ -5,15 +5,12 @@ const Document = require('../models/document')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
 
-exports.checkPermission = async function getDocumentsCount (authorId, limit) {
-  let count = await Document.countDocuments({ authorId: authorId })
-  if (count >= limit) throw errors.ErrForbidden('Cannot create more documents')
-  return true
+exports.countAuthorDocuments = async function countAuthorDocuments (authorId) {
+  return Document.count({ authorId: authorId })
 }
 
 exports.isAuthor = async function isAuthor (id, authorId) {
-  if (!ObjectId.isValid(id)) throw errors.Error('Document not found')
-  let count = await Document.countDocuments({ authorId: authorId })
+  let count = await Document.count({ _id: id, authorId: authorId })
   return count
 }
 
@@ -47,5 +44,13 @@ exports.update = async function update (document, documentType) {
     .then((_document) => {
       if (!_document) throw errors.ErrNotFound('Document to update not found')
       return merge(_document, document).save()
+    })
+}
+
+exports.remove = function remove (id) {
+  return Document.findOne({ _id: ObjectId(id) })
+    .then((document) => {
+      if (!document) throw errors.ErrNotFound('Document to remove not found')
+      document.remove()
     })
 }

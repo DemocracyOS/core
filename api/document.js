@@ -47,6 +47,12 @@ router.route('/')
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
+        const permissions = auth.getPermissions(req)
+        // check if permissions
+        const documentsCount = await Document.countAuthorDocuments(auth.getUserId(req))
+        if (documentsCount >= permissions.documentLimit) {
+          throw errors.ErrNotAuthorized('Cannot create more documents (Limit reached)')
+        }
         const documentType = await DocumentType.get()
         const newDocument = await Document.create(req.body, documentType)
         res.send(status.CREATED, newDocument)
@@ -67,7 +73,9 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         const document = await Document.get({ _id: req.params.id })
+        // No document?
         if (!document) throw errors.ErrNotFound('Document not found or doesn\'t exist')
+        // Check if it is published or not (draft)
         if (!document.published) {
           // It's a draft, check if the author is the user who requested it.
           if (document.authorId === auth.getUserId(req)) {
@@ -95,15 +103,17 @@ router.route('/:id')
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        // Check if the user is the author of the document
+        // Get the document
         const document = await Document.get({ _id: req.params.id })
+        // Check if the user is the author of the document
         if (!(document.authorId === auth.getUserId(req))) {
-          throw errors.ErrForbidden
+          throw errors.ErrForbidden // User is not the author
         }
+        // Retrieve the version of the documentType that the document follows
         const documentType = await DocumentTypeVersion.getVersion(document.documentTypeVersion)
+        // Update the document, with the correct documentType
         const updatedDocumentType = await Document.update(req.body, documentType)
         res.status(status.OK).json(updatedDocumentType)
-        // res.status(status.IM_A_TEAPOT).json({a: 'b'})
       } catch (err) {
         next(err)
       }
@@ -120,8 +130,13 @@ router.route('/:id')
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        // TODO
-        // res.status(status.OK).json({ id: req.params.id })
+        // Check if the user is the author of the document.
+        if (!Document.isAuthor(req.params.id, auth.getUserId(req))) {
+          throw errors.ErrForbidden // User is not the author
+        }
+        // Remove document.
+        await Document.remove(req.params.id)
+        res.status(status.OK).json({ id: req.params.id })
       } catch (err) {
         next(err)
       }
