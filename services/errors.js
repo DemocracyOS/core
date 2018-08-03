@@ -65,6 +65,12 @@ const ErrForbidden = new APIError('Resource not available', {
   status: FORBIDDEN
 })
 
+
+const ErrNotAuthorized = (message) => new APIError(message, {
+  translationKey: 'NOT_AUTHORIZED',
+  status: FORBIDDEN
+})
+
 const ErrUserNotLoggedIn = new APIError('User is not logged in', {
   translationKey: 'USER_NOT_LOGGED_IN',
   status: FORBIDDEN
@@ -93,6 +99,7 @@ const ErrInvalidData = (metadata) => new APIError('Data doesn\'t follow the spec
 module.exports = {
   APIError,
   ErrNotFound,
+  ErrNotAuthorized,
   ErrMissingParam,
   ErrInvalidParam,
   ErrParamTooLong,
