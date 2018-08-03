@@ -8,8 +8,10 @@ const errors = require('../services/errors')
 
 // Utility functions
 
-exports.getDocumentsCount = async function getDocumentsCount (id) {
-  return Document.countDocuments({ _id: id })
+exports.checkPermission = async function getDocumentsCount (authorId, limit) {
+  let count = await Document.countDocuments({ authorId: authorId })
+  if (count >= limit) throw errors.ErrForbidden('Cannot create more documents')
+  return true
 }
 
 // Create document
