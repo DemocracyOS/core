@@ -36,6 +36,13 @@ const ErrMissingParam = (field) => new APIError('Missing required paramether', {
   field: field
 })
 
+const ErrInvalidParam = (field) => new APIError('Invalid paramether', {
+  translationKey: 'INVALID_PARAM',
+  status: BAD_REQUEST
+}, {
+  field: field
+})
+
 const ErrParamTooLong = (field) => new APIError('Paramether is too long', {
   translationKey: 'PARAM_LENGTH',
   status: BAD_REQUEST
@@ -87,6 +94,7 @@ module.exports = {
   APIError,
   ErrNotFound,
   ErrMissingParam,
+  ErrInvalidParam,
   ErrParamTooLong,
   ErrCommunitysNotInit,
   ErrCommunityInit,

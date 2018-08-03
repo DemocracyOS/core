@@ -4,6 +4,13 @@ const Document = require('../models/document')
 const DocumentType = require('../models/documentType')
 const log = require('../services/logger')
 const validator = require('../services/jsonSchemaValidator')
+const errors = require('../services/errors')
+
+// Utility functions
+
+exports.getDocumentsCount = async function getDocumentsCount (id) {
+  return Document.countDocuments({ _id: id })
+}
 
 // Create document
 exports.create = async function create (document) {
@@ -17,6 +24,9 @@ exports.create = async function create (document) {
 
 // Get document
 exports.get = function get (query) {
+  if (query._id) {
+    if (!ObjectId.isValid(query._id)) throw errors.ErrNotFound('Document not found')
+  }
   return Document.findOne(query)
 }
 
