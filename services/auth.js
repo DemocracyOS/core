@@ -35,9 +35,18 @@ const hasRealmRole = (req, roleName) => {
   return false
 }
 
+const getPermissions = (req) => {
+  if (req.kauth && req.kauth.grant) {
+    return req.kauth.grant.access_token.content.permissions
+  } else {
+    return null
+  }
+}
+
 module.exports = {
   keycloak,
   isAuthenticated,
   hasRealmRole,
-  getUserId
+  getUserId,
+  getPermissions
 }
