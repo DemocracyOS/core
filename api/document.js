@@ -1,10 +1,13 @@
 const status = require('http-status')
 const express = require('express')
 const Document = require('../db-api/document')
+const DocumentType = require('../db-api/documentType')
+const DocumentTypeVersion = require('../db-api/documentTypeVersion')
 const router = express.Router()
 const auth = require('../services/auth')
 const errors = require('../services/errors')
 const log = require('../services/logger')
+const middlewares = require('../services/middlewares')
 // const {
 //   ErrMissingParam,
 //   ErrNotFound,
@@ -44,7 +47,8 @@ router.route('/')
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        const newDocument = await Document.create(req.body)
+        const documentType = await DocumentType.get()
+        const newDocument = await Document.create(req.body, documentType)
         res.send(status.CREATED, newDocument)
       } catch (err) {
         next(err)
@@ -59,11 +63,10 @@ router.route('/:id')
    * @apiParam {Number} id Documents ID.
    */
   .get(
+    middlewares.checkId,
     async (req, res, next) => {
       try {
-        let document = null
-
-        document = await Document.get({ _id: req.params.id })
+        const document = await Document.get({ _id: req.params.id })
         if (!document) throw errors.ErrNotFound('Document not found or doesn\'t exist')
         if (!document.published) {
           // It's a draft, check if the author is the user who requested it.
@@ -88,10 +91,19 @@ router.route('/:id')
    * @apiParam {Number} id Documents ID.
    */
   .put(
+    middlewares.checkId,
+    auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        // TODO
-        // res.send(status.OK).json(updatedDocument)
+        // Check if the user is the author of the document
+        const document = await Document.get({ _id: req.params.id })
+        if (!(document.authorId === auth.getUserId(req))) {
+          throw errors.ErrForbidden
+        }
+        const documentType = await DocumentTypeVersion.getVersion(document.documentTypeVersion)
+        const updatedDocumentType = await Document.update(req.body, documentType)
+        res.status(status.OK).json(updatedDocumentType)
+        // res.status(status.IM_A_TEAPOT).json({a: 'b'})
       } catch (err) {
         next(err)
       }
@@ -104,6 +116,8 @@ router.route('/:id')
    * @apiParam {Number} id Documents ID.
    */
   .delete(
+    middlewares.checkId,
+    auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
         // TODO

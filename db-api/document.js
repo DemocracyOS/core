@@ -1,12 +1,9 @@
 const { Types: { ObjectId } } = require('mongoose')
-// const { ErrNotFound } = require('../services/errors')
+const { merge } = require('lodash/object')
 const Document = require('../models/document')
-const DocumentType = require('../models/documentType')
-const log = require('../services/logger')
+// const log = require('../services/logger')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
-
-// Utility functions
 
 exports.checkPermission = async function getDocumentsCount (authorId, limit) {
   let count = await Document.countDocuments({ authorId: authorId })
@@ -14,9 +11,14 @@ exports.checkPermission = async function getDocumentsCount (authorId, limit) {
   return true
 }
 
+exports.isAuthor = async function isAuthor (id, authorId) {
+  if (!ObjectId.isValid(id)) throw errors.Error('Document not found')
+  let count = await Document.countDocuments({ authorId: authorId })
+  return count
+}
+
 // Create document
-exports.create = async function create (document) {
-  const documentType = await DocumentType.findOne({})
+exports.create = async function create (document, documentType) {
   validator.isDataValid(
     documentType.fields,
     document.content.fields
@@ -26,9 +28,6 @@ exports.create = async function create (document) {
 
 // Get document
 exports.get = function get (query) {
-  if (query._id) {
-    if (!ObjectId.isValid(query._id)) throw errors.ErrNotFound('Document not found')
-  }
   return Document.findOne(query)
 }
 
@@ -39,16 +38,14 @@ exports.list = function list (query, { limit, page }) {
 }
 
 // Update document
-// exports.update = function update (document) {
-//   if (document.fields) {
-//     validator.isSchemaValid({
-//       properties: document.fields.properties,
-//       required: document.fields.required
-//     })
-//   }
-//   return Document.findOne({})
-//     .then((_document) => {
-//       if (!_document) throw ErrNotFound('Document to update not found')
-//       return Object.assign(_document, document).save()
-//     })
-// }
+exports.update = async function update (document, documentType) {
+  validator.isDataValid(
+    documentType.fields,
+    document.content.fields
+  )
+  return Document.findOne({})
+    .then((_document) => {
+      if (!_document) throw errors.ErrNotFound('Document to update not found')
+      return merge(_document, document).save()
+    })
+}
