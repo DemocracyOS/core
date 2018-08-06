@@ -22,7 +22,7 @@ router.route('/')
   .get(
     async (req, res, next) => {
       try {
-        const results = await Document.list({}, {
+        const results = await Document.list({ published: true }, {
           limit: req.query.limit,
           page: req.query.page
         })
@@ -53,9 +53,10 @@ router.route('/')
         if (documentsCount >= permissions.documentLimit) {
           throw errors.ErrNotAuthorized('Cannot create more documents (Limit reached)')
         }
+        req.body.authorId = auth.getUserId(req)
         const documentType = await DocumentType.get()
         const newDocument = await Document.create(req.body, documentType)
-        res.send(status.CREATED, newDocument)
+        res.status(status.CREATED).send(newDocument)
       } catch (err) {
         next(err)
       }
@@ -112,7 +113,7 @@ router.route('/:id')
         // Retrieve the version of the documentType that the document follows
         const documentType = await DocumentTypeVersion.getVersion(document.documentTypeVersion)
         // Update the document, with the correct documentType
-        const updatedDocumentType = await Document.update(req.body, documentType)
+        const updatedDocumentType = await Document.update(req.params.id, req.body, documentType)
         res.status(status.OK).json(updatedDocumentType)
       } catch (err) {
         next(err)
