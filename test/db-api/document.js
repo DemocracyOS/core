@@ -67,23 +67,25 @@ describe('Document DB-APIs', () => {
       })
   })
   it('Document.update() should modify a document', () => {
-    // const DocumentMock = sinon.mock(Document)
-    // const save = sinon.spy(() => documentSample)
+    const DocumentMock = sinon.mock(Document)
+    let documentSample = fake.document()
+    documentSample.save = sinon.spy(() => documentSample)
+    
+    DocumentMock
+      .expects('findOne').withArgs({ _id: '5a5e29d948a9cc2fbeed02fa' })
+      .chain('exec')
+      .resolves(documentSample)
 
-    // DocumentMock
-    //   .expects('findOne').withArgs({ _id: '5a5e29d948a9cc2fbeed02fa' })
-    //   .chain('exec')
-    //   .resolves(documentSample)
+    // let stub = sinon.stub(document, "")
 
-    // // DocumentMock.expects('save')
-
-    // return document.update('5a5e29d948a9cc2fbeed02fa', { published: false }, documentTypeSample)
-    //   .then((result) => {
-    //     DocumentMock.verify()
-    //     DocumentMock.restore()
-    //     sinon.assert.calledOnce(save)
-    //     expect(result).to.equal(documentSample)
-    //   })
+    return document.update('5a5e29d948a9cc2fbeed02fa', { published: false }, documentTypeSample)
+      .then((result) => {
+        DocumentMock.verify()
+        DocumentMock.restore()
+        sinon.assert.calledOnce(documentSample.save)
+        expect(result).to.have.property('published')
+        expect(result.published).to.be.equal(false)
+      })
   })
   it('Document.remove() should remove a document', () => {
     const DocumentMock = sinon.mock(Document)
