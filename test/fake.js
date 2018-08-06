@@ -45,7 +45,7 @@ const documentType = (valid) => {
           title: "Author's surname"
         },
         'authorEmail': {
-          type: (valid !== undefined && !valid ? 'strong' : 'string'),
+          type: valid !== undefined && !valid ? 'strong' : 'string',
           title: "Author's email"
         },
         'orgTel': {
@@ -53,7 +53,7 @@ const documentType = (valid) => {
           title: "Org's tel"
         },
         'orgEmail': {
-          type: (valid !== undefined && !valid ? 'strong' : 'string'),
+          type: valid !== undefined && !valid ? 'strong' : 'string',
           title: "Org's email"
         },
         'orgAdress': {
@@ -70,7 +70,28 @@ const documentType = (valid) => {
   }
 }
 
+const document = (valid, published, authorId, documentTypeId) => {
+  return {
+    authorId: authorId || '40bb3a93-36c2-4fe5-8fa1-5bd488874cda',
+    published: !!published,
+    publishedAt: faker.date.recent(),
+    documentType: documentTypeId || null,
+    documentTypeVersion: 0,
+    content: {
+      title: faker.lorem.words(4),
+      brief: faker.lorem.sentence(12),
+      fields: {
+        authorName: valid !== undefined && !valid ? faker.random.number() : faker.name.firstName(),
+        authorSurname: faker.name.lastName(),
+        authorEmail: faker.internet.email(),
+        orgTel: valid !== undefined && !valid ? faker.random.number() : faker.company.companyName()
+      }
+    }
+  }
+}
+
 module.exports = {
   community,
-  documentType
+  documentType,
+  document
 }
