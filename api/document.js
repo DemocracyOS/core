@@ -15,8 +15,9 @@ const middlewares = require('../services/middlewares')
 // } = require('../services/errors')
 router.route('/')
   /**
-   * @api {get} /documents List documents
+   * @api {get} /documents List
    * @apiName getDocuments
+   * @apiDescription Returns a paginated list of -published- documents. Note that it wont list drafts if the request comes from a user with saved drafts.
    * @apiGroup Document
    */
   .get(
@@ -39,8 +40,9 @@ router.route('/')
       }
     })
   /**
-   * @api {post} /documents Create a new document
+   * @api {post} /documents Create
    * @apiName postDocument
+   * @apiDescription Creates a document and returns the created document. The authorId is not required to be sent on the body. API sets the authorId by itself.
    * @apiGroup Document
    */
   .post(
@@ -63,11 +65,22 @@ router.route('/')
     })
 router.route('/:id')
   /**
-   * @api {get} /documents/:id Gets a document
+   * @api {get} /documents/:id Get
    * @apiName getDocument
+   * @apiDescription Returns the data of a document.
    * @apiGroup Document
-   *
-   * @apiParam {Number} id Documents ID.
+   * @apiParam {String} id Documents ID.
+   * @apiSuccess {String}  id Id of the document
+   * @apiSuccess {String}  authorId  The author keycloak id.
+   * @apiSuccess {String}  published State of the document. If `false` is a draft and should not be public.
+   * @apiSuccess {String}  documentType Id of the document type
+   * @apiSuccess {Integer}  documentTypeVersion The current version of the document type. Starts with 0. If it is <code>0</code> then its the first version of the document type.
+   * @apiSuccess {Date}  createdAt Date of creation
+   * @apiSuccess {Date}  updatedAt Date of update
+   * @apiSuccess {Object}  content Content of the document
+   * @apiSuccess {String}  content.title Title of the document
+   * @apiSuccess {String}  content.brief A brief of the document
+   * @apiSuccess {Object}  content.fields The custom fields of the document, those were defined on the document type.
    */
   .get(
     middlewares.checkId,
@@ -93,8 +106,9 @@ router.route('/:id')
       }
     })
   /**
-   * @api {put} /documents/:id Updates a document
+   * @api {put} /documents/:id Update
    * @apiName putDocument
+   * @apiDescription Modifies a document. You just need to send the changed fields. No need to send all the document.
    * @apiGroup Document
    *
    * @apiParam {Number} id Documents ID.
@@ -120,10 +134,10 @@ router.route('/:id')
       }
     })
   /**
-   * @api {delete} /documents/:id Delets a document
+   * @api {delete} /documents/:id Delete
    * @apiName deleteDocument
    * @apiGroup Document
-   *
+   * @apiDescription Deletes a document and returns the id of the removed document.
    * @apiParam {Number} id Documents ID.
    */
   .delete(
