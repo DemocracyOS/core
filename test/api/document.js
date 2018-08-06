@@ -48,30 +48,16 @@ describe('Documents API (/api/v1/documents)', () => {
       // Create the agent
       agent = await chai.request.agent(config.ROOT_URL)
     })
-    it('GET (/) Anyone should be able to get a list of PUBLISHED documents', async () => {
+    it('GET (/) should not be able to list documents', async () => {
       await agent.get('/api/v1/documents')
+        .set('Authorization', 'Bearer ' + accessToken)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .set('Content-Type', 'application/json')
         .then((res) => {
-          expect(res).to.have.status(status.OK)
-          const { results, pagination } = res.body
-          expect(results).to.be.a('array')
-          expect(results.length).to.be.eql(2)
-          expect(results[0]).to.have.property('authorId')
-          expect(results[0]).to.have.property('published')
-          expect(results[0]).to.have.property('documentType')
-          expect(results[0]).to.have.property('documentTypeVersion')
-          expect(results[0].content).to.be.an('object')
-          expect(results[0].content).to.have.property('title')
-          expect(results[0].content).to.have.property('brief')
-          expect(results[0].content).to.have.property('fields')
-          expect(results[0]).to.have.property('createdAt')
-          expect(results[0]).to.have.property('updatedAt')
-          expect(pagination).to.have.property('count')
-          expect(pagination).to.have.property('page')
-          expect(pagination).to.have.property('limit')
+          // Nothing
         })
         .catch((err) => {
-          // expect(err).to.have.status(status.FORBIDDEN)
-          throw err
+          expect(err).to.have.status(status.FORBIDDEN)
         })
     })
     it('POST (/) should not be able to create a document', async () => {
@@ -180,6 +166,35 @@ describe('Documents API (/api/v1/documents)', () => {
           })
       } while (keepCreating && documentsCreated <= 10)
       expect(documentsCreated).to.be.most(10)
+    })
+    it('GET (/) The author should be able to list its own documents, drafts or published', async () => {
+      await agent.get('/api/v1/documents')
+        .set('Authorization', 'Bearer ' + accessToken)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .set('Content-Type', 'application/json')
+        .then((res) => {
+          expect(res).to.have.status(status.OK)
+          const { results, pagination } = res.body
+          expect(results).to.be.a('array')
+          expect(results.length).to.be.least(1)
+          expect(results[0]).to.have.property('authorId')
+          expect(results[0]).to.have.property('published')
+          expect(results[0]).to.have.property('documentType')
+          expect(results[0]).to.have.property('documentTypeVersion')
+          expect(results[0].content).to.be.an('object')
+          expect(results[0].content).to.have.property('title')
+          expect(results[0].content).to.have.property('brief')
+          expect(results[0].content).to.have.property('fields')
+          expect(results[0]).to.have.property('createdAt')
+          expect(results[0]).to.have.property('updatedAt')
+          expect(pagination).to.have.property('count')
+          expect(pagination).to.have.property('page')
+          expect(pagination).to.have.property('limit')
+        })
+        .catch((err) => {
+          // expect(err).to.have.status(status.FORBIDDEN)
+          throw err
+        })
     })
     it('GET (/:id) it should be to retrieve a document', async () => {
       await agent.get(`/api/v1/documents/${newDocument4._id}`)

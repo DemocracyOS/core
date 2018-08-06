@@ -21,9 +21,10 @@ router.route('/')
    * @apiGroup Document
    */
   .get(
+    auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        const results = await Document.list({ published: true }, {
+        const results = await Document.list({ authorId: auth.getUserId(req) }, {
           limit: req.query.limit,
           page: req.query.page
         })
