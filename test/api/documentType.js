@@ -9,10 +9,8 @@ const fake = require('../fake')
 const expect = chai.expect
 chai.use(chaiHttp)
 
-let fakeDocumentType1 = fake.documentType()
-let fakeDocumentType2 = fake.documentType()
-let fakeDocumentType3 = fake.documentType()
-let newDocumentType1 = null
+let fakeDocumentType = fake.documentType()
+let newDocumentType = null
 // Global variables for testing
 let agent = null // user agent, simulates a browser.
 let keycloakAgent = null // keycloak agent, simulates a browser.
@@ -25,9 +23,7 @@ describe('DocumentType API (/api/v1/document-type)', () => {
     // That is, clean the database, or initialize anything you need before executing the suite of tests
     await DocumentType.remove({})
     await DocumentTypeVersion.remove({})
-    newDocumentType_1 = await (new DocumentType(fakeDocumentType1)).save()
-    await (new DocumentType(fakeDocumentType2)).save()
-    await (new DocumentType(fakeDocumentType3)).save()
+    newDocumentType = await (new DocumentType(fakeDocumentType)).save()
   })
 
   describe('As anonymous user', () => {
