@@ -57,7 +57,6 @@ describe('Documents API (/api/v1/documents)', () => {
           expect(results.length).to.be.eql(2)
           expect(results[0]).to.have.property('authorId')
           expect(results[0]).to.have.property('published')
-          expect(results[0]).to.have.property('publishedAt')
           expect(results[0]).to.have.property('documentType')
           expect(results[0]).to.have.property('documentTypeVersion')
           expect(results[0].content).to.be.an('object')
@@ -103,7 +102,6 @@ describe('Documents API (/api/v1/documents)', () => {
           expect(res.body).to.have.property('authorId')
           expect(res.body).to.have.property('published')
           expect(res.body.published).to.be.equal(true)
-          expect(res.body).to.have.property('publishedAt')
           expect(res.body).to.have.property('documentType')
           expect(res.body).to.have.property('documentTypeVersion')
           expect(res.body.content).to.be.an('object')
@@ -158,6 +156,30 @@ describe('Documents API (/api/v1/documents)', () => {
           throw err
         })
     })
+    it('POST (/) should fail because the permission -documentLimit- is set (Test is limited to 10 tries)', async () => {
+      let newDocument = fake.document(true, true, null, newDocumentType.id)
+      let keepCreating = true
+      let documentsCreated = 0
+      do {
+        await agent.post(`/api/v1/documents`)
+          .set('Authorization', 'Bearer ' + accessToken)
+          .set('X-Requested-With', 'XMLHttpRequest')
+          .set('Content-Type', 'application/json')
+          .send(newDocument)
+          .then((res) => {
+            if (res.status === status.FORBIDDEN) {
+              keepCreating = false
+              expect(res).to.have.status(status.FORBIDDEN)
+            }
+            documentsCreated++
+            // Do nothing.. keep creating
+          })
+          .catch((err) => {
+            throw err
+          })
+      } while (keepCreating && documentsCreated <= 10)
+      expect(documentsCreated).to.be.most(10)
+    })
     it('GET (/:id) it should be to retrieve a document', async () => {
       await agent.get(`/api/v1/documents/${newDocument4._id}`)
         .set('Authorization', 'Bearer ' + accessToken)
@@ -167,7 +189,6 @@ describe('Documents API (/api/v1/documents)', () => {
           expect(res).to.have.status(status.OK)
           expect(res.body).to.have.property('authorId')
           expect(res.body).to.have.property('published')
-          expect(res.body).to.have.property('publishedAt')
           expect(res.body).to.have.property('documentType')
           expect(res.body).to.have.property('documentTypeVersion')
           expect(res.body.content).to.be.an('object')
@@ -193,7 +214,6 @@ describe('Documents API (/api/v1/documents)', () => {
           expect(res.body).to.have.property('authorId')
           expect(res.body).to.have.property('published')
           expect(res.body.published).to.be.equal(true)
-          expect(res.body).to.have.property('publishedAt')
           expect(res.body).to.have.property('documentType')
           expect(res.body).to.have.property('documentTypeVersion')
           expect(res.body.content).to.be.an('object')
