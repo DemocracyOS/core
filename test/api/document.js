@@ -75,6 +75,48 @@ describe('Documents API (/api/v1/documents)', () => {
           throw err
         })
     })
+    it('POST (/) should not be able to create a document', async () => {
+      let newDocument = fake.document(true, false, null, newDocumentType.id)
+      await agent.post(`/api/v1/documents`)
+        .set('Content-Type', 'application/json')
+        .send(newDocument)
+        .then((res) => {
+          // Nothing
+        })
+        .catch((err) => {
+          expect(err).to.have.status(status.FORBIDDEN)
+        })
+    })
+    it('GET (/:id) An anonymous user should not be able to get a unpublished document', async () => {
+      await agent.get(`/api/v1/documents/${newDocument2._id}`)
+        .then((res) => {
+          // Nothing
+        })
+        .catch((err) => {
+          expect(err).to.have.status(status.FORBIDDEN)
+        })
+    })
+    it('GET (/:id) An anonymous user should able to get a published document', async () => {
+      await agent.get(`/api/v1/documents/${newDocument1._id}`)
+        .then((res) => {
+          expect(res).to.have.status(status.OK)
+          expect(res.body).to.have.property('authorId')
+          expect(res.body).to.have.property('published')
+          expect(res.body.published).to.be.equal(true)
+          expect(res.body).to.have.property('publishedAt')
+          expect(res.body).to.have.property('documentType')
+          expect(res.body).to.have.property('documentTypeVersion')
+          expect(res.body.content).to.be.an('object')
+          expect(res.body.content).to.have.property('title')
+          expect(res.body.content).to.have.property('brief')
+          expect(res.body.content).to.have.property('fields')
+          expect(res.body).to.have.property('createdAt')
+          expect(res.body).to.have.property('updatedAt')
+        })
+        .catch((err) => {
+          throw err
+        })
+    })
   })
   describe('As an "Accountable" user (Group member: Accountable - Role: accountable)', () => {
     before(async () => {
@@ -93,7 +135,6 @@ describe('Documents API (/api/v1/documents)', () => {
         .then((res) => {
           accessToken = res.body.access_token
           expect(res).to.have.status(status.OK)
-          /* eslint-disable no-unused-expressions */
           expect(res.body).to.not.be.null
           expect(res.body).to.have.property('access_token')
           expect(res.body).to.be.a('object')
@@ -111,7 +152,6 @@ describe('Documents API (/api/v1/documents)', () => {
         .send(newDocument)
         .then((res) => {
           expect(res).to.have.status(status.CREATED)
-          /* eslint-disable no-unused-expressions */
           newDocument4 = res.body
         })
         .catch((err) => {
@@ -125,7 +165,6 @@ describe('Documents API (/api/v1/documents)', () => {
         .set('Content-Type', 'application/json')
         .then((res) => {
           expect(res).to.have.status(status.OK)
-          /* eslint-disable no-unused-expressions */
           expect(res.body).to.have.property('authorId')
           expect(res.body).to.have.property('published')
           expect(res.body).to.have.property('publishedAt')
@@ -151,7 +190,6 @@ describe('Documents API (/api/v1/documents)', () => {
         .send(modification)
         .then((res) => {
           expect(res).to.have.status(status.OK)
-          /* eslint-disable no-unused-expressions */
           expect(res.body).to.have.property('authorId')
           expect(res.body).to.have.property('published')
           expect(res.body.published).to.be.equal(true)
@@ -183,4 +221,5 @@ describe('Documents API (/api/v1/documents)', () => {
           throw err
         })
     })
+  })
 })
