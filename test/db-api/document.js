@@ -12,6 +12,7 @@ const documentSample = fake.document()
 const documentTypeSample = fake.documentType()
 
 describe('Document DB-APIs', () => {
+  // ===================================================
   it('Document.create() should create a document', () => {
     // require module with rewire to override its internal Document reference
     const document = rewire('../../db-api/document')
@@ -37,6 +38,8 @@ describe('Document DB-APIs', () => {
         expect(result).to.equal(documentSample)
       })
   })
+  // ===================================================
+
   it('Document.get() should get a document', () => {
     const DocumentMock = sinon.mock(Document)
 
@@ -52,6 +55,7 @@ describe('Document DB-APIs', () => {
         expect(result).to.equal(documentSample)
       })
   })
+  // ===================================================
   it('Document.list() should list all documents', () => {
     const DocumentMock = sinon.mock(Document)
 
@@ -66,17 +70,16 @@ describe('Document DB-APIs', () => {
         expect(result).to.equal(documentSample)
       })
   })
+  // ===================================================
   it('Document.update() should modify a document', () => {
     const DocumentMock = sinon.mock(Document)
     let documentSample = fake.document()
     documentSample.save = sinon.spy(() => documentSample)
-    
+
     DocumentMock
       .expects('findOne').withArgs({ _id: '5a5e29d948a9cc2fbeed02fa' })
       .chain('exec')
       .resolves(documentSample)
-
-    // let stub = sinon.stub(document, "")
 
     return document.update('5a5e29d948a9cc2fbeed02fa', { published: false }, documentTypeSample)
       .then((result) => {
@@ -87,6 +90,7 @@ describe('Document DB-APIs', () => {
         expect(result.published).to.be.equal(false)
       })
   })
+  // ===================================================
   it('Document.remove() should remove a document', () => {
     const DocumentMock = sinon.mock(Document)
     const remove = sinon.spy()

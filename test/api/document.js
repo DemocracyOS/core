@@ -116,6 +116,7 @@ describe('Documents API (/api/v1/documents)', () => {
         })
     })
   })
+  // ===================================================
   describe('As an "Accountable" user (Group member: Accountable - Role: accountable)', () => {
     before(async () => {
       // Create the agent
