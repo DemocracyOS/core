@@ -35,20 +35,21 @@ exports.list = function list (query, { limit, page }) {
 }
 
 // Update document
-exports.update = async function update (document, documentType) {
-  validator.isDataValid(
-    documentType.fields,
-    document.content.fields
-  )
-  return Document.findOne({})
+exports.update = async function update (id, document, documentType) {
+  return Document.findOne({ _id: id })
     .then((_document) => {
       if (!_document) throw errors.ErrNotFound('Document to update not found')
-      return merge(_document, document).save()
+      let documentToSave = merge(_document, document)
+      validator.isDataValid(
+        documentType.fields,
+        documentToSave.content.fields
+      )
+      return documentToSave.save()
     })
 }
 
 exports.remove = function remove (id) {
-  return Document.findOne({ _id: ObjectId(id) })
+  return Document.findOne({ _id: id })
     .then((document) => {
       if (!document) throw errors.ErrNotFound('Document to remove not found')
       document.remove()
