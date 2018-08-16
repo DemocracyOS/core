@@ -36,6 +36,13 @@ const ErrMissingParam = (field) => new APIError('Missing required paramether', {
   field: field
 })
 
+const ErrInvalidParam = (field) => new APIError('Invalid paramether', {
+  translationKey: 'INVALID_PARAM',
+  status: BAD_REQUEST
+}, {
+  field: field
+})
+
 const ErrParamTooLong = (field) => new APIError('Paramether is too long', {
   translationKey: 'PARAM_LENGTH',
   status: BAD_REQUEST
@@ -55,6 +62,12 @@ const ErrCommunityInit = new APIError('The community is already initialized', {
 
 const ErrForbidden = new APIError('Resource not available', {
   translationKey: 'RESOURCE_NOT_AVAILABLE',
+  status: FORBIDDEN
+})
+
+
+const ErrNotAuthorized = (message) => new APIError(message, {
+  translationKey: 'NOT_AUTHORIZED',
   status: FORBIDDEN
 })
 
@@ -78,15 +91,17 @@ const ErrInvalidJSONSchema = (metadata) => new APIError('JSON Schema is not vali
   status: BAD_REQUEST
 }, { errors: metadata })
 
-const ErrInvalidData = new APIError('Data doesn\'t follow the specified JSON Schema.', {
+const ErrInvalidData = (metadata) => new APIError('Data doesn\'t follow the specified JSON Schema.', {
   translationKey: 'INVALID_DATA_FOR_JSON_SCHEMA',
   status: BAD_REQUEST
-})
+}, { errors: metadata })
 
 module.exports = {
   APIError,
   ErrNotFound,
+  ErrNotAuthorized,
   ErrMissingParam,
+  ErrInvalidParam,
   ErrParamTooLong,
   ErrCommunitysNotInit,
   ErrCommunityInit,

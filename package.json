@@ -34,6 +34,7 @@
     "helmet": "^3.12.1",
     "http-status": "^1.2.0",
     "keycloak-connect": "^4.1.0",
+    "lodash": "^4.17.10",
     "mongoose": "^5.1.5",
     "mongoose-paginate": "^5.0.3",
     "mongoose-version": "^1.1.0",
@@ -48,16 +49,15 @@
     "ajv": "^6.5.2",
     "apidoc": "^0.17.6",
     "chai": "^4.1.2",
-    "chai-http": "^3.0.0",
+    "chai-http": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-config-democracyos": "^2.0.2",
-    "fakegoose": "0.0.3",
     "faker": "^4.1.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.5",
     "rewire": "^3.0.2",
-    "sinon": "^4.5.0",
-    "sinon-mongoose": "^2.1.1"
+    "sinon": "^6.1.4",
+    "sinon-mongoose": "^2.2.1"
   },
   "apidoc": {
     "title": "DemocracyOS v3 API",

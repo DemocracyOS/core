@@ -33,6 +33,7 @@ router.use(
 
 routerV1.use('/community', require('../api/community'))
 routerV1.use('/document-type', require('../api/documentType'))
+routerV1.use('/documents', require('../api/document'))
 routerV1.use('/users', require('../api/user'))
 
 // ===============================
@@ -64,7 +65,7 @@ router.use('/docs/api',
 
 router.use('/admin',
   // Protect with realm role
-  auth.protect('realm:admin'),
+  auth.keycloak.protect('realm:admin'),
   express.static(path.join(__dirname, '../admin/build'))
 )
 

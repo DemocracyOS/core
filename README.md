@@ -95,6 +95,8 @@ docker exec core_keycloak_1 keycloak/bin/kcadm.sh set-password -r democracyos-te
 docker exec core_keycloak_1 keycloak/bin/kcadm.sh add-roles --uusername admin --rolename admin -r democracyos-test
 ```
 
+Now enter to http://localhost:4000/ and go to democracyos-test and add "user" to the group "Accountable" so the tests works
+
 #### To setup the app
 Before doing anything, make sure you have your `.env` file. Copy the `.env.dist` in a `.env` file and define the values. 
 
