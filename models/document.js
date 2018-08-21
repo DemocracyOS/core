@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const version = require('mongoose-version')
+// const version = require('mongoose-version')
 const mongoosePaginate = require('mongoose-paginate')
 
 // Define `Community` Schema

@@ -3,8 +3,8 @@ const Community = require('./models/community')
 const dbCommunity = require('./db-api/community')
 const DocumentType = require('./models/documentType')
 const dbDocumentType = require('./db-api/documentType')
-const DocumentTypeVersion = require('./models/documentTypeVersion')
-const dbDocumentTypeVersion = require('./db-api/documentTypeVersion')
+// const DocumentTypeVersion = require('./models/documentTypeVersion')
+// const dbDocumentTypeVersion = require('./db-api/documentTypeVersion')
 const config = require('./config')
 const log = require('./services/logger')
 const { NODE_ENV } = process.env
@@ -19,8 +19,8 @@ async function checkDB () {
   if (community) throw new DatabaseNotEmpty('ERROR There is at least one community already on the DB')
   let documentType = await DocumentType.findOne({})
   if (documentType) throw new DatabaseNotEmpty('ERROR There is at least one document type already on the DB')
-  let documentTypeVersions = await DocumentTypeVersion.findOne({})
-  if (documentTypeVersions) throw new DatabaseNotEmpty('ERROR There is at least one version of a document type already on the DB')
+  // let documentTypeVersions = await DocumentTypeVersion.findOne({})
+  // if (documentTypeVersions) throw new DatabaseNotEmpty('ERROR There is at least one version of a document type already on the DB')
   log.debug('--> OK')
 }
 
@@ -39,38 +39,70 @@ async function startSetup () {
       mainColor: config.SETUP.COMMUNITY_COLOR,
       logo: null,
       user: null,
+      userProfileSchema: {
+        'blocks': [
+          {
+            'fields': [
+              'twitter',
+              'facebook'
+            ],
+            'name': 'Social Media'
+          },
+          {
+            'fields': [
+              'bio'
+            ],
+            'name': 'About the user'
+          }
+        ],
+        'properties': {
+          'bio': {
+            'type': 'string',
+            'title': 'User information'
+          },
+          'twitter': {
+            'type': 'string',
+            'title': "User's surname"
+          },
+          'facebook': {
+            'type': 'string',
+            'title': "User's facebook"
+          }
+        },
+        'required': []
+      },
       initialized: true
     })
     log.debug('--> OK')
-    log.debug('* Creating document type...')
-    await dbDocumentType.create({
-      name: config.SETUP.DOCUMENT_TYPE_NAME,
-      icon: 'fa-file',
-      description: '- To be filled -',
-      fields: {
-        blocks: [],
-        properties: {
-          'authorName': {
-            type: 'string',
-            title: "Author's name"
-          },
-          'authorSurname': {
-            type: 'string',
-            title: "Author's surname"
-          },
-          'authorEmail': {
-            type: 'string',
-            title: "Author's email"
-          }
-        },
-        required: [
-          'authorName',
-          'authorSurname',
-          'authorEmail'
-        ]
-      }
-    })
-    log.debug('--> OK')
+    // log.debug('* Creating document type...')
+    // await dbDocumentType.create({
+    //   name: config.SETUP.DOCUMENT_TYPE_NAME,
+    //   icon: 'fa-file',
+    //   description: '- To be filled -',
+    //   fields: {
+    //     blocks: [],
+    //     properties: {
+    //       'authorName': {
+    //         type: 'string',
+    //         title: "Author's name"
+    //       },
+    //       'authorSurname': {
+    //         type: 'string',
+    //         title: "Author's surname"
+    //       },
+    //       'authorEmail': {
+    //         type: 'string',
+    //         title: "Author's email"
+    //       }
+    //     },
+    //     required: [
+    //       'authorName',
+    //       'authorSurname',
+    //       'authorEmail'
+    //     ]
+    //   }
+    // })
+    // log.debug('--> OK')
     log.debug('--> Setup finished!')
     process.exit(0) // Success
   } catch (err) {

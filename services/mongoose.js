@@ -19,8 +19,8 @@ mongoose
 require('../models/user')
 require('../models/community')
 require('../models/documentType')
-require('../models/documentTypeVersion')
 require('../models/document')
+// require('../models/documentTypeVersion')
 
 const db = mongoose.connection
 

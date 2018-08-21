@@ -2,11 +2,10 @@ const mongoose = require('mongoose')
 const mongoosePaginate = require('mongoose-paginate')
 
 const User = new mongoose.Schema({
-  authId: String,
-  email: String,
-  name: String,
+  keycloak: String,
+  username: String,
   avatar: { data: Buffer, contentType: String },
-  initialized: { type: Boolean, default: false }
+  fields: { type: mongoose.Schema.Types.Mixed }
 }, { timestamps: true })
 
 // Model's Plugin Extensions
