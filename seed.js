@@ -102,7 +102,7 @@ async function startSetup () {
     //     ]
     //   }
     // })
-    // log.debug('--> OK')
+    // log.debug('--> OK')  
     log.debug('--> Setup finished!')
     process.exit(0) // Success
   } catch (err) {

@@ -9,7 +9,7 @@ const DocumentType = new mongoose.Schema({
   icon: { type: String, required: true },
   description: { type: String, required: true },
   currentVersion: { type: Number },
-  fields: require('../snippets/jsonSchemaFields')
+  fieldsSchema: require('../snippets/jsonSchemaFields')
 }, {
   timestamps: true,
   versionKey: false
