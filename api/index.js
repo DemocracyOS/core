@@ -2,6 +2,7 @@ const path = require('path')
 const express = require('express')
 const paginate = require('express-paginate')
 const auth = require('../services/auth')
+const middlewares = require('../services/middlewares')
 // const status = require('http-status')
 // Utils
 const log = require('../services/logger')
@@ -15,16 +16,9 @@ const { NODE_ENV } = process.env
 
 // Middleware for pagination
 router.use(
-  function (req, res, next) {
-    // set default or minimum is 10
-    if (req.query.limit <= 10) req.query.limit = 10
-    next()
-  },
+  middlewares.addPaginationParams,
   paginate.middleware(10, 50),
-  function (req, res, next) {
-    // console.log(req)
-    next()
-  }
+  middlewares.bindUserToSession
 )
 
 // ===============================
@@ -32,7 +26,7 @@ router.use(
 // ===============================
 
 routerV1.use('/community', require('../api/community'))
-routerV1.use('/document-type', require('../api/documentType'))
+routerV1.use('/custom-forms', require('../api/customForm'))
 routerV1.use('/documents', require('../api/document'))
 routerV1.use('/users', require('../api/user'))
 

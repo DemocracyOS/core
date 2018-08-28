@@ -11,8 +11,8 @@ exports.create = function create (user) {
 
 // Get user
 
-const get = exports.get = function get ({ id, fields }) {
-  return User.findOne({ _id: ObjectId(id) }).select(fields)
+const get = exports.get = function get (query) {
+  return User.findOne(query)
 }
 
 // List users

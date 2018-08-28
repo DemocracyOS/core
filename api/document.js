@@ -1,8 +1,8 @@
 const status = require('http-status')
 const express = require('express')
 const Document = require('../db-api/document')
-const DocumentType = require('../db-api/documentType')
-const DocumentTypeVersion = require('../db-api/documentTypeVersion')
+const CustomForm = require('../db-api/customForm')
+// const CustomFormVersion = require('../db-api/customFormVersion')
 const router = express.Router()
 const auth = require('../services/auth')
 const errors = require('../services/errors')
@@ -57,8 +57,8 @@ router.route('/')
           throw errors.ErrNotAuthorized('Cannot create more documents (Limit reached)')
         }
         req.body.authorId = auth.getUserId(req)
-        const documentType = await DocumentType.get()
-        const newDocument = await Document.create(req.body, documentType)
+        const customForm = await CustomForm.get()
+        const newDocument = await Document.create(req.body, customForm)
         res.status(status.CREATED).send(newDocument)
       } catch (err) {
         next(err)
@@ -74,14 +74,14 @@ router.route('/:id')
    * @apiSuccess {String}  id Id of the document
    * @apiSuccess {String}  authorId  The author keycloak id.
    * @apiSuccess {String}  published State of the document. If `false` is a draft and should not be public.
-   * @apiSuccess {String}  documentType Id of the document type
-   * @apiSuccess {Integer}  documentTypeVersion The current version of the document type. Starts with 0. If it is <code>0</code> then its the first version of the document type.
+   * @apiSuccess {String}  customForm Id of the custom form
+   * @apiSuccess {Integer}  customFormVersion The current version of the custom form. Starts with 0. If it is <code>0</code> then its the first version of the custom form.
    * @apiSuccess {Date}  createdAt Date of creation
    * @apiSuccess {Date}  updatedAt Date of update
    * @apiSuccess {Object}  content Content of the document
    * @apiSuccess {String}  content.title Title of the document
    * @apiSuccess {String}  content.brief A brief of the document
-   * @apiSuccess {Object}  content.fields The custom fields of the document, those were defined on the document type.
+   * @apiSuccess {Object}  content.fields The custom fields of the document, those were defined on the custom form.
    */
   .get(
     middlewares.checkId,
@@ -125,11 +125,11 @@ router.route('/:id')
         if (!(document.authorId === auth.getUserId(req))) {
           throw errors.ErrForbidden // User is not the author
         }
-        // Retrieve the version of the documentType that the document follows
-        const documentType = await DocumentTypeVersion.getVersion(document.documentTypeVersion)
-        // Update the document, with the correct documentType
-        const updatedDocumentType = await Document.update(req.params.id, req.body, documentType)
-        res.status(status.OK).json(updatedDocumentType)
+        // Retrieve the version of the customForm that the document follows
+        const customForm = await CustomFormVersion.getVersion(document.customFormVersion)
+        // Update the document, with the correct customForm
+        const updatedCustomForm = await Document.update(req.params.id, req.body, customForm)
+        res.status(status.OK).json(updatedCustomForm)
       } catch (err) {
         next(err)
       }

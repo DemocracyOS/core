@@ -6,7 +6,7 @@ const Community = new mongoose.Schema({
   mainColor: { type: String, maxLength: 7, default: '#425cf4' },
   logo: { type: String },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  userProfileSchema: require('../snippets/jsonSchemaFields'),
+  userProfileSchema: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomForm' },
   initialized: { type: Boolean, default: false }
 }, { timestamps: true })
 

@@ -34,19 +34,6 @@ router.route('/')
         next(err)
       }
     })
-/**
- * @api {post} /users Create a new user
- * @apiName postUser
- * @apiGroup User
- */
-  .post(async (req, res, next) => {
-    try {
-      // TODO
-      // In discussion
-    } catch (err) {
-      next(err)
-    }
-  })
 router.route('/:id')
 /**
  * @api {get} /users/:id Gets a user

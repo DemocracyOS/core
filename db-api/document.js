@@ -15,9 +15,9 @@ exports.isAuthor = async function isAuthor (id, authorId) {
 }
 
 // Create document
-exports.create = async function create (document, documentType) {
+exports.create = async function create (document, customForm) {
   validator.isDataValid(
-    documentType.fields,
+    customForm.fields,
     document.content.fields
   )
   return (new Document(document)).save()
@@ -35,7 +35,7 @@ exports.list = function list (query, { limit, page }) {
 }
 
 // Update document
-exports.update = async function update (id, document, documentType) {
+exports.update = async function update (id, document, customForm) {
   // First, find if the document exists
   return Document.findOne({ _id: id })
     .then((_document) => {
@@ -45,7 +45,7 @@ exports.update = async function update (id, document, documentType) {
       let documentToSave = merge(_document, document)
       // Validate the data
       validator.isDataValid(
-        documentType.fields,
+        customForm.fields,
         documentToSave.content.fields
       )
       // Save!

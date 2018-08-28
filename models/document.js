@@ -6,8 +6,7 @@ const mongoosePaginate = require('mongoose-paginate')
 const Document = new mongoose.Schema({
   authorId: { type: String, required: true }, // Keycloak Id?
   published: { type: Boolean, required: true },
-  documentType: { type: mongoose.Schema.Types.ObjectId, ref: 'DocumentType' },
-  documentTypeVersion: { type: Number, required: true },
+  customForm: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomForm' },
   content: {
     title: { type: String, required: true, maxlength: 120 },
     brief: { type: String, required: false },
