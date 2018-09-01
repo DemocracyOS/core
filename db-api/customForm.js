@@ -27,23 +27,21 @@ exports.list = function list (query, { limit, page }) {
 
 // Update customForm
 exports.update = function update (id, customForm) {
-  // if (customForm.fields) {
-  //   validator.isSchemaValid({
-  //     properties: customForm.fields.properties,
-  //     required: customForm.fields.required
-  //   })
-  // }
+  if (customForm.fields) {
+    validator.isSchemaValid({
+      properties: customForm.fields.properties,
+      required: customForm.fields.required
+    })
+  }
   return CustomForm.findOne({ _id: id })
     .then((_customForm) => {
       if (!_customForm) throw ErrNotFound('CustomForm to update not found')
-      // let customFormToSave = merge(_customForm, customForm)
-      // console.log(customFormToSave)
       return Object.assign(_customForm, customForm).save()
     })
 }
 
 // Remove customForm
-exports.remove = function remove (id) {
+exports.remove = async function remove (id) {
   return CustomForm.get({ id })
     .then((customForm) => {
       if (!customForm) throw ErrNotFound('CustomForm to remove not found')
