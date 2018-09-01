@@ -10,5 +10,14 @@ const Community = new mongoose.Schema({
   initialized: { type: Boolean, default: false }
 }, { timestamps: true })
 
+let autoPopulate = function (next) {
+  this.populate('userProfileSchema')
+  next()
+};
+
+Community
+  .pre('findOne', autoPopulate)
+  .pre('find', autoPopulate)
+
 // Expose `Community` Model
 module.exports = mongoose.model('Community', Community)
