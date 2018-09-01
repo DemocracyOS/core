@@ -19,37 +19,52 @@ exports.bindUserToSession = async (req, res, next) => {
     // Check if there is a keycloak user in req
     if (auth.isAuthenticated(req)) {
       // Check if thre is userData in the session
-      if (req.session.userData) {
-        // User data already on session. Continue!
+      let keycloakId = auth.getUserId(req)
+      if (req.session.user) {
+        // User data already on session.
+        if (req.session.user.keycloak !== keycloakId) {
+          let user = await User.get({ keycloak: keycloakId })
+          if (!user) {
+            // Create user
+            let userCreated = await User.create({
+              keycloak: keycloakId,
+              username: null,
+              avatar: null,
+              fields: null
+            })
+            // Bind to session
+            req.session.user = userCreated
+          }
+        }
+        // Continue!
         next()
       } else {
         // Find user in database with id from Keycloak
-        let keycloakId = auth.getUserId(req)
         let user = await User.get({ keycloak: keycloakId })
         // Check if there is a user
         console.log(user)
         if (user) {
           // There is a user, bind it to the session!
-          req.session.userData = user
+          req.session.user = user
           next()
         } else {
           // Create user
           let userCreated = await User.create({
             keycloak: keycloakId,
-            username: 'thisisatest',
-            avatar: 'GreatAvatar!',
+            username: null,
+            avatar: null,
             fields: null
           })
           // Bind to session
-          req.session.userData = userCreated
+          req.session.user = userCreated
           // Continue!
           next()
         }
       }
     } else {
-      if (req.session.userData) {
+      if (req.session.user) {
         // User data in session. Need to be cleaned
-        req.session.userData = null
+        req.session.user = null
         next()
       } else {
         // No user data in session. Continue!

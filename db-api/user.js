@@ -1,6 +1,8 @@
 const { Types: { ObjectId } } = require('mongoose')
 const { ErrNotFound } = require('../services/errors')
 const User = require('../models/user')
+const CommunityDB = require('./community')
+const validator = require('../services/jsonSchemaValidator')
 const log = require('../services/logger')
 
 // Create uset
@@ -11,13 +13,13 @@ exports.create = function create (user) {
 
 // Get user
 
-const get = exports.get = function get (query) {
+exports.get = function get (query) {
   return User.findOne(query)
 }
 
 // List users
 
-exports.isEmpty = function get() {
+exports.isEmpty = function get () {
   return User.findOne({})
     .then((user) => {
       if (user === null) return true
@@ -25,35 +27,24 @@ exports.isEmpty = function get() {
     })
 }
 
-exports.list = function list ({ filter, limit, page, ids, fields }) {
-  let query = {}
-  if (filter !== undefined) {
-    let filterToJSON = JSON.parse(filter)
-    log.debug(filterToJSON)
-    // if (filterToJSON.name || filterToJSON.q) {
-    //   filterToJSON.name = { $regex: (filterToJSON.name || filterToJSON.q), $options: 'i' }
-    //   delete filterToJSON.q
-    // }
-    // query = filterToJSON
-    if (filter.ids) {
-      log.debug(ids)
-      const idsToArray = JSON.parse(ids)
-      let idsArray = idsToArray.id.map((id) => {
-        return ObjectId(id)
-      })
-      query._id = { $in: idsArray }
-    }
-  }
+exports.list = function list (query, { limit, page }) {
   return User
-    .paginate(query, { select: fields, page, limit })
+    .paginate(query, { limit, page })
 }
 
 // Update user
 
-exports.update = function update ({ id, user }) {
-  return get({ id })
-    .then((_user) => {
+exports.update = async function update (id, user) {
+  return User.findOne({ _id: id })
+    .then(async (_user) => {
       if (!_user) throw ErrNotFound('User to update not found')
+      if (user.fields) {
+        let community = await CommunityDB.get()
+        validator.isDataValid(
+          community.userProfileSchema.fields,
+          user.fields
+        )
+      }
       return Object.assign(_user, user).save()
     })
 }
@@ -61,7 +52,7 @@ exports.update = function update ({ id, user }) {
 // Remove user
 
 exports.remove = function remove (id) {
-  return get({ id })
+  return User.findOne({ id })
     .then((user) => {
       if (!user) throw ErrNotFound('User to remove not found')
       return user.remove()

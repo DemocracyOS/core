@@ -1,10 +1,10 @@
 const status = require('http-status')
 const express = require('express')
-const User = require('../db-api/user')
 const router = express.Router()
+const User = require('../db-api/user')
 const auth = require('../services/auth')
-const { isAdmin } = require('../services/utils')
-const log = require('../services/logger')
+const middlewares = require('../services/middlewares')
+const errors = require('../services/errors')
 
 router.route('/')
 /**
@@ -15,12 +15,9 @@ router.route('/')
   .get(
     async (req, res, next) => {
       try {
-        const results = await User.list({
-          filter: req.query.filter,
+        const results = await User.list({}, {
           limit: req.query.limit,
-          page: req.query.page,
-          ids: req.query.ids,
-          fields: {}
+          page: req.query.page
         })
         res.status(status.OK).json({
           results: results.docs,
@@ -34,6 +31,24 @@ router.route('/')
         next(err)
       }
     })
+/**
+ * @api {put} /users/:id Updates users info
+ * @apiName putUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users ID.
+ */
+  .put(
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        const updatedUser = await User.update(req.session.user._id, req.body)
+        res.status(status.OK).json(updatedUser)
+      } catch (err) {
+        next(err)
+      }
+    })
+    
 router.route('/:id')
 /**
  * @api {get} /users/:id Gets a user
@@ -43,26 +58,12 @@ router.route('/:id')
  * @apiParam {Number} id Users ID.
  */
   .get(
+    middlewares.checkId,
     async (req, res, next) => {
       try {
         // TODO
-        // res.status(status.OK).json(user)
-      } catch (err) {
-        next(err)
-      }
-    })
-/**
- * @api {put} /users/:id Updates a user
- * @apiName putUser
- * @apiGroup User
- *
- * @apiParam {Number} id Users ID.
- */
-  .put(
-    async (req, res, next) => {
-      try {
-        // TODO
-        // res.send(status.OK).json(updatedUser)
+        const results = await User.get({ _id: req.params.id })
+        res.status(status.OK).json(results)
       } catch (err) {
         next(err)
       }
@@ -75,6 +76,8 @@ router.route('/:id')
  * @apiParam {Number} id Users ID.
  */
   .delete(
+    middlewares.checkId,
+    auth.keycloak.protect('realm:admin'),
     async (req, res, next) => {
       try {
         // TODO
