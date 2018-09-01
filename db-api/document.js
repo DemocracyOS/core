@@ -4,12 +4,12 @@ const Document = require('../models/document')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
 
-exports.countAuthorDocuments = async function countAuthorDocuments (authorId) {
-  return Document.count({ authorId: authorId })
+exports.countAuthorDocuments = async function countAuthorDocuments (author) {
+  return Document.count({ author: author })
 }
 
-exports.isAuthor = async function isAuthor (id, authorId) {
-  let count = await Document.count({ _id: id, authorId: authorId })
+exports.isAuthor = async function isAuthor (id, author) {
+  let count = await Document.count({ _id: id, author: author })
   return count
 }
 
