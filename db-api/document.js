@@ -1,7 +1,6 @@
 const { Types: { ObjectId } } = require('mongoose')
 const { merge } = require('lodash/object')
 const Document = require('../models/document')
-// const log = require('../services/logger')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
 
