@@ -81,7 +81,8 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         // TODO
-        // res.status(status.OK).json({ id: req.params.id })
+        User.remove(req.params.id)
+        res.status(status.OK).json({ id: req.params.id })
       } catch (err) {
         next(err)
       }

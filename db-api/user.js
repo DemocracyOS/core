@@ -52,7 +52,7 @@ exports.update = async function update (id, user) {
 // Remove user
 
 exports.remove = function remove (id) {
-  return User.findOne({ id })
+  return User.findOne({ _id: id })
     .then((user) => {
       if (!user) throw ErrNotFound('User to remove not found')
       return user.remove()
