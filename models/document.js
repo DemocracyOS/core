@@ -4,7 +4,7 @@ const mongoosePaginate = require('mongoose-paginate')
 
 // Define `Community` Schema
 const Document = new mongoose.Schema({
-  authorId: { type: String, required: true }, // Keycloak Id?
+  authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   published: { type: Boolean, required: true },
   customForm: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomForm' },
   content: {
