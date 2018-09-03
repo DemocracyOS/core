@@ -1,23 +1,22 @@
 const { Types: { ObjectId } } = require('mongoose')
 const { merge } = require('lodash/object')
 const Document = require('../models/document')
-// const log = require('../services/logger')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
 
-exports.countAuthorDocuments = async function countAuthorDocuments (authorId) {
-  return Document.count({ authorId: authorId })
+exports.countAuthorDocuments = async function countAuthorDocuments (author) {
+  return Document.count({ author: author })
 }
 
-exports.isAuthor = async function isAuthor (id, authorId) {
-  let count = await Document.count({ _id: id, authorId: authorId })
+exports.isAuthor = async function isAuthor (id, author) {
+  let count = await Document.count({ _id: id, author: author })
   return count
 }
 
 // Create document
-exports.create = async function create (document, documentType) {
+exports.create = async function create (document, customForm) {
   validator.isDataValid(
-    documentType.fields,
+    customForm.fields,
     document.content.fields
   )
   return (new Document(document)).save()
@@ -35,7 +34,7 @@ exports.list = function list (query, { limit, page }) {
 }
 
 // Update document
-exports.update = async function update (id, document, documentType) {
+exports.update = async function update (id, document, customForm) {
   // First, find if the document exists
   return Document.findOne({ _id: id })
     .then((_document) => {
@@ -45,7 +44,7 @@ exports.update = async function update (id, document, documentType) {
       let documentToSave = merge(_document, document)
       // Validate the data
       validator.isDataValid(
-        documentType.fields,
+        customForm.fields,
         documentToSave.content.fields
       )
       // Save!

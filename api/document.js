@@ -1,8 +1,8 @@
 const status = require('http-status')
 const express = require('express')
 const Document = require('../db-api/document')
-const DocumentType = require('../db-api/documentType')
-const DocumentTypeVersion = require('../db-api/documentTypeVersion')
+const CustomForm = require('../db-api/customForm')
+// const CustomFormVersion = require('../db-api/customFormVersion')
 const router = express.Router()
 const auth = require('../services/auth')
 const errors = require('../services/errors')
@@ -24,7 +24,7 @@ router.route('/')
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        const results = await Document.list({ authorId: auth.getUserId(req) }, {
+        const results = await Document.list({ author: req.session.user._id }, {
           limit: req.query.limit,
           page: req.query.page
         })
@@ -43,7 +43,7 @@ router.route('/')
   /**
    * @api {post} /documents Create
    * @apiName postDocument
-   * @apiDescription Creates a document and returns the created document. The authorId is not required to be sent on the body. API sets the authorId by itself.
+   * @apiDescription Creates a document and returns the created document. The author is not required to be sent on the body. API sets the author by itself.
    * @apiGroup Document
    */
   .post(
@@ -52,13 +52,13 @@ router.route('/')
       try {
         const permissions = auth.getPermissions(req)
         // check if permissions
-        const documentsCount = await Document.countAuthorDocuments(auth.getUserId(req))
+        const documentsCount = await Document.countAuthorDocuments(req.session.user._id)
         if (documentsCount >= permissions.documentLimit) {
           throw errors.ErrNotAuthorized('Cannot create more documents (Limit reached)')
         }
-        req.body.authorId = auth.getUserId(req)
-        const documentType = await DocumentType.get()
-        const newDocument = await Document.create(req.body, documentType)
+        req.body.author = req.session.user._id
+        const customForm = await CustomForm.get({ _id: req.body.customForm })
+        const newDocument = await Document.create(req.body, customForm)
         res.status(status.CREATED).send(newDocument)
       } catch (err) {
         next(err)
@@ -72,16 +72,16 @@ router.route('/:id')
    * @apiGroup Document
    * @apiParam {String} id Documents ID.
    * @apiSuccess {String}  id Id of the document
-   * @apiSuccess {String}  authorId  The author keycloak id.
+   * @apiSuccess {String}  author  The user id of the author.
    * @apiSuccess {String}  published State of the document. If `false` is a draft and should not be public.
-   * @apiSuccess {String}  documentType Id of the document type
-   * @apiSuccess {Integer}  documentTypeVersion The current version of the document type. Starts with 0. If it is <code>0</code> then its the first version of the document type.
+   * @apiSuccess {String}  customForm Id of the custom form
+   * @apiSuccess {Integer}  customFormVersion The current version of the custom form. Starts with 0. If it is <code>0</code> then its the first version of the custom form.
    * @apiSuccess {Date}  createdAt Date of creation
    * @apiSuccess {Date}  updatedAt Date of update
    * @apiSuccess {Object}  content Content of the document
    * @apiSuccess {String}  content.title Title of the document
    * @apiSuccess {String}  content.brief A brief of the document
-   * @apiSuccess {Object}  content.fields The custom fields of the document, those were defined on the document type.
+   * @apiSuccess {Object}  content.fields The custom fields of the document, those were defined on the custom form.
    */
   .get(
     middlewares.checkId,
@@ -93,7 +93,7 @@ router.route('/:id')
         // Check if it is published or not (draft)
         if (!document.published) {
           // It's a draft, check if the author is the user who requested it.
-          if (document.authorId === auth.getUserId(req)) {
+          if (req.session.user._id.equals(document.author)) {
             // True! Deliver the document
             res.status(status.OK).json(document)
           } else {
@@ -122,14 +122,14 @@ router.route('/:id')
         // Get the document
         const document = await Document.get({ _id: req.params.id })
         // Check if the user is the author of the document
-        if (!(document.authorId === auth.getUserId(req))) {
+        if (!req.session.user._id.equals(document.author)) {
           throw errors.ErrForbidden // User is not the author
         }
-        // Retrieve the version of the documentType that the document follows
-        const documentType = await DocumentTypeVersion.getVersion(document.documentTypeVersion)
-        // Update the document, with the correct documentType
-        const updatedDocumentType = await Document.update(req.params.id, req.body, documentType)
-        res.status(status.OK).json(updatedDocumentType)
+        // Retrieve the version of the customForm that the document follows
+        const customForm = await CustomForm.get({ _id: document.customForm })
+        // Update the document, with the correct customForm
+        const updatedCustomForm = await Document.update(req.params.id, req.body, customForm)
+        res.status(status.OK).json(updatedCustomForm)
       } catch (err) {
         next(err)
       }
@@ -147,7 +147,7 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         // Check if the user is the author of the document.
-        if (!Document.isAuthor(req.params.id, auth.getUserId(req))) {
+        if (!Document.isAuthor(req.params.id, req.session.user._id)) {
           throw errors.ErrForbidden // User is not the author
         }
         // Remove document.

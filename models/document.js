@@ -1,21 +1,19 @@
 const mongoose = require('mongoose')
-const version = require('mongoose-version')
+// const version = require('mongoose-version')
 const mongoosePaginate = require('mongoose-paginate')
 
 // Define `Community` Schema
 const Document = new mongoose.Schema({
-  authorId: { type: String, required: true }, // Keycloak Id?
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   published: { type: Boolean, required: true },
-  documentType: { type: mongoose.Schema.Types.ObjectId, ref: 'DocumentType' },
-  documentTypeVersion: { type: Number, required: true },
+  customForm: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomForm' },
   content: {
     title: { type: String, required: true, maxlength: 120 },
     brief: { type: String, required: false },
     fields: { type: mongoose.Schema.Types.Mixed }
   }
 }, {
-  timestamps: true,
-  versionKey: false
+  timestamps: true
 })
 
 // Model's Plugin Extensions

@@ -10,6 +10,7 @@ const mongoStore = require('./services/sessions')
 // const { setup } = require('../services/setup')
 const config = require('./config')
 const log = require('./services/logger')
+const middlewares = require('./services/middlewares')
 const { NODE_ENV } = process.env
 const loggerMiddleware = expressWinston.logger({ winstonInstance: log })
 

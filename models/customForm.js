@@ -1,17 +1,16 @@
 const mongoose = require('mongoose')
-const version = require('mongoose-version')
 const mongoosePaginate = require('mongoose-paginate')
 const ignoredPaths = ['name', 'icon', 'description', 'updatedAt']
 
-// Define `Community` Schema
-const DocumentType = new mongoose.Schema({
+const CustomForm = new mongoose.Schema({
   name: { type: String, required: true },
-  icon: { type: String, required: true },
+  icon: { type: String },
   description: { type: String, required: true },
-  currentVersion: { type: Number },
+  version: { type: Number },
   fields: {
     blocks: [
       {
+        _id: false,
         name: { type: String },
         fields: [{ type: String }]
       }
@@ -20,15 +19,14 @@ const DocumentType = new mongoose.Schema({
     required: [{ type: String }]
   }
 }, {
-  timestamps: true,
-  versionKey: false
+  timestamps: true
 })
 
-let updateCurrentVersion = function (next) {
+const updateCurrentVersion = function (next) {
   // Following mongoose-version logic.
-  // Before saving, if it is a new document for the collection, define currentVersion to 0
+  // Before saving, if it is a new customForm for the collection, define currentVersion to 0
   if (this.isNew) {
-    this.currentVersion = 0
+    this.version = 0
     next()
   } else {
     // If it is not new, check which paths were modified
@@ -42,19 +40,15 @@ let updateCurrentVersion = function (next) {
         next()
       } else {
         // If the fields changed, then it defines a new current version.
-        this.currentVersion = this.currentVersion + 1
+        this.version = this.version + 1
         next()
       }
     }
+    next()
   }
 }
 
-DocumentType
-  .pre('save', updateCurrentVersion)
+CustomForm.pre('save', updateCurrentVersion)
+CustomForm.plugin(mongoosePaginate)
 
-// Model's Plugin Extensions
-DocumentType.plugin(version, { collection: 'documenttypes_versions', ignorePaths: ignoredPaths })
-DocumentType.plugin(mongoosePaginate)
-
-// Expose `Community` Model
-module.exports = mongoose.model('DocumentType', DocumentType)
+module.exports = mongoose.model('CustomForm', CustomForm)

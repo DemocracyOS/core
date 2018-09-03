@@ -3,20 +3,41 @@ const rewire = require('rewire')
 const sinon = require('sinon')
 require('sinon-mongoose')
 const { Types: { ObjectId } } = require('mongoose')
+const fake = require('../fake')
 
 const Community = require('../../models/community')
 const community = require('../../db-api/community')
 
 // Make a sample
-const communitySample = {
-  name: 'A testing community',
-  mainColor: '#425cf4',
-  logo: null,
-  user: null,
-  initialized: true
-}
+const communitySample = fake.community(null)
 
 describe('Community DB-APIs', () => {
+  // ===================================================
+  it('Community.create() should create a community', () => {
+    // require module with rewire to override its internal Document reference
+    const community = rewire('../../db-api/community')
+
+    // replace Document constructor for a spy
+    const CommunityMock = sinon.spy()
+
+    // add a save method that only returns the data
+    CommunityMock.prototype.save = () => { return Promise.resolve(communitySample) }
+    CommunityMock.findOne = () => { return Promise.resolve(null) }
+    // create a spy for the save method
+    const save = sinon.spy(CommunityMock.prototype, 'save')
+
+    // override Document inside `document/db-api/document`
+    community.__set__('Community', CommunityMock)
+
+    // call create method
+    return community.create(communitySample)
+      .then((result) => {
+        sinon.assert.calledWithNew(CommunityMock)
+        sinon.assert.calledWith(CommunityMock, communitySample)
+        sinon.assert.calledOnce(save)
+        expect(result).to.equal(communitySample)
+      })
+  })
   // ===================================================
   it('Community.get() should get the only community created in the database', () => {
     const CommunityMock = sinon.mock(Community)

@@ -1,10 +1,8 @@
 const mongoose = require('mongoose')
 const Community = require('./models/community')
 const dbCommunity = require('./db-api/community')
-const DocumentType = require('./models/documentType')
-const dbDocumentType = require('./db-api/documentType')
-const DocumentTypeVersion = require('./models/documentTypeVersion')
-const dbDocumentTypeVersion = require('./db-api/documentTypeVersion')
+const CustomForm = require('./models/customForm')
+const dbCustomForm = require('./db-api/customForm')
 const config = require('./config')
 const log = require('./services/logger')
 const { NODE_ENV } = process.env
@@ -17,10 +15,8 @@ async function checkDB () {
   log.debug('* Checking if database has data on it')
   let community = await Community.findOne({})
   if (community) throw new DatabaseNotEmpty('ERROR There is at least one community already on the DB')
-  let documentType = await DocumentType.findOne({})
-  if (documentType) throw new DatabaseNotEmpty('ERROR There is at least one document type already on the DB')
-  let documentTypeVersions = await DocumentTypeVersion.findOne({})
-  if (documentTypeVersions) throw new DatabaseNotEmpty('ERROR There is at least one version of a document type already on the DB')
+  let customForm = await CustomForm.findOne({})
+  if (customForm) throw new DatabaseNotEmpty('ERROR There is at least one document type already on the DB')
   log.debug('--> OK')
 }
 
@@ -34,21 +30,68 @@ async function startSetup () {
   try {
     await checkDB()
     log.debug('* Creating community...')
+    let profileSchema = await dbCustomForm.create({
+      name: 'User Profile Data',
+      icon: null,
+      description: 'The data of the user',
+      fields: {
+        'blocks': [
+          {
+            'fields': [
+              'twitter',
+              'facebook'
+            ],
+            'name': 'Social Media'
+          },
+          {
+            'fields': [
+              'bio'
+            ],
+            'name': 'About the user'
+          }
+        ],
+        'properties': {
+          'bio': {
+            'type': 'string',
+            'title': 'User information'
+          },
+          'twitter': {
+            'type': 'string',
+            'title': "User's surname"
+          },
+          'facebook': {
+            'type': 'string',
+            'title': "User's facebook"
+          }
+        },
+        'required': []
+      }
+    })
     await dbCommunity.create({
       name: config.SETUP.COMMUNITY_NAME,
       mainColor: config.SETUP.COMMUNITY_COLOR,
       logo: null,
       user: null,
+      userProfileSchema: profileSchema._id,
       initialized: true
     })
     log.debug('--> OK')
     log.debug('* Creating document type...')
-    await dbDocumentType.create({
+    await dbCustomForm.create({
       name: config.SETUP.DOCUMENT_TYPE_NAME,
-      icon: 'fa-file',
+      icon: null,
       description: '- To be filled -',
       fields: {
-        blocks: [],
+        blocks: [
+          {
+            'fields': [
+              'authorName',
+              'authorSurname',
+              'authorEmail'
+            ],
+            'name': 'About the author'
+          }
+        ],
         properties: {
           'authorName': {
             type: 'string',
