@@ -1,17 +1,70 @@
 const faker = require('faker')
-const { Types: { ObjectId } } = require('mongoose')
+// const { Types: { ObjectId } } = require('mongoose')
 
-const community = () => {
+const community = (userProfileSchemaId) => {
   return {
     name: 'Platform for ' + faker.address.city(),
     mainColor: faker.internet.color(),
     logo: null,
     user: null,
+    userProfileSchema: userProfileSchemaId,
     initialized: true
   }
 }
 
-const documentType = (valid) => {
+const user = (keycloak, username, fields) => {
+  return {
+    keycloak: keycloak || 'e331dbef-3283-42d9-9f39-0f9810ddc939',
+    username: username || null,
+    fields: fields || null
+  }
+}
+
+const userProfileCustomForm = () => {
+  return {
+    name: faker.lorem.words(4),
+    icon: faker.lorem.word(),
+    description: faker.lorem.sentence(10),
+    fields: userProfileSchema()
+  }
+}
+
+const userProfileSchema = (valid) => {
+  return {
+    required: [],
+    blocks: [
+      {
+        fields: [
+          'twitter',
+          'facebook'
+        ],
+        name: 'Social Media'
+      },
+      {
+        fields: [
+          'bio'
+        ],
+        name: 'About you'
+      }
+    ],
+    properties: {
+      bio: {
+        type: 'string',
+        title: 'User information'
+      },
+      twitter: {
+        type: 'string',
+        title: "User's surname"
+      },
+      facebook: {
+        type: 'string',
+        title: "User's facebook"
+      }
+    }
+  }
+}
+
+const customForm = (valid) => {
   return {
     name: faker.lorem.words(4),
     icon: faker.lorem.word(),
@@ -70,13 +123,11 @@ const documentType = (valid) => {
   }
 }
 
-const document = (valid, published, authorId, documentTypeId) => {
+const document = (valid, published, author, customFormId) => {
   return {
-    authorId: authorId || '40bb3a93-36c2-4fe5-8fa1-5bd488874cda',
-    published: !!published,
-    publishedAt: faker.date.recent(),
-    documentType: documentTypeId || null,
-    documentTypeVersion: 0,
+    author: author || null,
+    published: published || false,
+    customForm: customFormId || null,
     content: {
       title: faker.lorem.words(4),
       brief: faker.lorem.sentence(12),
@@ -92,6 +143,9 @@ const document = (valid, published, authorId, documentTypeId) => {
 
 module.exports = {
   community,
-  documentType,
-  document
+  customForm,
+  document,
+  userProfileSchema,
+  userProfileCustomForm,
+  user
 }

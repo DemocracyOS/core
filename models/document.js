@@ -13,8 +13,7 @@ const Document = new mongoose.Schema({
     fields: { type: mongoose.Schema.Types.Mixed }
   }
 }, {
-  timestamps: true,
-  versionKey: false
+  timestamps: true
 })
 
 // Model's Plugin Extensions

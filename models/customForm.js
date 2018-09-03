@@ -29,14 +29,12 @@ const updateCurrentVersion = function (next) {
     this.version = 0
     next()
   } else {
-    console.log('holis')
     // If it is not new, check which paths were modified
     let modifiedPaths = this.modifiedPaths()
     if (modifiedPaths.length) {
       let onlyIgnoredPathModified = modifiedPaths.every(function (path) {
         return ignoredPaths.indexOf(path) >= 0
       })
-      console.log(onlyIgnoredPathModified)
       if (onlyIgnoredPathModified) {
         // If the ignored paths were modified, do nothing
         next()

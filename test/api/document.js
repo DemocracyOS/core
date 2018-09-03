@@ -2,15 +2,14 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 const status = require('http-status')
 const Document = require('../../models/document')
-const DocumentType = require('../../models/documentType')
-const DocumentTypeVersion = require('../../models/documentTypeVersion')
+const CustomForm = require('../../models/customForm')
 const config = require('../../config')
 const fake = require('../fake')
 
 const expect = chai.expect
 chai.use(chaiHttp)
 
-let fakeDocumentType = fake.documentType()
+let fakeCustomForm = fake.customForm()
 let fakeDocument1 = null
 let fakeDocument2 = null
 let fakeDocument3 = null
@@ -20,7 +19,7 @@ let agent = null // user agent, simulates a browser.
 let keycloakAgent = null // keycloak agent, simulates a browser.
 let accessToken = null // bearer token provided by Keycloak
 
-let newDocumentType = null
+let newCustomForm = null
 let newDocument1 = null
 let newDocument2 = null
 let newDocument3 = null
@@ -31,13 +30,12 @@ describe('Documents API (/api/v1/documents)', () => {
     await require('../../server')
     // Before starting the tests, make sure to prepare the enviroment
     // That is, clean the database, or initialize anything you need before executing the suite of tests
-    await DocumentType.remove({})
-    await DocumentTypeVersion.remove({})
+    await CustomForm.remove({})
     await Document.remove({})
-    newDocumentType = await (new DocumentType(fakeDocumentType)).save()
-    fakeDocument1 = fake.document(true, true, null, newDocumentType.id)
-    fakeDocument2 = fake.document(true, false, null, newDocumentType.id)
-    fakeDocument3 = fake.document(true, true, null, newDocumentType.id)
+    newCustomForm = await (new CustomForm(fakeCustomForm)).save()
+    fakeDocument1 = fake.document(true, true, null, newCustomForm.id)
+    fakeDocument2 = fake.document(true, false, null, newCustomForm.id)
+    fakeDocument3 = fake.document(true, true, null, newCustomForm.id)
     newDocument1 = await (new Document(fakeDocument1)).save()
     newDocument2 = await (new Document(fakeDocument2)).save()
     newDocument3 = await (new Document(fakeDocument3)).save()
@@ -61,7 +59,7 @@ describe('Documents API (/api/v1/documents)', () => {
         })
     })
     it('POST (/) should not be able to create a document', async () => {
-      let newDocument = fake.document(true, false, null, newDocumentType.id)
+      let newDocument = fake.document(true, false, null, newCustomForm.id)
       await agent.post(`/api/v1/documents`)
         .set('Content-Type', 'application/json')
         .send(newDocument)
@@ -85,11 +83,10 @@ describe('Documents API (/api/v1/documents)', () => {
       await agent.get(`/api/v1/documents/${newDocument1._id}`)
         .then((res) => {
           expect(res).to.have.status(status.OK)
-          expect(res.body).to.have.property('authorId')
+          expect(res.body).to.have.property('author')
           expect(res.body).to.have.property('published')
           expect(res.body.published).to.be.equal(true)
-          expect(res.body).to.have.property('documentType')
-          expect(res.body).to.have.property('documentTypeVersion')
+          expect(res.body).to.have.property('customForm')
           expect(res.body.content).to.be.an('object')
           expect(res.body.content).to.have.property('title')
           expect(res.body.content).to.have.property('brief')
@@ -120,7 +117,7 @@ describe('Documents API (/api/v1/documents)', () => {
         .then((res) => {
           accessToken = res.body.access_token
           expect(res).to.have.status(status.OK)
-          expect(res.body).to.not.be.null
+          expect(res.body).to.not.be.equal(null)
           expect(res.body).to.have.property('access_token')
           expect(res.body).to.be.a('object')
         })
@@ -129,7 +126,7 @@ describe('Documents API (/api/v1/documents)', () => {
         })
     })
     it('POST (/) it should be able to create a document', async () => {
-      let newDocument = fake.document(true, false, null, newDocumentType.id)
+      let newDocument = fake.document(true, false, null, newCustomForm.id)
       await agent.post(`/api/v1/documents`)
         .set('Authorization', 'Bearer ' + accessToken)
         .set('X-Requested-With', 'XMLHttpRequest')
@@ -144,7 +141,7 @@ describe('Documents API (/api/v1/documents)', () => {
         })
     })
     it('POST (/) should fail because the permission -documentLimit- is set (Test is limited to 10 tries)', async () => {
-      let newDocument = fake.document(true, true, null, newDocumentType.id)
+      let newDocument = fake.document(true, true, null, newCustomForm.id)
       let keepCreating = true
       let documentsCreated = 0
       do {
@@ -177,10 +174,9 @@ describe('Documents API (/api/v1/documents)', () => {
           const { results, pagination } = res.body
           expect(results).to.be.a('array')
           expect(results.length).to.be.least(1)
-          expect(results[0]).to.have.property('authorId')
+          expect(results[0]).to.have.property('author')
           expect(results[0]).to.have.property('published')
-          expect(results[0]).to.have.property('documentType')
-          expect(results[0]).to.have.property('documentTypeVersion')
+          expect(results[0]).to.have.property('customForm')
           expect(results[0].content).to.be.an('object')
           expect(results[0].content).to.have.property('title')
           expect(results[0].content).to.have.property('brief')
@@ -203,10 +199,9 @@ describe('Documents API (/api/v1/documents)', () => {
         .set('Content-Type', 'application/json')
         .then((res) => {
           expect(res).to.have.status(status.OK)
-          expect(res.body).to.have.property('authorId')
+          expect(res.body).to.have.property('author')
           expect(res.body).to.have.property('published')
-          expect(res.body).to.have.property('documentType')
-          expect(res.body).to.have.property('documentTypeVersion')
+          expect(res.body).to.have.property('customForm')
           expect(res.body.content).to.be.an('object')
           expect(res.body.content).to.have.property('title')
           expect(res.body.content).to.have.property('brief')
@@ -227,11 +222,10 @@ describe('Documents API (/api/v1/documents)', () => {
         .send(modification)
         .then((res) => {
           expect(res).to.have.status(status.OK)
-          expect(res.body).to.have.property('authorId')
+          expect(res.body).to.have.property('author')
           expect(res.body).to.have.property('published')
           expect(res.body.published).to.be.equal(true)
-          expect(res.body).to.have.property('documentType')
-          expect(res.body).to.have.property('documentTypeVersion')
+          expect(res.body).to.have.property('customForm')
           expect(res.body.content).to.be.an('object')
           expect(res.body.content).to.have.property('title')
           expect(res.body.content).to.have.property('brief')

@@ -9,7 +9,7 @@ const Document = require('../../models/document')
 const document = require('../../db-api/document')
 
 const documentSample = fake.document()
-const documentTypeSample = fake.documentType()
+const customFormSample = fake.customForm()
 
 describe('Document DB-APIs', () => {
   // ===================================================
@@ -30,7 +30,7 @@ describe('Document DB-APIs', () => {
     document.__set__('Document', DocumentMock)
 
     // call create method
-    return document.create(documentSample, documentTypeSample)
+    return document.create(documentSample, customFormSample)
       .then((result) => {
         sinon.assert.calledWithNew(DocumentMock)
         sinon.assert.calledWith(DocumentMock, documentSample)
@@ -81,7 +81,7 @@ describe('Document DB-APIs', () => {
       .chain('exec')
       .resolves(documentSample)
 
-    return document.update('5a5e29d948a9cc2fbeed02fa', { published: false }, documentTypeSample)
+    return document.update('5a5e29d948a9cc2fbeed02fa', { published: false }, customFormSample)
       .then((result) => {
         DocumentMock.verify()
         DocumentMock.restore()

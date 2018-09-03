@@ -42,7 +42,7 @@ exports.update = function update (id, customForm) {
 
 // Remove customForm
 exports.remove = async function remove (id) {
-  return CustomForm.get({ id })
+  return CustomForm.findOne({ _id: id })
     .then((customForm) => {
       if (!customForm) throw ErrNotFound('CustomForm to remove not found')
       return customForm.remove()

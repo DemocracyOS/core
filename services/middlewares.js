@@ -28,7 +28,7 @@ exports.bindUserToSession = async (req, res, next) => {
             // Create user
             let userCreated = await User.create({
               keycloak: keycloakId,
-              username: null,
+              username: auth.getUsername(req),
               avatar: null,
               fields: null
             })
@@ -42,7 +42,7 @@ exports.bindUserToSession = async (req, res, next) => {
         // Find user in database with id from Keycloak
         let user = await User.get({ keycloak: keycloakId })
         // Check if there is a user
-        console.log(user)
+        // console.log(user)
         if (user) {
           // There is a user, bind it to the session!
           req.session.user = user
@@ -51,7 +51,7 @@ exports.bindUserToSession = async (req, res, next) => {
           // Create user
           let userCreated = await User.create({
             keycloak: keycloakId,
-            username: null,
+            username: auth.getUsername(req),
             avatar: null,
             fields: null
           })

@@ -24,7 +24,7 @@ router.route('/')
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        const results = await Document.list({ author: auth.getUserId(req) }, {
+        const results = await Document.list({ author: req.session.user._id }, {
           limit: req.query.limit,
           page: req.query.page
         })
@@ -52,12 +52,12 @@ router.route('/')
       try {
         const permissions = auth.getPermissions(req)
         // check if permissions
-        const documentsCount = await Document.countAuthorDocuments(auth.getUserId(req))
+        const documentsCount = await Document.countAuthorDocuments(req.session.user._id)
         if (documentsCount >= permissions.documentLimit) {
           throw errors.ErrNotAuthorized('Cannot create more documents (Limit reached)')
         }
-        req.body.author = auth.getUserId(req)
-        const customForm = await CustomForm.get()
+        req.body.author = req.session.user._id
+        const customForm = await CustomForm.get({ _id: req.body.customForm })
         const newDocument = await Document.create(req.body, customForm)
         res.status(status.CREATED).send(newDocument)
       } catch (err) {
@@ -93,7 +93,7 @@ router.route('/:id')
         // Check if it is published or not (draft)
         if (!document.published) {
           // It's a draft, check if the author is the user who requested it.
-          if (document.author === auth.getUserId(req)) {
+          if (req.session.user._id.equals(document.author)) {
             // True! Deliver the document
             res.status(status.OK).json(document)
           } else {
@@ -122,11 +122,11 @@ router.route('/:id')
         // Get the document
         const document = await Document.get({ _id: req.params.id })
         // Check if the user is the author of the document
-        if (!(document.author === auth.getUserId(req))) {
+        if (!req.session.user._id.equals(document.author)) {
           throw errors.ErrForbidden // User is not the author
         }
         // Retrieve the version of the customForm that the document follows
-        const customForm = await CustomFormVersion.getVersion(document.customFormVersion)
+        const customForm = await CustomForm.get({ _id: document.customForm })
         // Update the document, with the correct customForm
         const updatedCustomForm = await Document.update(req.params.id, req.body, customForm)
         res.status(status.OK).json(updatedCustomForm)
@@ -147,7 +147,7 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         // Check if the user is the author of the document.
-        if (!Document.isAuthor(req.params.id, auth.getUserId(req))) {
+        if (!Document.isAuthor(req.params.id, req.session.user._id)) {
           throw errors.ErrForbidden // User is not the author
         }
         // Remove document.

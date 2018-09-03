@@ -12,6 +12,14 @@ const getUserId = (req) => {
   }
 }
 
+const getUsername = (req) => {
+  if (req.kauth && req.kauth.grant) {
+    return req.kauth.grant.access_token.content.preferred_username
+  } else {
+    return null
+  }
+}
+
 const isAuthenticated = (req) => {
   if (req.kauth && req.kauth.grant) {
     return true
@@ -28,7 +36,7 @@ const hasRealmRole = (req, roleName) => {
     if (!req.kauth.grant.access_token.content.realm_access || !req.kauth.grant.access_token.content.realm_access.roles) {
       return false
     }
-    console.log(req.kauth.grant.access_token.content.realm_access.roles)
+    // console.log(req.kauth.grant.access_token.content.realm_access.roles)
     return (req.kauth.grant.access_token.content.realm_access.roles.indexOf(roleName) >= 0)
   }
 
@@ -48,5 +56,6 @@ module.exports = {
   isAuthenticated,
   hasRealmRole,
   getUserId,
-  getPermissions
+  getPermissions,
+  getUsername
 }
