@@ -39,7 +39,7 @@ router.route('/')
           results = await Document.list({ author: req.session.user._id }, {
             limit: req.query.limit,
             page: req.query.page
-          }) 
+          })
         } else {
           results = await Document.list({ published: true }, {
             limit: req.query.limit,
@@ -229,6 +229,11 @@ router.route('/:id/comments')
       try {
         req.body.user = req.session.user._id
         req.body.document = req.params.id
+        const document = await Document.get({ _id: req.params.id })
+        const customForm = await CustomForm.get({ _id: document.customForm })
+        if (!customForm.fields.allowComments.find((x) => { return x === req.body.field })) {
+          throw errors.ErrInvalidParam(`The field ${req.body.field} is not commentable`)
+        }
         const newGeneralComment = await GeneralComment.create(req.body)
         res.status(status.CREATED).send(newGeneralComment)
       } catch (err) {
