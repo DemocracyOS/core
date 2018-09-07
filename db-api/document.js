@@ -61,12 +61,7 @@ exports.remove = function remove (id) {
     })
 }
 
-exports.listGeneralComments = function (documentId, { limit, page }) {
+exports.listGeneralComments = function (query, { limit, page }) {
   return GeneralComment
-    .paginate({ document: documentId }, { page, limit })
-}
-
-exports.listGeneralCommentsByField = function (documentId, field, { limit, page }) {
-  return GeneralComment
-    .paginate({ document: documentId, field: field }, { page, limit })
+    .paginate(query, { page, limit })
 }
