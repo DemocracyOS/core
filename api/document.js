@@ -1,6 +1,7 @@
 const status = require('http-status')
 const express = require('express')
 const Document = require('../db-api/document')
+const GeneralComment = require('../db-api/generalComment')
 const CustomForm = require('../db-api/customForm')
 // const CustomFormVersion = require('../db-api/customFormVersion')
 const router = express.Router()
@@ -21,10 +22,12 @@ router.route('/')
    * @apiGroup Document
    */
   .get(
-    auth.keycloak.protect('realm:accountable'),
+    // auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        const results = await Document.list({ author: req.session.user._id }, {
+        const permissions = auth.getPermissions(req)
+        console.log(permissions)
+        const results = await Document.list({}, {
           limit: req.query.limit,
           page: req.query.page
         })
@@ -157,5 +160,42 @@ router.route('/:id')
         next(err)
       }
     })
+
+router.route('/:id/comments')
+  .get(
+    middlewares.checkId,
+    async (req, res, next) => {
+      try {
+        const results = await Document.listGeneralComments(req.params.id, {
+          limit: req.query.limit,
+          page: req.query.page
+        })
+        res.status(status.OK).json({
+          results: results.docs,
+          pagination: {
+            count: results.total,
+            page: results.page,
+            limit: results.limit
+          }
+        })
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+  .post(
+    middlewares.checkId,
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        req.body.user = req.session.user._id
+        req.body.document = req.params.id
+        const newGeneralComment = await GeneralComment.create(req.body)
+        res.status(status.CREATED).send(newGeneralComment)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
 
 module.exports = router

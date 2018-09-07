@@ -1,6 +1,7 @@
 const { Types: { ObjectId } } = require('mongoose')
 const { merge } = require('lodash/object')
 const Document = require('../models/document')
+const GeneralComment = require('../models/generalComment')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
 
@@ -58,4 +59,14 @@ exports.remove = function remove (id) {
       if (!document) throw errors.ErrNotFound('Document to remove not found')
       document.remove()
     })
+}
+
+exports.listGeneralComments = function (documentId, { limit, page }) {
+  return GeneralComment
+    .paginate({ document: documentId }, { page, limit })
+}
+
+exports.listGeneralCommentsByField = function (documentId, field, { limit, page }) {
+  return GeneralComment
+    .paginate({ document: documentId, field: field }, { page, limit })
 }

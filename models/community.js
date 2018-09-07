@@ -13,7 +13,7 @@ const Community = new mongoose.Schema({
 let autoPopulate = function (next) {
   this.populate('userProfileSchema')
   next()
-};
+}
 
 Community
   .pre('findOne', autoPopulate)
