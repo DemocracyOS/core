@@ -16,7 +16,9 @@ const CustomForm = new mongoose.Schema({
       }
     ],
     properties: { type: mongoose.Schema.Types.Mixed },
-    required: [{ type: String }]
+    required: [{ type: String }],
+    richText: [{ type: String }],
+    allowComments: [{ type: String }]
   }
 }, {
   timestamps: true

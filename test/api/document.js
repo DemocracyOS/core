@@ -3,6 +3,7 @@ const chaiHttp = require('chai-http')
 const status = require('http-status')
 const Document = require('../../models/document')
 const CustomForm = require('../../models/customForm')
+const GeneralComment = require('../../models/generalComment')
 const config = require('../../config')
 const fake = require('../fake')
 
@@ -32,6 +33,7 @@ describe('Documents API (/api/v1/documents)', () => {
     // That is, clean the database, or initialize anything you need before executing the suite of tests
     await CustomForm.remove({})
     await Document.remove({})
+    await GeneralComment.remove({})
     newCustomForm = await (new CustomForm(fakeCustomForm)).save()
     fakeDocument1 = fake.document(true, true, null, newCustomForm.id)
     fakeDocument2 = fake.document(true, false, null, newCustomForm.id)
@@ -165,7 +167,7 @@ describe('Documents API (/api/v1/documents)', () => {
       expect(documentsCreated).to.be.most(10)
     })
     it('GET (/) The author should be able to list its own documents, drafts or published', async () => {
-      await agent.get('/api/v1/documents')
+      await agent.get('/api/v1/documents?myDocs')
         .set('Authorization', 'Bearer ' + accessToken)
         .set('X-Requested-With', 'XMLHttpRequest')
         .set('Content-Type', 'application/json')
@@ -192,7 +194,56 @@ describe('Documents API (/api/v1/documents)', () => {
           throw err
         })
     })
+    it('POST (/:id/comments) should be able to create a comment on a specific document, of a specific field', async () => {
+      let fakeComment = fake.generalComment()
+      await agent.post(`/api/v1/documents/${newDocument1._id}/comments`)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .set('Content-Type', 'application/json')
+        .send(fakeComment)
+        .then((res) => {
+          expect(res).to.have.status(status.CREATED)
+          /* eslint-disable no-unused-expressions */
+          expect(res.body).to.not.be.null
+          expect(res.body).to.have.property('document')
+          expect(res.body).to.have.property('user')
+          expect(res.body).to.have.property('field')
+          expect(res.body).to.have.property('comment')
+          expect(res.body).to.have.property('createdAt')
+          expect(res.body).to.have.property('updatedAt')
+        })
+        .catch((err) => {
+          // expect(err).to.have.status(status.FORBIDDEN)
+          throw err
+        })
+    })
+    it('GET (/:id/comments) should be able to get a list of comments of a specific document', async () => {
+      await agent.get(`/api/v1/documents/${newDocument1._id}/comments`)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .set('Content-Type', 'application/json')
+        .then((res) => {
+          expect(res).to.have.status(status.OK)
+          const { results, pagination } = res.body
+          expect(results).to.be.a('array')
+          expect(results.length).to.be.least(1)
+          expect(results[0]).to.have.property('document')
+          expect(results[0]).to.have.property('user')
+          expect(results[0]).to.have.property('field')
+          expect(results[0]).to.have.property('comment')
+          expect(results[0]).to.have.property('createdAt')
+          expect(results[0]).to.have.property('updatedAt')
+          expect(pagination).to.have.property('count')
+          expect(pagination).to.have.property('page')
+          expect(pagination).to.have.property('limit')
+        })
+        .catch((err) => {
+          // expect(err).to.have.status(status.FORBIDDEN)
+          throw err
+        })
+    })
     it('GET (/:id) it should be to retrieve a document', async () => {
+          console.log(`/api/v1/documents/${newDocument4._id}`)
       await agent.get(`/api/v1/documents/${newDocument4._id}`)
         .set('Authorization', 'Bearer ' + accessToken)
         .set('X-Requested-With', 'XMLHttpRequest')

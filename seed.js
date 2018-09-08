@@ -90,6 +90,12 @@ async function startSetup () {
               'authorEmail'
             ],
             'name': 'About the author'
+          },
+          {
+            'fields': [
+              'introduction'
+            ],
+            'name': 'The text itself'
           }
         ],
         properties: {
@@ -104,13 +110,20 @@ async function startSetup () {
           'authorEmail': {
             type: 'string',
             title: "Author's email"
+          },
+          'introduction': {
+            'type': 'string',
+            'title': 'A small introduction'
           }
         },
         required: [
           'authorName',
           'authorSurname',
-          'authorEmail'
-        ]
+          'authorEmail',
+          'introduction'
+        ],
+        richText: ['introduction'],
+        allowComments: ['introduction']
       }
     })
     log.debug('--> OK')
