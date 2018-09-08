@@ -194,7 +194,7 @@ describe('Documents API (/api/v1/documents)', () => {
           throw err
         })
     })
-    it('POST (/:id/comments) should be able to create a comment on a specific document, in a specific field', async () => {
+    it('POST (/:id/comments) should be able to create a comment on a specific document, of a specific field', async () => {
       let fakeComment = fake.generalComment()
       await agent.post(`/api/v1/documents/${newDocument1._id}/comments`)
         .set('Authorization', 'Bearer ' + accessToken)
