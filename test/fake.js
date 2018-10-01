@@ -157,7 +157,7 @@ const document = (valid, published, authorId, customFormId) => {
   }
 }
 
-const generalComment = (documentId, userId, field) => {
+const comment = (documentId, userId, field) => {
   return {
     field: field || 'introduction',
     comment: faker.lorem.sentence(12)
@@ -168,7 +168,7 @@ module.exports = {
   community,
   customForm,
   document,
-  generalComment,
+  comment,
   userProfileSchema,
   userProfileCustomForm,
   user

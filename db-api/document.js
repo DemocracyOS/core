@@ -1,7 +1,7 @@
 const { Types: { ObjectId } } = require('mongoose')
 const { merge } = require('lodash/object')
 const Document = require('../models/document')
-const GeneralComment = require('../models/generalComment')
+const Comment = require('../models/comment')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
 
@@ -61,7 +61,7 @@ exports.remove = function remove (id) {
     })
 }
 
-exports.listGeneralComments = function (query, { limit, page }) {
-  return GeneralComment
+exports.listComments = function (query, { limit, page }) {
+  return Comment
     .paginate(query, { page, limit })
 }

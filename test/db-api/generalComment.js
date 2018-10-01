@@ -5,36 +5,36 @@ require('sinon-mongoose')
 const { Types: { ObjectId } } = require('mongoose')
 const fake = require('../fake')
 
-const GeneralComment = require('../../models/generalComment')
-const generalComment = require('../../db-api/generalComment')
+const Comment = require('../../models/comment')
+const comment = require('../../db-api/comment')
 
-const generalCommentSample = fake.generalComment()
+const commentSample = fake.comment()
 
-describe('GeneralComment DB-APIs', () => {
+describe('Comment DB-APIs', () => {
   // ===================================================
-  it('GeneralComment.create() should create a generalComment', () => {
-    // require module with rewire to override its internal GeneralComment reference
-    const generalComment = rewire('../../db-api/generalComment')
+  it('Comment.create() should create a comment', () => {
+    // require module with rewire to override its internal Comment reference
+    const comment = rewire('../../db-api/comment')
 
-    // replace GeneralComment constructor for a spy
-    const GeneralCommentMock = sinon.spy()
+    // replace Comment constructor for a spy
+    const CommentMock = sinon.spy()
 
     // add a save method that only returns the data
-    GeneralCommentMock.prototype.save = () => { return Promise.resolve(generalCommentSample) }
+    CommentMock.prototype.save = () => { return Promise.resolve(commentSample) }
 
     // create a spy for the save method
-    const save = sinon.spy(GeneralCommentMock.prototype, 'save')
+    const save = sinon.spy(CommentMock.prototype, 'save')
 
-    // override GeneralComment inside `generalComment/db-api/generalComment`
-    generalComment.__set__('GeneralComment', GeneralCommentMock)
+    // override Comment inside `comment/db-api/comment`
+    comment.__set__('Comment', CommentMock)
 
     // call create method
-    return generalComment.create(generalCommentSample)
+    return comment.create(commentSample)
       .then((result) => {
-        sinon.assert.calledWithNew(GeneralCommentMock)
-        sinon.assert.calledWith(GeneralCommentMock, generalCommentSample)
+        sinon.assert.calledWithNew(CommentMock)
+        sinon.assert.calledWith(CommentMock, commentSample)
         sinon.assert.calledOnce(save)
-        expect(result).to.equal(generalCommentSample)
+        expect(result).to.equal(commentSample)
       })
   })
 })

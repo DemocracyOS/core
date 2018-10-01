@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http')
 const status = require('http-status')
 const Document = require('../../models/document')
 const CustomForm = require('../../models/customForm')
-const GeneralComment = require('../../models/generalComment')
+const Comment = require('../../models/comment')
 const config = require('../../config')
 const fake = require('../fake')
 
@@ -33,7 +33,7 @@ describe('Documents API (/api/v1/documents)', () => {
     // That is, clean the database, or initialize anything you need before executing the suite of tests
     await CustomForm.remove({})
     await Document.remove({})
-    await GeneralComment.remove({})
+    await Comment.remove({})
     newCustomForm = await (new CustomForm(fakeCustomForm)).save()
     fakeDocument1 = fake.document(true, true, null, newCustomForm.id)
     fakeDocument2 = fake.document(true, false, null, newCustomForm.id)
@@ -195,7 +195,7 @@ describe('Documents API (/api/v1/documents)', () => {
         })
     })
     it('POST (/:id/comments) should be able to create a comment on a specific document, of a specific field', async () => {
-      let fakeComment = fake.generalComment()
+      let fakeComment = fake.comment()
       await agent.post(`/api/v1/documents/${newDocument1._id}/comments`)
         .set('Authorization', 'Bearer ' + accessToken)
         .set('X-Requested-With', 'XMLHttpRequest')
@@ -243,8 +243,8 @@ describe('Documents API (/api/v1/documents)', () => {
         })
     })
     it('GET (/:id) it should be to retrieve a document', async () => {
-          console.log(`/api/v1/documents/${newDocument4._id}`)
-      await agent.get(`/api/v1/documents/${newDocument4._id}`)
+      // console.log(`/api/v1/documents/${newDocument4._id}`)
+      await agent.get(`/api/v1/documents/${newDocument3._id}`)
         .set('Authorization', 'Bearer ' + accessToken)
         .set('X-Requested-With', 'XMLHttpRequest')
         .set('Content-Type', 'application/json')

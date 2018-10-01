@@ -1,7 +1,7 @@
 const status = require('http-status')
 const express = require('express')
 const Document = require('../db-api/document')
-const GeneralComment = require('../db-api/generalComment')
+const Comment = require('../db-api/comment')
 const CustomForm = require('../db-api/customForm')
 const router = express.Router()
 const auth = require('../services/auth')
@@ -179,8 +179,8 @@ router.route('/:id')
 router.route('/:id/comments')
   /**
    * @api {get} /documents/:id/comments Get
-   * @apiName getGeneralComments
-   * @apiGroup GeneralComments
+   * @apiName getComments
+   * @apiGroup Comments
    * @apiDescription Retrieves a paginated list of comments of a document
    */
   .get(
@@ -191,7 +191,7 @@ router.route('/:id/comments')
           document: req.params.id
         }
         if (req.body.field) query.field = req.body.field
-        const results = await Document.listGeneralComments(query, {
+        const results = await Document.listComments(query, {
           limit: req.query.limit,
           page: req.query.page
         })
@@ -211,7 +211,7 @@ router.route('/:id/comments')
   /**
    * @api {post} /documents/:id/comments Create
    * @apiName createComment
-   * @apiGroup GeneralComments
+   * @apiGroup Comments
    * @apiDescription Creates a comment on a specific field of a document.
    * @apiPermission authenticated
    * @apiParam {string} field (Body) The field of the document where the comment is being made
@@ -234,8 +234,8 @@ router.route('/:id/comments')
         if (!customForm.fields.allowComments.find((x) => { return x === req.body.field })) {
           throw errors.ErrInvalidParam(`The field ${req.body.field} is not commentable`)
         }
-        const newGeneralComment = await GeneralComment.create(req.body)
-        res.status(status.CREATED).send(newGeneralComment)
+        const newComment = await Comment.create(req.body)
+        res.status(status.CREATED).send(newComment)
       } catch (err) {
         next(err)
       }
