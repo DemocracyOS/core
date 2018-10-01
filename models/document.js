@@ -7,11 +7,14 @@ const Document = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   published: { type: Boolean, required: true },
   customForm: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomForm' },
+  hash: { type: String },
   content: {
     title: { type: String, required: true, maxlength: 120 },
     brief: { type: String, required: false },
     fields: { type: mongoose.Schema.Types.Mixed }
-  }
+  },
+  contributions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+  parentDocument: this
 }, {
   timestamps: true
 })
