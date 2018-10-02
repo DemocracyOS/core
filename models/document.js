@@ -11,7 +11,8 @@ const Document = new mongoose.Schema({
   content: {
     title: { type: String, required: true, maxlength: 120 },
     brief: { type: String, required: false },
-    fields: { type: mongoose.Schema.Types.Mixed }
+    fields: { type: mongoose.Schema.Types.Mixed },
+    hashes: { type: mongoose.Schema.Types.Mixed }
   },
   contributions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   parentDocument: this

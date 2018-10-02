@@ -7,6 +7,7 @@ const router = express.Router()
 const auth = require('../services/auth')
 const errors = require('../services/errors')
 const middlewares = require('../services/middlewares')
+const services = require('../services/utils')
 
 /**
  * @apiDefine admin User access only
@@ -27,7 +28,7 @@ router.route('/')
   /**
    * @api {get} /documents List
    * @apiName getDocuments
-   * @apiDescription Returns a paginated list of -published- documents. Note that it wont list drafts if the request comes from a user with saved drafts.
+   * @apiDescription Returns a paginated list of -published- documents
    * @apiGroup Document
    */
   .get(
@@ -35,17 +36,10 @@ router.route('/')
       try {
         let results = null
         // If it is null, just show the published documents
-        if (req.query.myDocs !== undefined && auth.hasRealmRole(req, 'accountable')) {
-          results = await Document.list({ author: req.session.user._id }, {
-            limit: req.query.limit,
-            page: req.query.page
-          })
-        } else {
-          results = await Document.list({ published: true }, {
-            limit: req.query.limit,
-            page: req.query.page
-          })
-        }
+        results = await Document.list({ published: true }, {
+          limit: req.query.limit,
+          page: req.query.page
+        })
         res.status(status.OK).json({
           results: results.docs,
           pagination: {
@@ -83,6 +77,37 @@ router.route('/')
         next(err)
       }
     })
+
+router.route('/my-documents')
+/**
+   * @api {get} /my-documents List
+   * @apiName getDocuments
+   * @apiDescription Returns a paginated list of the users documents. Lists all kind of documents, no matter the state.
+   * @apiGroup Document
+   */
+  .get(
+    auth.keycloak.protect('realm:accountable'),
+    async (req, res, next) => {
+      try {
+        let results = null
+        // If it is null, just show the published documents
+        results = await Document.list({ author: req.session.user._id }, {
+          limit: req.query.limit,
+          page: req.query.page
+        })
+        res.status(status.OK).json({
+          results: results.docs,
+          pagination: {
+            count: results.total,
+            page: results.page,
+            limit: results.limit
+          }
+        })
+      } catch (err) {
+        next(err)
+      }
+    })
+
 router.route('/:id')
   /**
    * @api {get} /documents/:id Get
@@ -227,19 +252,74 @@ router.route('/:id/comments')
     auth.keycloak.protect(),
     async (req, res, next) => {
       try {
-        req.body.user = req.session.user._id
-        req.body.document = req.params.id
+        req.body.user = req.session.user._id // Set the user
+        req.body.document = req.params.id // Set the document
         const document = await Document.get({ _id: req.params.id })
+        if (!document) {
+          // Document not found
+          throw errors.ErrNotFound('Document not found')
+        }
+        // Document Found
+        // Get the customForm
         const customForm = await CustomForm.get({ _id: document.customForm })
         if (!customForm.fields.allowComments.find((x) => { return x === req.body.field })) {
+          // If the field is not inside the "allowComments" array, throw error
           throw errors.ErrInvalidParam(`The field ${req.body.field} is not commentable`)
         }
+        // Field is commentable
+        // Save the comment
         const newComment = await Comment.create(req.body)
+        // Return the comment with the ID
         res.status(status.CREATED).send(newComment)
       } catch (err) {
         next(err)
       }
     }
   )
+
+router.route('/:id/:field')
+  .put(
+    middlewares.checkId,
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        // Get the document
+        const document = await Document.get({ _id: req.params.id })
+        // Check if yhe field is part of the document
+        if (!Object.keys(document.content.fields).indexOf(req.params.field)) {
+          throw errors.ErrInvalidParam(req.params.field)
+        }
+        const customForm = await CustomForm.get({ _id: document.customForm })
+        if (!customForm.fields.allowComments.indexOf(req.params.field)) {
+          // If the field is not inside the "allowComments" array, throw an error
+          throw errors.ErrInvalidParam(`The field ${req.params.field} is not commentable`)
+        }
+        let newHash = services.hashDocumentText(req.body.state)
+        if (document.content.hashes[req.params.field] !== newHash) {
+          // If the text of the field is being changed, throw an error
+          throw errors.ErrForbidden(`Warning. The content of the field is being changed`)
+        }
+        // We need to check if the change is indeed a commentary
+        // First we get an object with the Diff
+        let fieldChanges = services.getJsonDiffs(document.content.field[req.params.field], req.body.content)
+        // Now we get the changes of type "comment"
+        let commentObjects = services.getObjects(fieldChanges, 'type', 'comment')
+        // Check if the change is only one commentary
+        if (commentObjects.length !== 1) {
+        // If the change is different to a new comment, throw error
+          throw errors.ErrForbidden(`Only new comments are allowed to be included`)
+        }
+        // If everythig is ok...
+        // Update the field
+        const updatedDocument = await Document.updateField(req.params.id, req.params.field, req.body.state, newHash)
+
+        // // Retrieve the version of the customForm that the document follows
+        // res.status(status.OK).json(updatedCustomForm)
+        // console.log('Hola!')
+        res.status(status.OK).json(updatedDocument)
+      } catch (err) {
+        next(err)
+      }
+    })
 
 module.exports = router

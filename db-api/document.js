@@ -53,6 +53,22 @@ exports.update = async function update (id, document, customForm) {
     })
 }
 
+// Update document
+exports.updateField = async function updateField (id, field, state, hash) {
+  // First, find if the document exists
+  return Document.findOne({ _id: id })
+    .then((_document) => {
+      // Found?
+      if (!_document) throw errors.ErrNotFound('Document to update not found')
+      // Deep merge the change(s) with the document
+      _document.content.fields[field] = state
+      _document.content.hashes[field] = hash
+      // Validate the data
+      // Save!
+      return _document.save()
+    })
+}
+
 exports.remove = function remove (id) {
   return Document.findOne({ _id: id })
     .then((document) => {
