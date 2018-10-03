@@ -79,12 +79,12 @@ router.route('/')
     })
 
 router.route('/my-documents')
-/**
-   * @api {get} /my-documents List
-   * @apiName getDocuments
-   * @apiDescription Returns a paginated list of the users documents. Lists all kind of documents, no matter the state.
-   * @apiGroup Document
-   */
+  /**
+     * @api {get} /my-documents List
+     * @apiName getDocuments
+     * @apiDescription Returns a paginated list of the users documents. Lists all kind of documents, no matter the state.
+     * @apiGroup Document
+     */
   .get(
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
@@ -278,6 +278,14 @@ router.route('/:id/comments')
   )
 
 router.route('/:id/:field')
+/**
+   * @api {put} /documents/:id/:field Put
+   * @apiName createComment
+   * @apiGroup Comments
+   * @apiDescription It modifies the state of the text of a field. This is only intended to add comments to a rich text.
+   * @apiPermission authenticated
+   * @apiParam {string} content (Body) The state of the text editor
+   */
   .put(
     middlewares.checkId,
     auth.keycloak.protect(),
@@ -294,6 +302,7 @@ router.route('/:id/:field')
           // If the field is not inside the "allowComments" array, throw an error
           throw errors.ErrInvalidParam(`The field ${req.params.field} is not commentable`)
         }
+        // Create a new hash of the document, that will be used to check the text consistency
         let newHash = services.hashDocumentText(req.body.state)
         if (document.content.hashes[req.params.field] !== newHash) {
           // If the text of the field is being changed, throw an error
@@ -302,17 +311,19 @@ router.route('/:id/:field')
         // We need to check if the change is indeed a commentary
         // First we get an object with the Diff
         let fieldChanges = services.getJsonDiffs(document.content.field[req.params.field], req.body.content)
-        // Now we get the changes of type "comment"
-        let commentObjects = services.getObjects(fieldChanges, 'type', 'comment')
-        // Check if the change is only one commentary
-        if (commentObjects.length !== 1) {
-        // If the change is different to a new comment, throw error
-          throw errors.ErrForbidden(`Only new comments are allowed to be included`)
+        // Now we get *ALL* the changes
+        let theChanges = services.getObjects(fieldChanges, 'type', '')
+        // There has to be only one change, and it should be the comments
+        if (theChanges.length !== 1) {
+          throw errors.ErrInvalidParam(`More than one mark has been added to the text`)
+        }
+        // And now, the only change allowed should be a mark of type "comment"
+        if (theChanges[0].type !== 'comment') {
+          throw errors.ErrInvalidParam(`You can only comment on a text.`)
         }
         // If everythig is ok...
         // Update the field
         const updatedDocument = await Document.updateField(req.params.id, req.params.field, req.body.state, newHash)
-
         // // Retrieve the version of the customForm that the document follows
         // res.status(status.OK).json(updatedCustomForm)
         // console.log('Hola!')
