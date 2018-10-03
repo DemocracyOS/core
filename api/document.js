@@ -201,7 +201,7 @@ router.route('/:id')
       }
     })
 
-router.route('/:id/comments')
+router.route('/:id/:field/comments')
   /**
    * @api {get} /documents/:id/comments Get
    * @apiName getComments
@@ -213,9 +213,9 @@ router.route('/:id/comments')
     async (req, res, next) => {
       try {
         let query = {
-          document: req.params.id
+          document: req.params.id,
+          field: req.params.field
         }
-        if (req.body.field) query.field = req.body.field
         const results = await Document.listComments(query, {
           limit: req.query.limit,
           page: req.query.page
@@ -279,11 +279,18 @@ router.route('/:id/comments')
 
 router.route('/:id/:field')
 /**
-   * @api {put} /documents/:idDocument/:field Put
+   * @api {put} /documents/:idDocument/:field Update the state of a field of a document
    * @apiName updateDocumentField
    * @apiGroup Comments
    * @apiDescription This is only intended when updating a state of a field after a comment was created and added to the text's state.
-   * It modifies the state of the text of a field. This is only intended to add comments to a rich text.
+   * 
+   * The following should throw an error:
+   * 
+   * - The <code>:field</code> is not part of the content of the document.
+   * - The <code>:field</code> is not commentable.
+   * - The text is being changed.
+   * - More than one mark is being added to the state.
+   * - The one and only mark (the modification) needs to be a comment..
    * @apiPermission authenticated
    * @apiParam {string} content (Body) The state of the text editor
    */
@@ -294,20 +301,20 @@ router.route('/:id/:field')
       try {
         // Get the document
         const document = await Document.get({ _id: req.params.id })
-        // Check if yhe field is part of the document
+        // Check if the field is part of the document
         if (!Object.keys(document.content.fields).indexOf(req.params.field)) {
-          throw errors.ErrInvalidParam(req.params.field)
+          throw errors.ErrForbidden(req.params.field)
         }
         const customForm = await CustomForm.get({ _id: document.customForm })
         if (!customForm.fields.allowComments.indexOf(req.params.field)) {
           // If the field is not inside the "allowComments" array, throw an error
-          throw errors.ErrInvalidParam(`The field ${req.params.field} is not commentable`)
+          throw errors.ErrForbidden(`The field ${req.params.field} is not commentable`)
         }
         // Create a new hash of the document, that will be used to check the text consistency
         let newHash = services.hashDocumentText(req.body.state)
         if (document.content.hashes[req.params.field] !== newHash) {
           // If the text of the field is being changed, throw an error
-          throw errors.ErrForbidden(`Warning. The content of the field is being changed`)
+          throw errors.ErrForbidden(`The content of the field is being changed`)
         }
         // We need to check if the change is indeed a commentary
         // First we get an object with the Diff
@@ -316,15 +323,15 @@ router.route('/:id/:field')
         let theChanges = services.getObjects(fieldChanges, 'type', '')
         // There has to be only one change, and it should be the comments
         if (theChanges.length !== 1) {
-          throw errors.ErrInvalidParam(`More than one mark has been added to the text`)
+          throw errors.ErrForbidden(`More than one mark has been added to the text`)
         }
         // And now, the only change allowed should be a mark of type "comment"
         if (theChanges[0].type !== 'comment') {
-          throw errors.ErrInvalidParam(`You can only comment on a text.`)
+          throw errors.ErrForbidden(`You can only comment on a text.`)
         }
         // If everythig is ok...
         // Update the field
-        const updatedDocument = await Document.updateField(req.params.id, req.params.field, req.body.state, newHash)
+        const updatedDocument = await Document.updateField(req.params.id, req.params.field, req.body.content, newHash)
         res.status(status.OK).json(updatedDocument)
       } catch (err) {
         next(err)
