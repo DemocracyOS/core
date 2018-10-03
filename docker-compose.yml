@@ -89,9 +89,9 @@ services:
       - PROXY_ADDRESS_FORWARDING=true
     depends_on:
       - mysql
-    volumes:
-      - ./realm-dev.json:/var/realm-dev.json
-      - ./realm-test.json:/var/realm-test.json
+    # volumes:
+      # - ./realm-dev.json:/var/realm-dev.json
+      # - ./realm-test.json:/var/realm-test.json
     ports:
       - "4000:8080"
     labels:
