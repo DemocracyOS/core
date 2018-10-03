@@ -24,6 +24,7 @@
     "ajv-i18n": "^3.3.0",
     "compression": "^1.7.2",
     "connect-mongo": "^2.0.1",
+    "cors": "^2.8.4",
     "crypto-js": "^3.1.9-1",
     "dotenv": "^5.0.1",
     "draft-js": "^0.10.5",
@@ -65,5 +66,9 @@
   "apidoc": {
     "title": "DemocracyOS v3 API",
     "url": "api/v1"
+  },
+  "now": {
+    "name": "backend-congreso-dev",
+    "dotenv": true
   }
 }
