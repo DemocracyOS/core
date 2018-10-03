@@ -78,9 +78,9 @@ async function startSetup () {
     log.debug('--> OK')
     log.debug('* Creating document type...')
     await dbCustomForm.create({
-      name: config.SETUP.DOCUMENT_TYPE_NAME,
+      name: 'A simple type of custom form',
       icon: null,
-      description: '- To be filled -',
+      description: 'This is an example of a custom form to be used for documents',
       fields: {
         blocks: [
           {

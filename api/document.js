@@ -279,10 +279,11 @@ router.route('/:id/comments')
 
 router.route('/:id/:field')
 /**
-   * @api {put} /documents/:id/:field Put
-   * @apiName createComment
+   * @api {put} /documents/:idDocument/:field Put
+   * @apiName updateDocumentField
    * @apiGroup Comments
-   * @apiDescription It modifies the state of the text of a field. This is only intended to add comments to a rich text.
+   * @apiDescription This is only intended when updating a state of a field after a comment was created and added to the text's state.
+   * It modifies the state of the text of a field. This is only intended to add comments to a rich text.
    * @apiPermission authenticated
    * @apiParam {string} content (Body) The state of the text editor
    */
@@ -324,9 +325,6 @@ router.route('/:id/:field')
         // If everythig is ok...
         // Update the field
         const updatedDocument = await Document.updateField(req.params.id, req.params.field, req.body.state, newHash)
-        // // Retrieve the version of the customForm that the document follows
-        // res.status(status.OK).json(updatedCustomForm)
-        // console.log('Hola!')
         res.status(status.OK).json(updatedDocument)
       } catch (err) {
         next(err)
