@@ -40,9 +40,8 @@ const CONFIG = {
   },
 
   SETUP: {
-    COMMUNITY_NAME: process.env.COMMUNITY_NAME,
-    COMMUNITY_COLOR: '#' + process.env.COMMUNITY_COLOR_HEX,
-    DOCUMENT_TYPE_NAME: process.env.DOCUMENT_TYPE_NAME
+    COMMUNITY_NAME: process.env.COMMUNITY_NAME || 'My community',
+    COMMUNITY_COLOR: '#' + process.env.COMMUNITY_COLOR_HEX || 'My community'
   }
 }
 
