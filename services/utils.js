@@ -1,8 +1,8 @@
 const crypto = require('crypto-js')
 const jsonDiff = require('json-diff')
-const auth = require('../services/auth')
-const log = require('./logger')
-const errors = require('./errors')
+// const auth = require('../services/auth')
+// const log = require('./logger')
+// const errors = require('./errors')
 
 const isAdmin = (token, request) => {
   return token.hasRole('realm:admin')
@@ -74,7 +74,7 @@ const hashDocumentText = (document) => {
 }
 
 const getJsonDiffs = (oldJson, newJson) => {
-  return jsonDiff.diff(oldJson, newJson);
+  return jsonDiff.diff(oldJson, newJson)
 }
 
 module.exports = {
