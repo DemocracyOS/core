@@ -1,5 +1,6 @@
 const status = require('http-status')
 const express = require('express')
+const { Types: { ObjectId } } = require('mongoose')
 const Document = require('../db-api/document')
 const Comment = require('../db-api/comment')
 const CustomForm = require('../db-api/customForm')
@@ -201,81 +202,37 @@ router.route('/:id')
       }
     })
 
-router.route('/:id/:field/comments')
-  /**
-   * @api {get} /documents/:id/comments Get
-   * @apiName getComments
+router.route('/:id/comments')
+/**
+   * @api {put} /documents/:idDocument/comments Get an array of comments by IDs
+   * @apiName getSomeComments
    * @apiGroup Comments
-   * @apiDescription Retrieves a paginated list of comments of a document
+   * @apiDescription You can get an array of comments of a document, no matter the field,
+   * you just need to specify in the querystring a key-value pair with key <code>ids</code> and an Stringified array of ids. Please, remember to user Array.prototype.join(',') the allowed format is <code>?ids=idExample1,idExample2,idExample3</code>.   
+   *
+   * @apiPermission authenticated
+   * @apiParam {string} content (Body) The state of the text editor
    */
   .get(
-    middlewares.checkId,
+    // auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
+        if (!req.query.ids) {
+          throw errors.ErrMissingParam('ids')
+        }
+        const idsToArray = JSON.parse(req.query.ids)
+        let idsArray = idsToArray.map((id) => {
+          return ObjectId(id)
+        })
         let query = {
-          document: req.params.id,
-          field: req.params.field
+          _id: { $in: idsArray }
         }
-        const results = await Document.listComments(query, {
-          limit: req.query.limit,
-          page: req.query.page
-        })
-        res.status(status.OK).json({
-          results: results.docs,
-          pagination: {
-            count: results.total,
-            page: results.page,
-            limit: results.limit
-          }
-        })
+        const results = await Comment.getAll(query)
+        res.status(status.OK).json(results)
       } catch (err) {
         next(err)
       }
-    }
-  )
-  /**
-   * @api {post} /documents/:id/comments Create
-   * @apiName createComment
-   * @apiGroup Comments
-   * @apiDescription Creates a comment on a specific field of a document.
-   * @apiPermission authenticated
-   * @apiParam {string} field (Body) The field of the document where the comment is being made
-   * @apiParam {Number} comment (Body) The field of the document where the comment is being made
-   * @apiExample {json} POST body
-   * {
-   *  "field": "authorName",
-   *  "comment": "Nullam sit amet ipsum id metus porta rutrum in vel nibh. Sed efficitur quam urna, eget imperdiet libero ornare."
-   * }
-   */
-  .post(
-    middlewares.checkId,
-    auth.keycloak.protect(),
-    async (req, res, next) => {
-      try {
-        req.body.user = req.session.user._id // Set the user
-        req.body.document = req.params.id // Set the document
-        const document = await Document.get({ _id: req.params.id })
-        if (!document) {
-          // Document not found
-          throw errors.ErrNotFound('Document not found')
-        }
-        // Document Found
-        // Get the customForm
-        const customForm = await CustomForm.get({ _id: document.customForm })
-        if (!customForm.fields.allowComments.find((x) => { return x === req.body.field })) {
-          // If the field is not inside the "allowComments" array, throw error
-          throw errors.ErrInvalidParam(`The field ${req.body.field} is not commentable`)
-        }
-        // Field is commentable
-        // Save the comment
-        const newComment = await Comment.create(req.body)
-        // Return the comment with the ID
-        res.status(status.CREATED).send(newComment)
-      } catch (err) {
-        next(err)
-      }
-    }
-  )
+    })
 
 router.route('/:id/:field')
 /**
@@ -283,9 +240,9 @@ router.route('/:id/:field')
    * @apiName updateDocumentField
    * @apiGroup Comments
    * @apiDescription This is only intended when updating a state of a field after a comment was created and added to the text's state.
-   * 
+   *
    * The following should throw an error:
-   * 
+   *
    * - The <code>:field</code> is not part of the content of the document.
    * - The <code>:field</code> is not commentable.
    * - The text is being changed.
@@ -337,5 +294,78 @@ router.route('/:id/:field')
         next(err)
       }
     })
+
+router.route('/:id/:field/comments')
+  /**
+   * @api {get} /documents/:id/comments Get
+   * @apiName getComments
+   * @apiGroup Comments
+   * @apiDescription Retrieves a paginated list of comments of a document
+   */
+  .get(
+    middlewares.checkId,
+    async (req, res, next) => {
+      try {
+        let query = {
+          document: req.params.id,
+          field: req.params.field
+        }
+        const results = await Comment.getAll(query)
+        res.status(status.OK).json({
+          results: results.docs,
+          pagination: {
+            count: results.total,
+            page: results.page,
+            limit: results.limit
+          }
+        })
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+  /**
+   * @api {post} /documents/:id/:field/comments Create
+   * @apiName createComment
+   * @apiGroup Comments
+   * @apiDescription Creates a comment on a specific field of a document.
+   * @apiPermission authenticated
+   * @apiParam {string} field (Body) The field of the document where the comment is being made
+   * @apiParam {Number} comment (Body) The field of the document where the comment is being made
+   * @apiExample {json} POST body
+   * {
+   *  "field": "authorName",
+   *  "comment": "Nullam sit amet ipsum id metus porta rutrum in vel nibh. Sed efficitur quam urna, eget imperdiet libero ornare."
+   * }
+   */
+  .post(
+    middlewares.checkId,
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        req.body.user = req.session.user._id // Set the user
+        req.body.document = req.params.id // Set the document
+        const document = await Document.get({ _id: req.params.id })
+        if (!document) {
+          // Document not found
+          throw errors.ErrNotFound('Document not found')
+        }
+        // Document Found
+        // Get the customForm
+        const customForm = await CustomForm.get({ _id: document.customForm })
+        if (!customForm.fields.allowComments.find((x) => { return x === req.body.field })) {
+          // If the field is not inside the "allowComments" array, throw error
+          throw errors.ErrInvalidParam(`The field ${req.body.field} is not commentable`)
+        }
+        // Field is commentable
+        // Save the comment
+        const newComment = await Comment.create(req.body)
+        // Return the comment with the ID
+        res.status(status.CREATED).send(newComment)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
 
 module.exports = router

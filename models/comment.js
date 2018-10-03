@@ -5,7 +5,7 @@ const Comment = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   document: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
   field: { type: String },
-  comment: { type: String },
+  content: { type: String },
   resolved: { type: Boolean, default: false }
 }, { timestamps: true })
 

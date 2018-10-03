@@ -34,10 +34,6 @@ routerV1.use('/users', require('../api/user'))
 // Resource services
 // ===============================
 
-// routerV1Services.use('/reactions', require('../old/api/reaction-services'))
-
-routerV1.use('/services', routerV1Services)
-
 // Add everything to route wrapper
 router.use('/api/v1', routerV1)
 

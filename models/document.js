@@ -2,15 +2,15 @@ const mongoose = require('mongoose')
 // const version = require('mongoose-version')
 const mongoosePaginate = require('mongoose-paginate')
 
-// Define `Community` Schema
+// Define `Document` Schema
 const Document = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   published: { type: Boolean, required: true },
   customForm: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomForm' },
   hash: { type: String },
   content: {
-    title: { type: String, required: true, maxlength: 120 },
-    brief: { type: String, required: false },
+    title: { type: String, required: true },
+    imageCover: { type: String },
     fields: { type: mongoose.Schema.Types.Mixed },
     hashes: { type: mongoose.Schema.Types.Mixed }
   },

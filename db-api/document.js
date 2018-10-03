@@ -25,7 +25,7 @@ exports.create = async function create (document, customForm) {
 
 // Get document
 exports.get = function get (query) {
-  return Document.findOne(query)
+  return Document.findOne(query).populate('author')
 }
 
 // List documents
@@ -75,9 +75,4 @@ exports.remove = function remove (id) {
       if (!document) throw errors.ErrNotFound('Document to remove not found')
       document.remove()
     })
-}
-
-exports.listComments = function (query, { limit, page }) {
-  return Comment
-    .paginate(query, { page, limit })
 }

@@ -8,3 +8,8 @@ const errors = require('../services/errors')
 exports.create = async function create (comment, customForm) {
   return (new Comment(comment)).save()
 }
+
+exports.getAll = function getAll (query, { limit, page }) {
+  return Comment
+    .find(query)
+}

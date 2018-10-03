@@ -41,7 +41,7 @@ const CONFIG = {
 
   SETUP: {
     COMMUNITY_NAME: process.env.COMMUNITY_NAME || 'My community',
-    COMMUNITY_COLOR: '#' + process.env.COMMUNITY_COLOR_HEX || 'My community'
+    COMMUNITY_COLOR: '#' + (process.env.COMMUNITY_COLOR_HEX || '3177cc')
   }
 }
 
