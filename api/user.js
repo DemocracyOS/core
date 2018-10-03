@@ -4,7 +4,7 @@ const router = express.Router()
 const User = require('../db-api/user')
 const auth = require('../services/auth')
 const middlewares = require('../services/middlewares')
-const errors = require('../services/errors')
+// const errors = require('../services/errors')
 
 router.route('/')
 /**
@@ -48,7 +48,7 @@ router.route('/')
         next(err)
       }
     })
-    
+
 router.route('/:id')
 /**
  * @api {get} /users/:id Gets a user
