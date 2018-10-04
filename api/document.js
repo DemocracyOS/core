@@ -139,13 +139,19 @@ router.route('/:id')
           // It's a draft, check if the author is the user who requested it.
           if (req.session.user._id.equals(document.author)) {
             // True! Deliver the document
-            res.status(status.OK).json(document)
+            res.status(status.OK).json({
+              document: document,
+              isAuthor: req.session.user._id.equals(document.author)
+            })
           } else {
             // No, Then the user shouldn't be asking for this document.
             throw errors.ErrForbidden
           }
         }
-        res.status(status.OK).json(document)
+        res.status(status.OK).json({
+          document: document,
+          isAuthor: req.session.user._id.equals(document.author)
+        })
       } catch (err) {
         next(err)
       }
@@ -203,16 +209,16 @@ router.route('/:id')
     })
 
 router.route('/:id/comments')
-/**
-   * @api {put} /documents/:idDocument/comments Get an array of comments by IDs
-   * @apiName getSomeComments
-   * @apiGroup Comments
-   * @apiDescription You can get an array of comments of a document, no matter the field,
-   * you just need to specify in the querystring a key-value pair with key <code>ids</code> and an Stringified array of ids. Please, remember to user Array.prototype.join(',') the allowed format is <code>?ids=idExample1,idExample2,idExample3</code>.   
-   *
-   * @apiPermission authenticated
-   * @apiParam {string} content (Body) The state of the text editor
-   */
+  /**
+     * @api {put} /documents/:idDocument/comments Get an array of comments by IDs
+     * @apiName getSomeComments
+     * @apiGroup Comments
+     * @apiDescription You can get an array of comments of a document, no matter the field,
+     * you just need to specify in the querystring a key-value pair with key <code>ids</code> and an Stringified array of ids. Please, remember to user Array.prototype.join(',') the allowed format is <code>?ids=idExample1,idExample2,idExample3</code>.   
+     *
+     * @apiPermission authenticated
+     * @apiParam {string} content (Body) The state of the text editor
+     */
   .get(
     // auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
@@ -234,23 +240,59 @@ router.route('/:id/comments')
       }
     })
 
-router.route('/:id/:field')
+router.route('/:id/comments/:idComment/resolve')
 /**
-   * @api {put} /documents/:idDocument/:field Update the state of a field of a document
-   * @apiName updateDocumentField
-   * @apiGroup Comments
-   * @apiDescription This is only intended when updating a state of a field after a comment was created and added to the text's state.
-   *
-   * The following should throw an error:
-   *
-   * - The <code>:field</code> is not part of the content of the document.
-   * - The <code>:field</code> is not commentable.
-   * - The text is being changed.
-   * - More than one mark is being added to the state.
-   * - The one and only mark (the modification) needs to be a comment..
-   * @apiPermission authenticated
-   * @apiParam {string} content (Body) The state of the text editor
-   */
+     * @api {post} /documents/:idDocument/comments/:idComment/resolve Resolve a comment of a document
+     * @apiName resolveComment
+     * @apiGroup Comments
+     * @apiDescription Resolves a comment of a document. This only sets the value <code>resolved</code> of a comment
+     * 
+     * The only one who can do this is the author of the document.
+     *
+     * @apiPermission accountable
+     */
+  .post(
+    auth.keycloak.protect('realm:accountable'),
+    async (req, res, next) => {
+      try {
+        const document = await Document.get({ _id: req.params.id })
+        // Check if the user is the author of the document
+        if (!req.session.user._id.equals(document.author)) {
+          throw errors.ErrForbidden // User is not the author
+        }
+        // Update the comment
+        const commentResolved = Comment.resolve({
+          _id: req.params.idComment,
+          document: req.params.id,
+          resolved: false
+        })
+        res.status(status.OK).json(commentResolved)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+router.route('/:id/:field')
+  /**
+     * @api {put} /documents/:idDocument/:field Updates the content a field of a document
+     * @apiName updateDocumentField
+     * @apiGroup Comments
+     * @apiDescription Note: This is only intended when updating a state of a field after a comment was created and added to the text's state.
+     *
+     * The following should throw an error:
+     *
+     * - The <code>:field</code> is not part of the content of the document.
+     * - The <code>:field</code> is not commentable.
+     * - The text is being changed.
+     * - More than one mark is being added to the state.
+     * - The one and only mark (the modification) needs to be a comment.
+     * 
+     * Please note that any logged user can modify a field but knowing that this is for comments, the validators are used so you cannot mess around with this.
+     * 
+     * @apiPermission authenticated
+     * @apiParam {string} content (Body) The state of the text editor
+     */
   .put(
     middlewares.checkId,
     auth.keycloak.protect(),

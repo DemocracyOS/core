@@ -88,4 +88,20 @@ router.route('/:id')
       }
     })
 
+router.route('/me')
+/**
+ * @api {get} /me Get the info of the logged user
+ * @apiName getMyInfo
+ * @apiGroup User
+ */
+  .get(
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        res.status(status.OK).json(req.user)
+      } catch (err) {
+        next(err)
+      }
+    })
+
 module.exports = router

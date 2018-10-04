@@ -42,10 +42,10 @@ router.use('/api/v1', routerV1)
 // ===============================
 
 router.use('/docs/api',
-  (req, res, next) => {
-    if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
-    else next()
-  },
+  // (req, res, next) => {
+  //   if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
+  //   else next()
+  // },
   express.static(path.join(__dirname, '../docs/api'))
 )
 
