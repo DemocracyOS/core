@@ -9,7 +9,7 @@ exports.create = async function create (comment, customForm) {
   return (new Comment(comment)).save()
 }
 
-exports.getAll = function getAll (query, { limit, page }) {
+exports.getAll = function getAll (query) {
   return Comment
     .find(query)
 }
