@@ -349,14 +349,7 @@ router.route('/:id/:field/comments')
           field: req.params.field
         }
         const results = await Comment.getAll(query)
-        res.status(status.OK).json({
-          results: results.docs,
-          pagination: {
-            count: results.total,
-            page: results.page,
-            limit: results.limit
-          }
-        })
+        res.status(status.OK).json(results)
       } catch (err) {
         next(err)
       }
