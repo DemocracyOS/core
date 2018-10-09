@@ -3,5 +3,5 @@ npm-debug.log*
 node_modules
 # Env variables and values should not be uploadad
 .env
-# The builded API doc is not uploaded to the repo.
-/docs/api
+.env.test
+.env.dev

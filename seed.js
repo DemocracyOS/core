@@ -78,9 +78,9 @@ async function startSetup () {
     log.debug('--> OK')
     log.debug('* Creating document type...')
     await dbCustomForm.create({
-      name: config.SETUP.DOCUMENT_TYPE_NAME,
+      name: 'A simple type of custom form',
       icon: null,
-      description: '- To be filled -',
+      description: 'This is an example of a custom form to be used for documents',
       fields: {
         blocks: [
           {
@@ -90,6 +90,12 @@ async function startSetup () {
               'authorEmail'
             ],
             'name': 'About the author'
+          },
+          {
+            'fields': [
+              'introduction'
+            ],
+            'name': 'The text itself'
           }
         ],
         properties: {
@@ -104,13 +110,20 @@ async function startSetup () {
           'authorEmail': {
             type: 'string',
             title: "Author's email"
+          },
+          'introduction': {
+            'type': 'string',
+            'title': 'A small introduction'
           }
         },
         required: [
           'authorName',
           'authorSurname',
-          'authorEmail'
-        ]
+          'authorEmail',
+          'introduction'
+        ],
+        richText: ['introduction'],
+        allowComments: ['introduction']
       }
     })
     log.debug('--> OK')

@@ -34,10 +34,6 @@ routerV1.use('/users', require('../api/user'))
 // Resource services
 // ===============================
 
-// routerV1Services.use('/reactions', require('../old/api/reaction-services'))
-
-routerV1.use('/services', routerV1Services)
-
 // Add everything to route wrapper
 router.use('/api/v1', routerV1)
 
@@ -46,10 +42,10 @@ router.use('/api/v1', routerV1)
 // ===============================
 
 router.use('/docs/api',
-  (req, res, next) => {
-    if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
-    else next()
-  },
+  // (req, res, next) => {
+  //   if (NODE_ENV !== 'dev') next(errors.ErrForbidden)
+  //   else next()
+  // },
   express.static(path.join(__dirname, '../docs/api'))
 )
 

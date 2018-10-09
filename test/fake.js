@@ -86,6 +86,12 @@ const customForm = (valid) => {
             'orgAdress',
             'orgTel'
           ]
+        },
+        {
+          name: 'The content info',
+          fields: [
+            'introduction'
+          ]
         }
       ],
       properties: {
@@ -112,20 +118,29 @@ const customForm = (valid) => {
         'orgAdress': {
           type: 'string',
           title: "Org's address"
+        },
+        'introduction': {
+          type: 'string',
+          title: 'Some introduction'
         }
       },
       required: [
         'authorName',
         'authorSurname',
-        'authorEmail'
+        'authorEmail',
+        'introduction'
+      ],
+      richText: ['introduction'],
+      allowComments: [
+        'introduction'
       ]
     }
   }
 }
 
-const document = (valid, published, author, customFormId) => {
+const document = (valid, published, authorId, customFormId) => {
   return {
-    author: author || null,
+    author: authorId || '5b9297921388502c145a952e',
     published: published || false,
     customForm: customFormId || null,
     content: {
@@ -135,9 +150,17 @@ const document = (valid, published, author, customFormId) => {
         authorName: valid !== undefined && !valid ? faker.random.number() : faker.name.firstName(),
         authorSurname: faker.name.lastName(),
         authorEmail: faker.internet.email(),
-        orgTel: valid !== undefined && !valid ? faker.random.number() : faker.company.companyName()
+        orgTel: valid !== undefined && !valid ? faker.random.number() : faker.company.companyName(),
+        introduction: faker.lorem.paragraphs(3)
       }
     }
+  }
+}
+
+const comment = (documentId, userId, field) => {
+  return {
+    field: field || 'introduction',
+    comment: faker.lorem.sentence(12)
   }
 }
 
@@ -145,6 +168,7 @@ module.exports = {
   community,
   customForm,
   document,
+  comment,
   userProfileSchema,
   userProfileCustomForm,
   user

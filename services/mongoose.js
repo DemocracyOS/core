@@ -20,6 +20,7 @@ require('../models/user')
 require('../models/community')
 require('../models/customForm')
 require('../models/document')
+require('../models/comment')
 
 const db = mongoose.connection
 

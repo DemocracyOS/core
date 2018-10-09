@@ -4,7 +4,7 @@ const router = express.Router()
 const User = require('../db-api/user')
 const auth = require('../services/auth')
 const middlewares = require('../services/middlewares')
-const errors = require('../services/errors')
+// const errors = require('../services/errors')
 
 router.route('/')
 /**
@@ -48,7 +48,7 @@ router.route('/')
         next(err)
       }
     })
-    
+
 router.route('/:id')
 /**
  * @api {get} /users/:id Gets a user
@@ -83,6 +83,22 @@ router.route('/:id')
         // TODO
         User.remove(req.params.id)
         res.status(status.OK).json({ id: req.params.id })
+      } catch (err) {
+        next(err)
+      }
+    })
+
+router.route('/me')
+/**
+ * @api {get} /me Get the info of the logged user
+ * @apiName getMyInfo
+ * @apiGroup User
+ */
+  .get(
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        res.status(status.OK).json(req.user)
       } catch (err) {
         next(err)
       }

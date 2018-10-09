@@ -29,6 +29,13 @@ const ErrNotFound = (message) => new APIError(message, {
   status: NOT_FOUND
 })
 
+const ErrMissingQuerystring = (fields) => new APIError('Missing querystring values', {
+  translationKey: 'MISSING_PARAM',
+  status: BAD_REQUEST
+}, {
+  fields: fields.join(', ')
+})
+
 const ErrMissingParam = (field) => new APIError('Missing required paramether', {
   translationKey: 'MISSING_PARAM',
   status: BAD_REQUEST
@@ -65,7 +72,6 @@ const ErrForbidden = new APIError('Resource not available', {
   status: FORBIDDEN
 })
 
-
 const ErrNotAuthorized = (message) => new APIError(message, {
   translationKey: 'NOT_AUTHORIZED',
   status: FORBIDDEN
@@ -100,6 +106,7 @@ module.exports = {
   APIError,
   ErrNotFound,
   ErrNotAuthorized,
+  ErrMissingQuerystring,
   ErrMissingParam,
   ErrInvalidParam,
   ErrParamTooLong,

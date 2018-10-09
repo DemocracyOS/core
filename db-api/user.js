@@ -19,7 +19,7 @@ exports.get = function get (query) {
 
 // List users
 
-exports.isEmpty = function get () {
+exports.isEmpty = function isEmpty () {
   return User.findOne({})
     .then((user) => {
       if (user === null) return true
