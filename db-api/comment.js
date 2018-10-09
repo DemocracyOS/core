@@ -5,7 +5,7 @@ const Comment = require('../models/comment')
 const errors = require('../services/errors')
 
 // Create comment
-exports.create = async function create (comment, customForm) {
+exports.create = async function create (comment) {
   return (new Comment(comment)).save()
 }
 
