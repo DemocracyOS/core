@@ -72,7 +72,6 @@ const ErrForbidden = new APIError('Resource not available', {
   status: FORBIDDEN
 })
 
-
 const ErrNotAuthorized = (message) => new APIError(message, {
   translationKey: 'NOT_AUTHORIZED',
   status: FORBIDDEN
