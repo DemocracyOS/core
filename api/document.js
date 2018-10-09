@@ -8,7 +8,7 @@ const router = express.Router()
 const auth = require('../services/auth')
 const errors = require('../services/errors')
 const middlewares = require('../services/middlewares')
-const services = require('../services/utils')
+const utils = require('../services/utils')
 
 /**
  * @apiDefine admin User access only
@@ -141,7 +141,7 @@ router.route('/:id')
           if (!isTheAuthor) {
             // No, Then the user shouldn't be asking for this document.
             throw errors.ErrForbidden
-          } 
+          }
         }
         // Deliver the document
         res.status(status.OK).json({
@@ -204,49 +204,17 @@ router.route('/:id')
       }
     })
 
-router.route('/:id/comments')
-  /**
-     * @api {get} /documents/:idDocument/comments Get an array of comments by IDs
-     * @apiName getSomeComments
-     * @apiGroup Comments
-     * @apiDescription You can get an array of comments of a document, no matter the field,
-     * you just need to specify in the querystring a key-value pair with key <code>ids</code> and an Stringified array of ids. Please, remember to user Array.prototype.join(',') the allowed format is <code>?ids=idExample1,idExample2,idExample3</code>.   
-     */
-  .get(
-    async (req, res, next) => {
-      try {
-        if (!req.query.ids) {
-          throw errors.ErrMissingParam('ids')
-        }
-        const idsToArray = req.query.ids.split(',')
-        let idsArray = idsToArray.map((id) => {
-          // console.log(ObjectId(id))
-          return ObjectId(id)
-          // return id
-        })
-        let query = {
-          _id: { $in: idsArray },
-          document: req.params.id
-        }
-        console.log(query)
-        const results = await Comment.getAll(query)
-        res.status(status.OK).json(results)
-      } catch (err) {
-        next(err)
-      }
-    })
-
 router.route('/:id/comments/:idComment/resolve')
-/**
-     * @api {post} /documents/:idDocument/comments/:idComment/resolve Resolve a comment of a document
-     * @apiName resolveComment
-     * @apiGroup Comments
-     * @apiDescription Resolves a comment of a document. This only sets the value <code>resolved</code> of a comment
-     * 
-     * The only one who can do this is the author of the document.
-     *
-     * @apiPermission accountable
-     */
+  /**
+       * @api {post} /documents/:idDocument/comments/:idComment/resolve Resolve a comment of a document
+       * @apiName resolveComment
+       * @apiGroup Comments
+       * @apiDescription Resolves a comment of a document. This only sets the value <code>resolved</code> of a comment
+       *
+       * The only one who can do this is the author of the document.
+       *
+       * @apiPermission accountable
+       */
   .post(
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
@@ -269,9 +237,9 @@ router.route('/:id/comments/:idComment/resolve')
     }
   )
 
-router.route('/:id/:field')
+router.route('/:id/update/:field')
   /**
-     * @api {put} /documents/:idDocument/:field Updates the content a field of a document
+     * @api {put} /documents/:idDocument/update/:field Updates the content a field of a document
      * @apiName updateDocumentField
      * @apiGroup Comments
      * @apiDescription Note: This is only intended when updating a state of a field after a comment was created and added to the text's state.
@@ -283,9 +251,9 @@ router.route('/:id/:field')
      * - The text is being changed.
      * - More than one mark is being added to the state.
      * - The one and only mark (the modification) needs to be a comment.
-     * 
+     *
      * Please note that any logged user can modify a field but knowing that this is for comments, the validators are used so you cannot mess around with this.
-     * 
+     *
      * @apiPermission authenticated
      * @apiParam {string} content (Body) The state of the text editor
      */
@@ -306,16 +274,16 @@ router.route('/:id/:field')
           throw errors.ErrForbidden(`The field ${req.params.field} is not commentable`)
         }
         // Create a new hash of the document, that will be used to check the text consistency
-        let newHash = services.hashDocumentText(req.body.state)
+        let newHash = utils.hashDocumentText(req.body.state)
         if (document.content.hashes[req.params.field] !== newHash) {
           // If the text of the field is being changed, throw an error
           throw errors.ErrForbidden(`The content of the field is being changed`)
         }
         // We need to check if the change is indeed a commentary
         // First we get an object with the Diff
-        let fieldChanges = services.getJsonDiffs(document.content.field[req.params.field], req.body.content)
+        let fieldChanges = utils.getJsonDiffs(document.content.field[req.params.field], req.body.content)
         // Now we get *ALL* the changes
-        let theChanges = services.getObjects(fieldChanges, 'type', '')
+        let theChanges = utils.getObjects(fieldChanges, 'type', '')
         // There has to be only one change, and it should be the comments
         if (theChanges.length !== 1) {
           throw errors.ErrForbidden(`More than one mark has been added to the text`)
@@ -333,20 +301,38 @@ router.route('/:id/:field')
       }
     })
 
-router.route('/:id/:field/comments')
+router.route('/:id/comments')
   /**
-   * @api {get} /documents/:id/comments Get
-   * @apiName getComments
-   * @apiGroup Comments
-   * @apiDescription Retrieves a paginated list of comments of a document
-   */
+     * @api {get} /documents/:idDocument/comments Get an array of comments
+     * @apiName getSomeComments
+     * @apiGroup Comments
+     * @apiDescription You can get an array of comments of a document, as long you provide the correct querystring. No querystring at all returns a BAD REQUEST error.
+     * @apiParam {ObjectID(s)} [ids] A list of ObjectIds, separated by comma. Ex: <code>ids=commentI21,commentId2,commentId3</code>
+     * @apiParam {String} [field] The name of the field that the comments belongs to
+     */
   .get(
     middlewares.checkId,
     async (req, res, next) => {
       try {
+        // If there are no query string, then throw an error
+        if (!utils.checkIfAtLeastOneQuery(req.query, ['ids', 'field'])) {
+          throw errors.ErrMissingQuerystring(['ids', 'field'])
+        }
+        // Prepare query
         let query = {
-          document: req.params.id,
-          field: req.params.field
+          document: req.params.id
+        }
+        // If there is a "ids" querystring.. add it
+        if (req.query.ids) {
+          const idsToArray = req.query.ids.split(',')
+          let idsArray = idsToArray.map((id) => {
+            return ObjectId(id)
+          })
+          query._id = { $in: idsArray }
+        }
+        // If there is a "field" querystring.. add it
+        if (req.query.field) {
+          query.field = req.query.field
         }
         const results = await Comment.getAll(query)
         res.status(status.OK).json(results)
@@ -398,5 +384,4 @@ router.route('/:id/:field/comments')
       }
     }
   )
-
 module.exports = router

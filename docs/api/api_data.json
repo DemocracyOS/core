@@ -46,38 +46,27 @@
   },
   {
     "type": "get",
-    "url": "/documents/:id/comments",
-    "title": "Get",
-    "name": "getComments",
-    "group": "Comments",
-    "description": "<p>Retrieves a paginated list of comments of a document</p>",
-    "version": "0.0.0",
-    "filename": "api/document.js",
-    "groupTitle": "Comments"
-  },
-  {
-    "type": "put",
     "url": "/documents/:idDocument/comments",
-    "title": "Get an array of comments by IDs",
+    "title": "Get an array of comments",
     "name": "getSomeComments",
     "group": "Comments",
-    "description": "<p>You can get an array of comments of a document, no matter the field, you just need to specify in the querystring a key-value pair with key <code>ids</code> and an Stringified array of ids. Please, remember to user Array.prototype.join(',') the allowed format is <code>?ids=idExample1,idExample2,idExample3</code>.</p>",
-    "permission": [
-      {
-        "name": "authenticated",
-        "title": "Must be authenticated",
-        "description": "<p>User must be authenticated before accessing (Keycloak)</p>"
-      }
-    ],
+    "description": "<p>You can get an array of comments of a document, as long you provide the correct querystring. No querystring at all returns a BAD REQUEST error.</p>",
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "content",
-            "description": "<p>(Body) The state of the text editor</p>"
+            "type": "ObjectID(s)",
+            "optional": true,
+            "field": "ids",
+            "description": "<p>A list of ObjectIds, separated by comma. Ex: <code>ids=commentI21,commentId2,commentId3</code></p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "field",
+            "description": "<p>The name of the field that the comments belongs to</p>"
           }
         ]
       }
@@ -95,9 +84,9 @@
     "description": "<p>Resolves a comment of a document. This only sets the value <code>resolved</code> of a comment</p> <p>The only one who can do this is the author of the document.</p>",
     "permission": [
       {
-        "name": "authenticated",
-        "title": "Must be authenticated",
-        "description": "<p>User must be authenticated before accessing (Keycloak)</p>"
+        "name": "accountable",
+        "title": "Accountable members only",
+        "description": "<p>User must be a member of the Accountable group (Keycloak)</p>"
       }
     ],
     "version": "0.0.0",
@@ -106,11 +95,11 @@
   },
   {
     "type": "put",
-    "url": "/documents/:idDocument/:field",
-    "title": "Update the state of a field of a document",
+    "url": "/documents/:idDocument/update/:field",
+    "title": "Updates the content a field of a document",
     "name": "updateDocumentField",
     "group": "Comments",
-    "description": "<p>This is only intended when updating a state of a field after a comment was created and added to the text's state.</p> <p>The following should throw an error:</p> <ul> <li>The <code>:field</code> is not part of the content of the document.</li> <li>The <code>:field</code> is not commentable.</li> <li>The text is being changed.</li> <li>More than one mark is being added to the state.</li> <li>The one and only mark (the modification) needs to be a comment..</li> </ul>",
+    "description": "<p>Note: This is only intended when updating a state of a field after a comment was created and added to the text's state.</p> <p>The following should throw an error:</p> <ul> <li>The <code>:field</code> is not part of the content of the document.</li> <li>The <code>:field</code> is not commentable.</li> <li>The text is being changed.</li> <li>More than one mark is being added to the state.</li> <li>The one and only mark (the modification) needs to be a comment.</li> </ul> <p>Please note that any logged user can modify a field but knowing that this is for comments, the validators are used so you cannot mess around with this.</p>",
     "permission": [
       {
         "name": "authenticated",

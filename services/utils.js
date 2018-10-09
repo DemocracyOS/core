@@ -56,7 +56,7 @@ const getValues = (obj, key) => {
 }
 
 const getKeys = (obj, val) => {
-// return an array of keys that match on a certain value
+  // return an array of keys that match on a certain value
   let objects = []
   for (let i in obj) {
     if (!obj.hasOwnProperty(i)) continue
@@ -77,6 +77,15 @@ const getJsonDiffs = (oldJson, newJson) => {
   return jsonDiff.diff(oldJson, newJson)
 }
 
+const checkIfAtLeastOneQuery = (queries, arrKeys) => {
+  let reqKeys = Object.keys(queries)
+  return reqKeys.some((queryKey) => {
+    return arrKeys.some((key) => {
+      return key === queryKey
+    })
+  })
+}
+
 module.exports = {
   isAdmin,
   getObjects,
@@ -84,5 +93,6 @@ module.exports = {
   getKeys,
   hashDocumentText,
   allowedFieldsFor,
-  getJsonDiffs
+  getJsonDiffs,
+  checkIfAtLeastOneQuery
 }
