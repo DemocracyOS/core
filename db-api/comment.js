@@ -11,7 +11,7 @@ exports.create = async function create (comment) {
 
 exports.getAll = function getAll (query) {
   return Comment
-    .find(query)
+    .find(query).populate('user')
 }
 
 exports.resolve = function resolve (query) {
