@@ -67,7 +67,7 @@ router.route('/')
         const permissions = auth.getPermissions(req)
         // check if permissions
         const documentsCount = await Document.countAuthorDocuments(req.session.user._id)
-        if (documentsCount >= permissions.documentLimit) {
+        if (documentsCount >= permissions.documentCreationLimit) {
           throw errors.ErrNotAuthorized('Cannot create more documents (Limit reached)')
         }
         req.body.author = req.session.user._id
