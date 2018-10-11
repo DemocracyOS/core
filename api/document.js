@@ -4,6 +4,7 @@ const { Types: { ObjectId } } = require('mongoose')
 const Document = require('../db-api/document')
 const Comment = require('../db-api/comment')
 const CustomForm = require('../db-api/customForm')
+const Like = require('../db-api/like')
 const router = express.Router()
 const auth = require('../services/auth')
 const errors = require('../services/errors')
@@ -231,6 +232,36 @@ router.route('/:id/comments/:idComment/resolve')
           resolved: false
         })
         res.status(status.OK).json(commentResolved)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+router.route('/:id/comments/:idComment/like')
+  .post(async (req, res, next) => {
+      try {
+        //NOTE: testUserId and userId is only for develop and test purpose
+        // until know how to get the real userId from "req.session.user"
+        const testUserId = '5bbe939984792f07bc2143a2'
+        const userId = req.session.user ? req.session.user._id : testUserId
+        const { idComment } = req.params
+
+        const like = await Like.get({
+          user: userId,
+          comment: idComment
+        })
+
+        if (!like) {
+          await Like.create({
+            user: testUserId,
+            comment: idComment
+          })
+        } else {
+          await Like.remove(like._id)
+        }
+
+        res.status(status.OK).json({})
       } catch (err) {
         next(err)
       }

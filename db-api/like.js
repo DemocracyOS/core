@@ -9,8 +9,8 @@ exports.create = function create(likeData) {
   return (new Like(likeData)).save()
 }
 
-exports.remove = function remove(userId, commentId) {
-  return Like.findOne({user: userId, comment: commentId})
+exports.remove = function remove(id) {
+  return Like.findById(id)
     .then((like) => {
       if (!like) throw ErrNotFound('Like to remove not found')
       return like.remove()
