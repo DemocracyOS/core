@@ -239,6 +239,13 @@ router.route('/:id/comments/:idComment/resolve')
   )
 
 router.route('/:id/comments/:idComment/like')
+  /**
+   * @api {post} /documents/:idDocument/comments/:idComment/like Like a comment of a document
+   * @apiName likeComment
+   * @apiGroup Comments
+   * @apiDescription Likes a comment of a document
+   *
+   */
   .post(async (req, res, next) => {
       try {
         //NOTE: testUserId and userId is only for develop and test purpose
