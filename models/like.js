@@ -3,11 +3,13 @@ const mongoose = require('mongoose')
 const Like = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   },
   comment: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Comment'
+    ref: 'Comment',
+    required: true
   }
 })
 
