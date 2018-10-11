@@ -13,10 +13,18 @@ const community = (userProfileSchemaId) => {
 }
 
 const user = (keycloak, username, fields) => {
-  return {
+  return {    
     keycloak: keycloak || 'e331dbef-3283-42d9-9f39-0f9810ddc939',
     username: username || null,
     fields: fields || null
+  }
+}
+
+const like = () => {
+  return {
+    _id: '5bbe939984792f07bc2143a2',
+    user: '5bbe939984792fdbbc2143a1',
+    comment: '5bbe939984792f07bc3113b5'
   }
 }
 
@@ -171,5 +179,6 @@ module.exports = {
   comment,
   userProfileSchema,
   userProfileCustomForm,
-  user
+  user,
+  like
 }
