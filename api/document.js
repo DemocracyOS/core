@@ -247,34 +247,33 @@ router.route('/:id/comments/:idComment/like')
    * @apiPermission accountable
    *
    */
-  auth.keycloak.protect(),
-  .post(async (req, res, next) => {
-    try {
-      // NOTE: testUserId and userId is only for develop and test purpose
-      // until know how to get the real userId from "req.session.user"
-      const testUserId = '5bbe939984792f07bc2143a2'
-      const userId = req.session.user ? req.session.user._id : testUserId
-      const { idComment } = req.params
+  .post(
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        const userId = req.session.user._id
+        const { idComment } = req.params
 
-      const like = await Like.get({
-        user: userId,
-        comment: idComment
-      })
-
-      if (!like) {
-        await Like.create({
-          user: testUserId,
+        const like = await Like.get({
+          user: userId,
           comment: idComment
         })
-      } else {
-        await Like.remove(like._id)
-      }
 
-      res.status(status.OK).json({})
-    } catch (err) {
-      next(err)
+        if (!like) {
+          const createdLike = await Like.create({
+            user: userId,
+            comment: idComment
+          })
+          res.json(createdLike)
+        } else {
+          await Like.remove(like._id)
+          res.json(null)
+        }
+        res.status(status.OK)
+      } catch (err) {
+        next(err)
+      }
     }
-  }
   )
 
 router.route('/:id/update/:field')
