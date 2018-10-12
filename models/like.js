@@ -11,7 +11,7 @@ const Like = new mongoose.Schema({
     ref: 'Comment',
     required: true
   }
-})
+}, { timestamps: true })
 
 // Expose 'Like' model
 module.exports = mongoose.model('Like', Like)
