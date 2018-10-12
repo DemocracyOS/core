@@ -21,6 +21,7 @@ require('../models/community')
 require('../models/customForm')
 require('../models/document')
 require('../models/comment')
+require('../models/like')
 
 const db = mongoose.connection
 
