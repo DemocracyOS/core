@@ -15,6 +15,7 @@ let fakeCustomForm = fake.customForm()
 let fakeDocument1 = null
 let fakeDocument2 = null
 let fakeDocument3 = null
+let fakeLike = null
 
 // Global variables for testing
 let agent = null // user agent, simulates a browser.
