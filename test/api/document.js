@@ -4,6 +4,7 @@ const status = require('http-status')
 const Document = require('../../models/document')
 const CustomForm = require('../../models/customForm')
 const Comment = require('../../models/comment')
+const Like = require('../../models/like')
 const config = require('../../config')
 const fake = require('../fake')
 
@@ -25,6 +26,7 @@ let newDocument1 = null
 let newDocument2 = null
 let newDocument3 = null
 let newDocument4 = null
+let newLike = null
 
 describe('Documents API (/api/v1/documents)', () => {
   before(async () => {
@@ -34,19 +36,31 @@ describe('Documents API (/api/v1/documents)', () => {
     await CustomForm.remove({})
     await Document.remove({})
     await Comment.remove({})
+    await Like.remove({})
     newCustomForm = await (new CustomForm(fakeCustomForm)).save()
     fakeDocument1 = fake.document(true, true, null, newCustomForm.id)
     fakeDocument2 = fake.document(true, false, null, newCustomForm.id)
     fakeDocument3 = fake.document(true, true, null, newCustomForm.id)
+    fakeLike = fake.like()
     newDocument1 = await (new Document(fakeDocument1)).save()
     newDocument2 = await (new Document(fakeDocument2)).save()
     newDocument3 = await (new Document(fakeDocument3)).save()
+    newLike = await (new Like(fakeLike)).save()
   })
 
   describe('As anonymous user', () => {
     before(async () => {
       // Create the agent
       agent = await chai.request.agent(config.ROOT_URL)
+    })
+    it('POST (/:id/comments/:idComment/like) should be able to like a comment', async () => {
+      const fakeLikeData = fake.like()
+      await agent.post(`/api/v1/documents/1234/comments/${fakeLikeData.comment}/like`)
+        .set('Content-Type', 'application/json')
+        .send({})
+        .then((res) => {
+          expect(res).to.have.status(status.OK)
+        })
     })
     it('GET (/) should not be able to list documents', async () => {
       await agent.get('/api/v1/documents')
@@ -126,7 +140,7 @@ describe('Documents API (/api/v1/documents)', () => {
         .catch((err) => {
           throw err
         })
-    })
+    })    
     it('POST (/) it should be able to create a document', async () => {
       let newDocument = fake.document(true, false, null, newCustomForm.id)
       await agent.post(`/api/v1/documents`)
