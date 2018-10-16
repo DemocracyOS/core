@@ -4,6 +4,7 @@ const { Types: { ObjectId } } = require('mongoose')
 const Document = require('../db-api/document')
 const Comment = require('../db-api/comment')
 const CustomForm = require('../db-api/customForm')
+const Like = require('../db-api/like')
 const router = express.Router()
 const auth = require('../services/auth')
 const errors = require('../services/errors')
@@ -231,6 +232,44 @@ router.route('/:id/comments/:idComment/resolve')
           resolved: false
         })
         res.status(status.OK).json(commentResolved)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+router.route('/:id/comments/:idComment/like')
+  /**
+   * @api {post} /documents/:idDocument/comments/:idComment/like Like a comment of a document
+   * @apiName likeComment
+   * @apiGroup Comments
+   * @apiDescription Likes a comment of a document
+   * @apiPermission accountable
+   *
+   */
+  .post(
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        const userId = req.session.user._id
+        const { idComment } = req.params
+
+        const like = await Like.get({
+          user: userId,
+          comment: idComment
+        })
+
+        if (!like) {
+          const createdLike = await Like.create({
+            user: userId,
+            comment: idComment
+          })
+          res.json(createdLike)
+        } else {
+          await Like.remove(like._id)
+          res.json(null)
+        }
+        res.status(status.OK)
       } catch (err) {
         next(err)
       }
