@@ -26,7 +26,8 @@ const CONFIG = {
     'auth-server-url': process.env.AUTH_SERVER_URL,
     'ssl-required': 'external',
     'resource': process.env.AUTH_CLIENT,
-    'public-client': true,
+    'bearer-only': true,
+    'use-resource-role-mappings': true,
     'confidential-port': 0
   },
 
