@@ -11,9 +11,10 @@ const Comment = new mongoose.Schema({
   when: { type: String }
 }, { timestamps: true })
 
-Comment.post('init', function(doc){
-  doc.when = timeago().format(doc.createdAt, 'es_AR')
-  return doc;
+Comment.post('find', function(doc){
+  doc = doc.map(d => {
+    return d.when = timeago().format(d.createdAt, 'es_AR')
+  })
 })
 
 // Model's Plugin Extensions
