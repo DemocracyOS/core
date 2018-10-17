@@ -49,7 +49,6 @@ router.route('/')
       }
     })
 
-
 router.route('/me')
 /**
  * @api {get} /me Get the info of the logged user
@@ -60,14 +59,13 @@ router.route('/me')
     auth.keycloak.protect(),
     async (req, res, next) => {
       try {
-        // res.status(status.OK).json({ holis: 'carolis' })
         // console.log(req.kauth.grant)
-        res.status(status.OK).json(req.kauth.grant)
+        res.status(status.OK).json(req.session.user)
       } catch (err) {
         next(err)
       }
     })
-    
+
 router.route('/:id')
 /**
  * @api {get} /users/:id Gets a user
