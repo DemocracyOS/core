@@ -11,7 +11,7 @@ const { NODE_ENV } = process.env
 class NoEnvDefined extends Error { }
 class DatabaseNotEmpty extends Error { }
 
-async function checkDB () {
+async function checkDB() {
   log.debug('* Checking if database has data on it')
   let community = await Community.findOne({})
   if (community) throw new DatabaseNotEmpty('ERROR There is at least one community already on the DB')
@@ -20,20 +20,20 @@ async function checkDB () {
   log.debug('--> OK')
 }
 
-async function checkEnv () {
+async function checkEnv() {
   log.debug(`* Checking if ENV is defined... [${NODE_ENV}] defined`)
   if (NODE_ENV === undefined) throw new NoEnvDefined('ERROR You need to run the script with NODE_ENV, like "dev" or "prod"')
   log.debug('--> OK')
 }
 
-async function startSetup () {
+async function startSetup() {
   try {
     await checkDB()
     log.debug('* Creating community...')
     let profileSchema = await dbCustomForm.create({
-      name: 'User Profile Data',
-      icon: null,
-      description: 'The data of the user',
+      name: 'User Profile',
+      icon: 'fas fa-user',
+      description: 'Template for a user profile',
       fields: {
         'blocks': [
           {
@@ -78,53 +78,54 @@ async function startSetup () {
     log.debug('--> OK')
     log.debug('* Creating document type...')
     await dbCustomForm.create({
-      name: 'A simple type of custom form',
-      icon: null,
-      description: 'This is an example of a custom form to be used for documents',
-      fields: {
-        blocks: [
+      '_id': ObjectId('5bb27ba27ad49b3d1a3a4478'),
+      'fields': {
+        'required': [
+          'fundation',
+          'articles'
+        ],
+        'richText': [
+          'fundation',
+          'articles'
+        ],
+        'allowComments': [
+          'fundation',
+          'articles'
+        ],
+        'blocks': [
           {
             'fields': [
-              'authorName',
-              'authorSurname',
-              'authorEmail'
+              'fundation',
+              'youtubeId'
             ],
-            'name': 'About the author'
-          },
+            'name': 'Project Fundations'
+          }
           {
             'fields': [
-              'introduction'
+              'articles'
             ],
-            'name': 'The text itself'
+            'name': 'Articulado del proyecto'
           }
         ],
-        properties: {
-          'authorName': {
-            type: 'string',
-            title: "Author's name"
-          },
-          'authorSurname': {
-            type: 'string',
-            title: "Author's surname"
-          },
-          'authorEmail': {
-            type: 'string',
-            title: "Author's email"
-          },
-          'introduction': {
+        'properties': {
+          'fundation': {
             'type': 'string',
-            'title': 'A small introduction'
+            'title': 'Project\'s fundations',
+          },
+          'articles': {
+            'type': 'string',
+            'title': 'Articles'
+          },
+          'youtubeId': {
+            'type': 'string',
+            'title': 'Video'
           }
-        },
-        required: [
-          'authorName',
-          'authorSurname',
-          'authorEmail',
-          'introduction'
-        ],
-        richText: ['introduction'],
-        allowComments: ['introduction']
-      }
+        }
+      },
+      'name': 'Project',
+      'icon': 'far fa-files',
+      'description': 'This is the template of fields for projects',
+      'version': 0
     })
     log.debug('--> OK')
     log.debug('--> Setup finished!')
@@ -136,7 +137,7 @@ async function startSetup () {
   }
 }
 
-async function execute () {
+async function execute() {
   try {
     await checkEnv()
     log.debug(`* Connecting to the database...`)
@@ -160,7 +161,7 @@ async function execute () {
 
 mongoose.Promise = global.Promise
 
-log.debug(`DemocracyOS - v3 core`)
+log.debug(`DemocracyOS - core`)
 log.debug(`Seeding mongodb with init values.`)
 log.debug('================================================')
 execute()
