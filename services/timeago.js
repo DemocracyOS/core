@@ -2,10 +2,10 @@ const timeago = require('timeago.js')
 
 const es_AR = function es_AR(number, index, total_sec) {
   return [
-    ['justo ahora', 'en un rato'],
-    ['hace %s segundos', 'en %s segundos'],
-    ['hace 1 minuto', 'en 1 minuto'],
-    ['hace %s minutos', 'en %s minutos'],
+    ['hace poco tiempo', 'dentro de poco tiempo'],
+    ['hace poco tiempo', 'dentro de poco tiempo'],
+    ['hace unos momentos', 'dentro de unos momentos'],
+    ['hace unos momentos', 'dentro de unos momentos'],
     ['hace 1 hora', 'en 1 hora'],
     ['hace %s horas', 'en %s horas'],
     ['hace 1 día', 'en 1 día'],
