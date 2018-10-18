@@ -120,7 +120,20 @@ async function startSetup () {
             'type': 'string',
             'title': 'Video'
           }
-        }
+        },
+        'required': [
+          'title',
+          'fundation',
+          'articles'
+        ],
+        'richText': [
+          'fundation',
+          'articles'
+        ],
+        'allowComments': [
+          'fundation',
+          'articles'
+        ],
       },
       name: 'Project',
       icon: 'far fa-files',
@@ -142,7 +155,7 @@ async function execute () {
     // await checkEnv()
     log.debug(`* Connecting to the database...`)
     mongoose
-      .connect(config.MONGO_URL)
+      .connect(config.MONGO_URL, { useNewUrlParser: true })
       .then(() => {
         log.debug('--> OK')
         startSetup()
