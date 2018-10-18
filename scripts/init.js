@@ -85,19 +85,29 @@ async function startSetup () {
         'blocks': [
           {
             'fields': [
-              'fundation',
-              'youtubeId'
+              'title',
+              'imgCover',
+              'youtubeId',
+              'fundation'
             ],
-            'name': 'Project Fundations'
+            'name': 'Project\'s basic info'
           },
           {
             'fields': [
               'articles'
             ],
-            'name': 'Articulado del proyecto'
+            'name': 'Articles of the project'
           }
         ],
         'properties': {
+          'title': {
+            'type': 'string',
+            'title': 'Project\'s title'
+          },
+          'imgCover': {
+            'type': 'string',
+            'title': 'URL for the cover of the image'
+          },
           'fundation': {
             'type': 'string',
             'title': 'Project\'s fundations'
