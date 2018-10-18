@@ -5,7 +5,7 @@ const log = require('./logger')
 mongoose.Promise = global.Promise
 
 mongoose
-  .connect(MONGO_URL)
+  .connect(MONGO_URL, { useNewUrlParser: true })
   .then(() => {
     log.debug('connection established to ' + MONGO_URL)
   })
