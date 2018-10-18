@@ -1,17 +1,17 @@
 const mongoose = require('mongoose')
-const Community = require('./models/community')
-const dbCommunity = require('./db-api/community')
-const CustomForm = require('./models/customForm')
-const dbCustomForm = require('./db-api/customForm')
-const config = require('./config')
-const log = require('./services/logger')
-const { NODE_ENV } = process.env
+const Community = require('../models/community')
+const dbCommunity = require('../db-api/community')
+const CustomForm = require('../models/customForm')
+const dbCustomForm = require('../db-api/customForm')
+const config = require('../config')
+const log = require('../services/logger')
+// const { NODE_ENV } = process.env
 
 // Error Definitions
-class NoEnvDefined extends Error { }
+// class NoEnvDefined extends Error { }
 class DatabaseNotEmpty extends Error { }
 
-async function checkDB() {
+async function checkDB () {
   log.debug('* Checking if database has data on it')
   let community = await Community.findOne({})
   if (community) throw new DatabaseNotEmpty('ERROR There is at least one community already on the DB')
@@ -20,13 +20,13 @@ async function checkDB() {
   log.debug('--> OK')
 }
 
-async function checkEnv() {
-  log.debug(`* Checking if ENV is defined... [${NODE_ENV}] defined`)
-  if (NODE_ENV === undefined) throw new NoEnvDefined('ERROR You need to run the script with NODE_ENV, like "dev" or "prod"')
-  log.debug('--> OK')
-}
+// async function checkEnv () {
+//   log.debug(`* Checking if ENV is defined... [${NODE_ENV}] defined`)
+//   if (NODE_ENV === undefined) throw new NoEnvDefined('ERROR You need to run the script with NODE_ENV, like "dev" or "prod"')
+//   log.debug('--> OK')
+// }
 
-async function startSetup() {
+async function startSetup () {
   try {
     await checkDB()
     log.debug('* Creating community...')
@@ -34,6 +34,7 @@ async function startSetup() {
       name: 'User Profile',
       icon: 'fas fa-user',
       description: 'Template for a user profile',
+      version: 0,
       fields: {
         'blocks': [
           {
@@ -64,7 +65,9 @@ async function startSetup() {
             'title': "User's facebook"
           }
         },
-        'required': []
+        'required': [],
+        'richText': [],
+        'allowComments': []
       }
     })
     await dbCommunity.create({
@@ -78,20 +81,7 @@ async function startSetup() {
     log.debug('--> OK')
     log.debug('* Creating document type...')
     await dbCustomForm.create({
-      '_id': ObjectId('5bb27ba27ad49b3d1a3a4478'),
-      'fields': {
-        'required': [
-          'fundation',
-          'articles'
-        ],
-        'richText': [
-          'fundation',
-          'articles'
-        ],
-        'allowComments': [
-          'fundation',
-          'articles'
-        ],
+      fields: {
         'blocks': [
           {
             'fields': [
@@ -99,7 +89,7 @@ async function startSetup() {
               'youtubeId'
             ],
             'name': 'Project Fundations'
-          }
+          },
           {
             'fields': [
               'articles'
@@ -110,7 +100,7 @@ async function startSetup() {
         'properties': {
           'fundation': {
             'type': 'string',
-            'title': 'Project\'s fundations',
+            'title': 'Project\'s fundations'
           },
           'articles': {
             'type': 'string',
@@ -122,10 +112,10 @@ async function startSetup() {
           }
         }
       },
-      'name': 'Project',
-      'icon': 'far fa-files',
-      'description': 'This is the template of fields for projects',
-      'version': 0
+      name: 'Project',
+      icon: 'far fa-files',
+      description: 'This is the template of fields for projects',
+      version: 0
     })
     log.debug('--> OK')
     log.debug('--> Setup finished!')
@@ -137,9 +127,9 @@ async function startSetup() {
   }
 }
 
-async function execute() {
+async function execute () {
   try {
-    await checkEnv()
+    // await checkEnv()
     log.debug(`* Connecting to the database...`)
     mongoose
       .connect(config.MONGO_URL)
