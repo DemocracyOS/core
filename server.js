@@ -1,17 +1,13 @@
-const path = require('path')
 const express = require('express')
 const compression = require('compression')
 const helmet = require('helmet')
 const session = require('express-session')
 const cors = require('cors')
 const expressWinston = require('express-winston')
-// const mongoose = require('./services/mongoose')
 const { keycloak } = require('./services/auth')
 const mongoStore = require('./services/sessions')
-// const { setup } = require('../services/setup')
 const config = require('./config')
 const log = require('./services/logger')
-const middlewares = require('./services/middlewares')
 const { NODE_ENV } = process.env
 const loggerMiddleware = expressWinston.logger({ winstonInstance: log })
 
