@@ -76,7 +76,14 @@ async function startSetup () {
       logo: null,
       user: null,
       userProfileSchema: profileSchema._id,
-      initialized: true
+      initialized: true,
+      permissions: {
+        user: {}, // Permissions for users
+        accountable: { // Permissions for accountables
+          documentCreationLimit: 1
+        },
+        admin: {} // Permissions for admin
+      }
     })
     log.debug('--> OK')
     log.debug('* Creating document type...')
@@ -104,23 +111,23 @@ async function startSetup () {
             'type': 'string',
             'title': 'Project\'s title'
           },
-          'imgCover': {
-            'oneOf': [
+          'imageCover': {
+            'anyof': [
               { 'type': 'null' },
-              { 'type': 'String' }
+              { 'type': 'string' }
             ],
             'title': 'URL for the cover of the image'
           },
           'fundation': {
-            'type': 'string',
+            'type': 'object',
             'title': 'Project\'s fundations'
           },
           'articles': {
-            'type': 'string',
+            'type': 'object',
             'title': 'Articles'
           },
           'youtubeId': {
-            'oneOf': [
+            'anyof': [
               { 'type': 'null' },
               { 'type': 'String' }
             ],
@@ -129,14 +136,14 @@ async function startSetup () {
           'closingDate': {
             'oneOf': [
               { 'type': 'null' },
-              { 'type': 'String' }
+              { 'type': 'string' }
             ],
             'title': 'Closing date (to participate)'
           },
           'closure': {
-            'oneOf': [
+            'anyof': [
               { 'type': 'null' },
-              { 'type': 'String' }
+              { 'type': 'object' }
             ],
             'title': 'Closure of the document'
           }

@@ -2,6 +2,7 @@ const status = require('http-status')
 const express = require('express')
 const { Types: { ObjectId } } = require('mongoose')
 const Document = require('../db-api/document')
+const Community = require('../db-api/community')
 const Comment = require('../db-api/comment')
 const CustomForm = require('../db-api/customForm')
 const Like = require('../db-api/like')
@@ -65,11 +66,12 @@ router.route('/')
     auth.keycloak.protect('realm:accountable'),
     async (req, res, next) => {
       try {
-        const permissions = auth.getPermissions(req)
-        // check if permissions
+        // Get the community, we will need it to check the permissions of an accountable
+        const community = await Community.get()
+        // check if the user reached the creation limit
         const documentsCount = await Document.countAuthorDocuments(req.session.user._id)
-        if (documentsCount >= permissions.documentCreationLimit) {
-          throw errors.ErrNotAuthorized('Cannot create more documents (Limit reached)')
+        if (documentsCount >= community.permissions.accountable.documentCreationLimit) {
+          throw errors.ErrNotAuthorized(`Cannot create more documents (Creation limit reached: ${community.permissions.accountable.documentCreationLimit})`)
         }
         req.body.author = req.session.user._id
         const customForm = await CustomForm.get({ _id: req.body.customForm })
@@ -177,29 +179,6 @@ router.route('/:id')
         // Update the document, with the correct customForm
         const updatedCustomForm = await Document.update(req.params.id, req.body, customForm)
         res.status(status.OK).json(updatedCustomForm)
-      } catch (err) {
-        next(err)
-      }
-    })
-  /**
-   * @api {delete} /documents/:id Delete
-   * @apiName deleteDocument
-   * @apiGroup Document
-   * @apiPermission accountable
-   * @apiDescription Deletes a document and returns the id of the removed document.
-   */
-  .delete(
-    middlewares.checkId,
-    auth.keycloak.protect('realm:accountable'),
-    async (req, res, next) => {
-      try {
-        // Check if the user is the author of the document.
-        if (!Document.isAuthor(req.params.id, req.session.user._id)) {
-          throw errors.ErrForbidden // User is not the author
-        }
-        // Remove document.
-        await Document.remove(req.params.id)
-        res.status(status.OK).json({ id: req.params.id })
       } catch (err) {
         next(err)
       }

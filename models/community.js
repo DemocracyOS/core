@@ -7,8 +7,9 @@ const Community = new mongoose.Schema({
   logo: { type: String },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   userProfileSchema: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomForm' },
-  initialized: { type: Boolean, default: false }
-}, { timestamps: true })
+  initialized: { type: Boolean, default: false },
+  permissions: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, minimize: false })
 
 let autoPopulate = function (next) {
   this.populate('userProfileSchema')

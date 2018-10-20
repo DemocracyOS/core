@@ -35,7 +35,7 @@
     "json-diff": "^0.5.3",
     "keycloak-connect": "^4.5.0",
     "lodash": "^4.17.11",
-    "mongoose": "^5.3.3",
+    "mongoose": "^5.3.4",
     "mongoose-immutable": "0.0.2",
     "mongoose-paginate": "^5.0.3",
     "mongoose-version": "^1.1.0",
@@ -45,7 +45,7 @@
     "react-dom": "^16.5.2",
     "timeago.js": "^4.0.0-beta.1",
     "winston": "^2.4.4",
-    "winston-mongodb": "^3.0.0"
+    "winston-mongodb": "^3.0.2"
   },
   "devDependencies": {
     "ajv": "^6.5.4",
