@@ -15,5 +15,5 @@ const Document = new mongoose.Schema({
 // Model's Plugin Extensions
 Document.plugin(mongoosePaginate)
 
-// Expose `Community` Model
+// Expose Model
 module.exports = mongoose.model('Document', Document)

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const mongoosePaginate = require('mongoose-paginate')
 
-// Define `Document` Schema
+// Define `DocumentVersion` Schema
 const DocumentVersion = new mongoose.Schema({
   document: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
   version: { type: Number, required: true },
@@ -14,5 +14,5 @@ const DocumentVersion = new mongoose.Schema({
 // Model's Plugin Extensions
 DocumentVersion.plugin(mongoosePaginate)
 
-// Expose `Community` Model
+// Expose Model
 module.exports = mongoose.model('DocumentVersion', DocumentVersion)
