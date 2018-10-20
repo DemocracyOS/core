@@ -105,7 +105,10 @@ async function startSetup () {
             'title': 'Project\'s title'
           },
           'imgCover': {
-            'type': 'string',
+            'oneOf': [
+              { 'type': 'null' },
+              { 'type': 'String' }
+            ],
             'title': 'URL for the cover of the image'
           },
           'fundation': {
@@ -117,8 +120,25 @@ async function startSetup () {
             'title': 'Articles'
           },
           'youtubeId': {
-            'type': 'string',
-            'title': 'Video'
+            'oneOf': [
+              { 'type': 'null' },
+              { 'type': 'String' }
+            ],
+            'title': 'Youtube Video ID'
+          },
+          'closingDate': {
+            'oneOf': [
+              { 'type': 'null' },
+              { 'type': 'String' }
+            ],
+            'title': 'Closing date (to participate)'
+          },
+          'closure': {
+            'oneOf': [
+              { 'type': 'null' },
+              { 'type': 'String' }
+            ],
+            'title': 'Closure of the document'
           }
         },
         'required': [
@@ -133,7 +153,7 @@ async function startSetup () {
         'allowComments': [
           'fundation',
           'articles'
-        ],
+        ]
       },
       name: 'Project',
       icon: 'far fa-files',
