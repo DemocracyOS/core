@@ -76,7 +76,14 @@ async function startSetup () {
       logo: null,
       user: null,
       userProfileSchema: profileSchema._id,
-      initialized: true
+      initialized: true,
+      permissions: {
+        user: {}, // Permissions for users
+        accountable: { // Permissions for accountables
+          documentCreationLimit: 1
+        },
+        admin: {} // Permissions for admin
+      }
     })
     log.debug('--> OK')
     log.debug('* Creating document type...')
