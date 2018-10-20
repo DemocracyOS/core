@@ -5,8 +5,9 @@ const mongoosePaginate = require('mongoose-paginate')
 const Document = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   customForm: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomForm' },
-  published: { type: Boolean, required: true },
-  lastVersion: { type: Number, default: 1 }
+  lastVersion: { type: Number, default: 1 },
+  published: { type: Boolean, required: true, default: false },
+  closed: { type: Boolean, required: true, default: false }
 }, {
   timestamps: true
 })
