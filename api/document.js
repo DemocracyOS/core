@@ -181,29 +181,6 @@ router.route('/:id')
         next(err)
       }
     })
-  /**
-   * @api {delete} /documents/:id Delete
-   * @apiName deleteDocument
-   * @apiGroup Document
-   * @apiPermission accountable
-   * @apiDescription Deletes a document and returns the id of the removed document.
-   */
-  .delete(
-    middlewares.checkId,
-    auth.keycloak.protect('realm:accountable'),
-    async (req, res, next) => {
-      try {
-        // Check if the user is the author of the document.
-        if (!Document.isAuthor(req.params.id, req.session.user._id)) {
-          throw errors.ErrForbidden // User is not the author
-        }
-        // Remove document.
-        await Document.remove(req.params.id)
-        res.status(status.OK).json({ id: req.params.id })
-      } catch (err) {
-        next(err)
-      }
-    })
 
 router.route('/:id/comments/:idComment/resolve')
   /**
