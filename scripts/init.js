@@ -111,7 +111,7 @@ async function startSetup () {
             'type': 'string',
             'title': 'Project\'s title'
           },
-          'imgCover': {
+          'imageCover': {
             'anyof': [
               { 'type': 'null' },
               { 'type': 'string' }
@@ -119,11 +119,11 @@ async function startSetup () {
             'title': 'URL for the cover of the image'
           },
           'fundation': {
-            'type': 'string',
+            'type': 'object',
             'title': 'Project\'s fundations'
           },
           'articles': {
-            'type': 'string',
+            'type': 'object',
             'title': 'Articles'
           },
           'youtubeId': {
@@ -143,7 +143,7 @@ async function startSetup () {
           'closure': {
             'anyof': [
               { 'type': 'null' },
-              { 'type': 'string' }
+              { 'type': 'object' }
             ],
             'title': 'Closure of the document'
           }
