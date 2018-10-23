@@ -175,7 +175,7 @@ router.route('/:id')
         if (!req.session.user._id.equals(document.author)) {
           throw errors.ErrForbidden // User is not the author
         }
-
+        // Prepare object to send to the update document method
         const documentUpdate = {
           published: req.body.published,
           closed: req.body.closed
@@ -186,12 +186,12 @@ router.route('/:id')
         const customForm = await CustomForm.get({ _id: document.customForm })
         // Create the variable who contains the updated version
         let updatedDocumentVersion = null
-        
+
         if (req.body.contributions && req.body.contributions.length > 0) {
           /**
            * TODO:
            * - Create new version and retrieve it
-           * - set lastVersion property to "documentUpdate" const and set the version
+           * - Set lastVersion property to "documentUpdate" const and set the version
            */
         } else {
           // Update the version document
