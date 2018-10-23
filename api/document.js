@@ -186,16 +186,18 @@ router.route('/:id')
         const customForm = await CustomForm.get({ _id: document.customForm })
         // Create the variable who contains the updated version
         let updatedDocumentVersion = null
+        
         if (req.body.contributions && req.body.contributions.length > 0) {
           /**
            * TODO:
            * - Create new version and retrieve it
            * - set lastVersion property to "documentUpdate" const and set the version
            */
+        } else {
+          // Update the version document
+          updatedDocumentVersion = await DocumentVersion.update(documentVersion._id, documentVersion.content, customForm) 
         }
 
-        // Update the version document
-        const updatedDocumentVersion = await DocumentVersion.update(documentVersion._id, documentVersion.content, customForm) 
         // Update the document, with the correct customForm
         const updatedCustomForm = await Document.update(req.params.id, documentUpdate)
         res.status(status.OK).json(updatedCustomForm)
