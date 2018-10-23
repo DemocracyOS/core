@@ -2,6 +2,7 @@ const status = require('http-status')
 const express = require('express')
 const { Types: { ObjectId } } = require('mongoose')
 const Document = require('../db-api/document')
+const DocumentVersion = require('../db-api/documentVersion')
 const Community = require('../db-api/community')
 const Comment = require('../db-api/comment')
 const CustomForm = require('../db-api/customForm')
@@ -174,10 +175,29 @@ router.route('/:id')
         if (!req.session.user._id.equals(document.author)) {
           throw errors.ErrForbidden // User is not the author
         }
+
+        const documentUpdate = {
+          published: req.body.published,
+          closed: req.body.closed
+        }
+        // Retrieve the document version
+        const documentVersion = await DocumentVersion.get({ document: document._id, version: document.lastVersion })
         // Retrieve the version of the customForm that the document follows
         const customForm = await CustomForm.get({ _id: document.customForm })
+        // Create the variable who contains the updated version
+        let updatedDocumentVersion = null
+        if (req.body.contributions && req.body.contributions.length > 0) {
+          /**
+           * TODO:
+           * - Create new version and retrieve it
+           * - set lastVersion property to "documentUpdate" const and set the version
+           */
+        }
+
+        // Update the version document
+        const updatedDocumentVersion = await DocumentVersion.update(documentVersion._id, documentVersion.content, customForm) 
         // Update the document, with the correct customForm
-        const updatedCustomForm = await Document.update(req.params.id, req.body, customForm)
+        const updatedCustomForm = await Document.update(req.params.id, documentUpdate)
         res.status(status.OK).json(updatedCustomForm)
       } catch (err) {
         next(err)
