@@ -75,7 +75,7 @@ exports.list = async function list (query, { limit, page }) {
 }
 
 // Update document
-exports.update = async function update (id, document, customForm) {
+exports.update = async function update (id, document) {
   // First, find if the document exists
   return Document.findOne({ _id: id })
     .then((_document) => {
@@ -83,11 +83,6 @@ exports.update = async function update (id, document, customForm) {
       if (!_document) throw errors.ErrNotFound('Document to update not found')
       // Deep merge the change(s) with the document
       let documentToSave = merge(_document, document)
-      // Validate the data
-      validator.isDataValid(
-        customForm.fields,
-        documentToSave.content
-      )
       // Save!
       return documentToSave.save()
     })
