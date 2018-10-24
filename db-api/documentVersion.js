@@ -23,3 +23,19 @@ exports.update = async function update (id, content, customForm) {
       return versionToSave.save()
     })
 }
+
+exports.create = function create (documentData, customForm) {
+  validator.isDataValid(
+    customForm.fields,
+    documentData.content
+  )
+
+  const versionToSave = {
+    document: documentData.document,
+    version: documentData.version,
+    content: documentData.content,
+    contributions: documentData.contributions
+  }
+
+  return new DocumentVersion(versionToSave).save()
+}
