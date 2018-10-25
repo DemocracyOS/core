@@ -1,7 +1,9 @@
 const status = require('http-status')
 const express = require('express')
 const { Types: { ObjectId } } = require('mongoose')
+const { cloneDeep } = require('lodash/lang')
 const Document = require('../db-api/document')
+const DocumentVersion = require('../db-api/documentVersion')
 const Community = require('../db-api/community')
 const Comment = require('../db-api/comment')
 const CustomForm = require('../db-api/customForm')
@@ -171,14 +173,35 @@ router.route('/:id')
         // Get the document
         const document = await Document.get({ _id: req.params.id })
         // Check if the user is the author of the document
-        if (!req.session.user._id.equals(document.author)) {
+        if (!req.session.user._id.equals(document.author._id)) {
           throw errors.ErrForbidden // User is not the author
+        }
+        let newDataDocument = {
+          published: req.body.published,
+          closed: req.body.closed
         }
         // Retrieve the version of the customForm that the document follows
         const customForm = await CustomForm.get({ _id: document.customForm })
+        // Check if this will imply a new document version
+        if (req.body.contributions && req.body.contributions.length > 0) {
+          // Set the data to save
+          const newVersionData = {
+            document: document._id,
+            version: document.currentVersion.version + 1,
+            content: req.body.content,
+            contributions: req.body.contributions
+          }
+          // Create the new version
+          const versionCreated = await DocumentVersion.create(newVersionData, customForm)
+          // Set the lastVersion recently created
+          newDataDocument.currentVersion = versionCreated._id
+        } else {
+          // Update the version document
+          await DocumentVersion.update(document.currentVersion._id, req.body.content, customForm) 
+        }
         // Update the document, with the correct customForm
-        const updatedCustomForm = await Document.update(req.params.id, req.body, customForm)
-        res.status(status.OK).json(updatedCustomForm)
+        const updatedDocument = await Document.update(req.params.id, newDataDocument)
+        res.status(status.OK).json(updatedDocument)
       } catch (err) {
         next(err)
       }
@@ -385,6 +408,13 @@ router.route('/:id/comments')
           // Document not found
           throw errors.ErrNotFound('Document not found')
         }
+        let commentBody = {
+          user: req.session.user._id,
+          document: document._id,
+          version: document.currentVersion._id,
+          field: req.body.field,
+          content: req.body.content
+        }
         // Document Found
         // Get the customForm
         const customForm = await CustomForm.get({ _id: document.customForm })
@@ -394,7 +424,7 @@ router.route('/:id/comments')
         }
         // Field is commentable
         // Save the comment
-        const newComment = await Comment.create(req.body)
+        const newComment = await Comment.create(commentBody)
         // Return the comment with the ID
         res.status(status.CREATED).send(newComment)
       } catch (err) {
