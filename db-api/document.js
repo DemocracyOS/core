@@ -1,5 +1,5 @@
 const { Types: { ObjectId } } = require('mongoose')
-const { merge } = require('lodash/object')
+const { merge, omit } = require('lodash/object')
 const Document = require('../models/document')
 const DocumentVersion = require('../models/documentVersion')
 const Comment = require('../models/comment')
@@ -55,18 +55,18 @@ exports.get = async function get (query) {
 
 // List documents
 exports.list = async function list (query, { limit, page }) {
-  let documentList = await Document.paginate(query, { page, limit, lean: true })
-  let promisesPopulate = documentList.docs.map(async (doc) => {
-    let theVersion = await DocumentVersion.findOne({
-      document: doc._id,
-      version: doc.lastVersion
-    }).lean()
-    let aux = doc
-    aux.content = theVersion.content
-    return aux
-  })
-  let populatedDocs = await Promise.all(promisesPopulate)
-  documentList.docs = populatedDocs
+  let documentList = await Document.paginate(query, { page, limit, lean: true, populate: ['author', 'currentVersion'] })
+  // let promisesPopulate = documentList.docs.map(async (doc) => {
+  //   let theVersion = await DocumentVersion.findOne({
+  //     document: doc._id,
+  //     version: doc.lastVersion
+  //   }).lean()
+  //   let aux = doc
+  //   aux.content = theVersion.content
+  //   return aux
+  // })
+  // let populatedDocs = await Promise.all(promisesPopulate)
+  // documentList.docs = populatedDocs
   return documentList
 }
 

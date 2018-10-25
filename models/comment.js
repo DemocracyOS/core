@@ -5,15 +5,17 @@ const timeago = require('../services/timeago')
 const Comment = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   document: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
+  version: { type: mongoose.Schema.Types.ObjectId, ref: 'DocumentVersion' },
   field: { type: String },
   content: { type: String },
   resolved: { type: Boolean, default: false },
   when: { type: String }
 }, { timestamps: true })
 
-Comment.post('find', function(doc){
-  doc = doc.map(d => {
-    return d.when = timeago().format(d.createdAt, 'es_AR')
+Comment.post('find', function (doc) {
+  doc = doc.map((d) => {
+    d.when = timeago().format(d.createdAt, 'es_AR')
+    return d
   })
 })
 

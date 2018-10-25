@@ -10,17 +10,17 @@ exports.get = function get (query) {
 
 exports.update = async function update (id, content, customForm) {
   return DocumentVersion.findOne({ _id: id })
-    .then(version => {
+    .then((version) => {
+      // Not found? Throw error
       if (!version) throw errors.ErrNotFound('Version document to update not found')
-
-      let versionToSave = merge(version, content)
-
       validator.isDataValid(
         customForm.fields,
         content
       )
-
-      return versionToSave.save()
+      // Merge content into version
+      version.content = content
+      // Save!
+      return version.save()
     })
 }
 
