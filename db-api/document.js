@@ -26,8 +26,7 @@ exports.create = async function create (documentData, customForm) {
   let documentToSave = {
     author: documentData.author,
     customForm: customForm._id,
-    published: documentData.published,
-    lastVersion: 1
+    published: documentData.published
   }
   // Save the document, to get the id
   let theDocument = await (new Document(documentToSave)).save()
@@ -38,22 +37,19 @@ exports.create = async function create (documentData, customForm) {
     content: documentData.content,
     contributions: []
   }
-
+  // Save the documentVersion
   let theVersion = await (new DocumentVersion(versionToSave)).save()
+  // Refer the currentVersion of the document to the saved version.
+  theDocument.currentVersion = theVersion._id
+  // Save on DB
+  await theDocument.save()
   theDocument.content = theVersion.content
   return theDocument
 }
 
 // Get document (with its last version)
 exports.get = async function get (query) {
-  let document = await Document.findOne(query).populate('author').lean()
-  let queryVersion = {
-    document: document._id,
-    version: document.lastVersion
-  }
-  let lastVersion = await DocumentVersion.findOne(queryVersion)
-  document.content = lastVersion.content
-  console.log(lastVersion)
+  let document = await Document.findOne(query).populate('author').populate('currentVersion')
   return document
 }
 
