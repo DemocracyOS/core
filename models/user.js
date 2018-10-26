@@ -5,6 +5,10 @@ const immutablePlugin = require('mongoose-immutable')
 const User = new mongoose.Schema({
   keycloak: { type: String, immutable: true },
   username: { type: String, immutable: true },
+  fullname: { type: String },
+  names: { type: String },
+  surnames: { type: String },
+  email: { type: String },
   avatar: { type: String },
   fields: { type: mongoose.Schema.Types.Mixed }
 }, { timestamps: true })

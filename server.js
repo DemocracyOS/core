@@ -34,7 +34,7 @@ module.exports = (async () => {
       saveUninitialized: true,
       store: mongoStore
     }))
-    server.use(keycloak.middleware({ logout: '/logout' }))
+    server.use(keycloak.middleware())
     // Apply API routes
     server.use('/', require('./api'))
 

@@ -29,11 +29,23 @@ exports.bindUserToSession = async (req, res, next) => {
             let userCreated = await User.create({
               keycloak: keycloakId,
               username: auth.getUsername(req),
+              fullname: auth.getFullname(req),
+              names: auth.getNames(req),
+              surnames: auth.getUsername(req),
+              email: auth.getEmail(req),
               avatar: null,
               fields: null
             })
             // Bind to session
             req.session.user = userCreated
+          } else {
+            console.log('Resave user')
+            await User.update(user._id, {
+              fullname: auth.getFullname(req),
+              names: auth.getNames(req),
+              surnames: auth.getUsername(req),
+              email: auth.getEmail(req)
+            })
           }
         }
         // Continue!
@@ -45,6 +57,13 @@ exports.bindUserToSession = async (req, res, next) => {
         // console.log(user)
         if (user) {
           // There is a user, bind it to the session!
+          console.log('Resave user')
+          await User.update(user._id, {
+            fullname: auth.getFullname(req),
+            names: auth.getNames(req),
+            surnames: auth.getUsername(req),
+            email: auth.getEmail(req)
+          })
           req.session.user = user
           next()
         } else {
