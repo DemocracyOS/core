@@ -1,7 +1,6 @@
 const status = require('http-status')
 const express = require('express')
 const { Types: { ObjectId } } = require('mongoose')
-const { cloneDeep } = require('lodash/lang')
 const Document = require('../db-api/document')
 const DocumentVersion = require('../db-api/documentVersion')
 const Community = require('../db-api/community')
@@ -197,7 +196,7 @@ router.route('/:id')
           newDataDocument.currentVersion = versionCreated._id
         } else {
           // Update the version document
-          await DocumentVersion.update(document.currentVersion._id, req.body.content, customForm) 
+          await DocumentVersion.update(document.currentVersion._id, req.body.content, customForm)
         }
         // Update the document, with the correct customForm
         const updatedDocument = await Document.update(req.params.id, newDataDocument)
@@ -305,37 +304,39 @@ router.route('/:id/update/:field')
       try {
         // Get the document
         const document = await Document.get({ _id: req.params.id })
-        // Check if the field is part of the document
-        if (!Object.keys(document.content.fields).indexOf(req.params.field)) {
-          throw errors.ErrForbidden(req.params.field)
-        }
         const customForm = await CustomForm.get({ _id: document.customForm })
+        // Check if the field is part of the document
+        if (!Object.keys(customForm.fields).indexOf(req.params.field)) {
+          throw errors.ErrBadRequest(`The field ${req.params.field} doesn't belong to the schema`)
+        }
         if (!customForm.fields.allowComments.indexOf(req.params.field)) {
           // If the field is not inside the "allowComments" array, throw an error
-          throw errors.ErrForbidden(`The field ${req.params.field} is not commentable`)
+          throw errors.ErrBadRequest(`The field ${req.params.field} is not commentable`)
         }
         // Create a new hash of the document, that will be used to check the text consistency
-        let newHash = utils.hashDocumentText(req.body.state)
-        if (document.content.hashes[req.params.field] !== newHash) {
+        let hashTextSaved = utils.hashDocumentText(document.currentVersion.content[req.params.field])
+        let hashTextState = utils.hashDocumentText(req.body)
+        console.log(hashTextSaved + '==' + hashTextState)
+        if (hashTextSaved !== hashTextState) {
           // If the text of the field is being changed, throw an error
-          throw errors.ErrForbidden(`The content of the field is being changed`)
+          throw errors.ErrBadRequest(`The content of the field is being changed`)
         }
         // We need to check if the change is indeed a commentary
         // First we get an object with the Diff
-        let fieldChanges = utils.getJsonDiffs(document.content.field[req.params.field], req.body.content)
+        let fieldChanges = utils.getJsonDiffs(document.currentVersion.content[req.params.field], req.body)
         // Now we get *ALL* the changes
         let theChanges = utils.getObjects(fieldChanges, 'type', '')
         // There has to be only one change, and it should be the comments
         if (theChanges.length !== 1) {
-          throw errors.ErrForbidden(`More than one mark has been added to the text`)
+          throw errors.ErrBadRequest(`None or more than one mark has been added to the text`, { changes: theChanges })
         }
         // And now, the only change allowed should be a mark of type "comment"
         if (theChanges[0].type !== 'comment') {
-          throw errors.ErrForbidden(`You can only comment on a text.`)
+          throw errors.ErrBadRequest(`You can only comment on a text.`)
         }
         // If everythig is ok...
         // Update the field
-        const updatedDocument = await Document.updateField(req.params.id, req.params.field, req.body.content, newHash)
+        const updatedDocument = await DocumentVersion.updateField(document.currentVersion._id, req.params.field, req.body, customForm)
         res.status(status.OK).json(updatedDocument)
       } catch (err) {
         next(err)
