@@ -10,6 +10,7 @@ const Like = require('../db-api/like')
 const router = express.Router()
 const auth = require('../services/auth')
 const errors = require('../services/errors')
+const notifier = require('../services/notifier')
 const middlewares = require('../services/middlewares')
 const utils = require('../services/utils')
 
@@ -261,10 +262,17 @@ router.route('/:id/comments/:idComment/like')
         })
 
         if (!like) {
+          const document = await Document.get({ _id: req.params.id })
+          const isTheAuthor = req.session.user ? req.session.user._id.equals(document.author._id) : false
           const createdLike = await Like.create({
             user: userId,
             comment: idComment
           })
+          if (isTheAuthor) {
+            const document = await Document.get({ _id: req.params.id })
+            const theComment = await Comment.get({ _id: req.params.idComment })
+            notifier.sendLikeNotification(theComment.user.email, theComment.content, document.author.fullname, document.currentVersion.content.title)
+          }
           res.json(createdLike)
         } else {
           await Like.remove(like._id)
