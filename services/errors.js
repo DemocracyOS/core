@@ -29,6 +29,11 @@ const ErrNotFound = (message) => new APIError(message, {
   status: NOT_FOUND
 })
 
+const ErrBadRequest = (message, meta) => new APIError(message, {
+  translationKey: 'BAD_REQUEST',
+  status: BAD_REQUEST
+}, meta)
+
 const ErrMissingQuerystring = (fields) => new APIError('Missing querystring values', {
   translationKey: 'MISSING_PARAM',
   status: BAD_REQUEST
@@ -105,6 +110,7 @@ const ErrInvalidData = (metadata) => new APIError('Data doesn\'t follow the spec
 module.exports = {
   APIError,
   ErrNotFound,
+  ErrBadRequest,
   ErrNotAuthorized,
   ErrMissingQuerystring,
   ErrMissingParam,
