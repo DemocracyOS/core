@@ -1,9 +1,8 @@
 const axios = require('axios')
+const { NOTIFIER_URL } = require('../config')
 const log = require('./logger')
 
-const http = axios.create({
-  baseURL: 'http://localhost:4000'
-})
+const http = axios.create()
 
 exports.sendLikeNotification = async (email, comment, author, title) => {
   let payload = {
@@ -11,20 +10,76 @@ exports.sendLikeNotification = async (email, comment, author, title) => {
     'info': {
       'to': email,
       'document': {
-        'title': `A ${author} le gustó tu comentario`,
-        'author': `El autor del proyecto "${title}" le gusto tu comentario`,
-        'comment': `Este fue el comentario que le gustó: ${comment}`
+        'title': title,
+        'author': author,
+        'comment': comment
       }
     }
   }
-  http.post('/api/sendemail', payload).then((response) => {
+  http.post(NOTIFIER_URL, payload).then((response) => {
     log.info(response.data.message, {
       type: 'comment-liked',
-      to: email })
+      to: email
+    })
   }).catch((error) => {
     log.error('ERROR Sending Email', {
       type: 'comment-liked',
       to: email,
-      meta: error.message })
+      meta: error.message
+    })
+  })
+}
+
+exports.sendResolvedNotification = async (email, comment, author, title) => {
+  let payload = {
+    'type': 'comment-resolved',
+    'info': {
+      'to': email,
+      'document': {
+        'title': title,
+        'author': author,
+        'comment': comment
+      }
+    }
+  }
+  http.post(NOTIFIER_URL, payload).then((response) => {
+    log.info(response.data.message, {
+      type: 'comment-resolved',
+      to: email
+    })
+  }).catch((error) => {
+    log.error('ERROR Sending Email', {
+      type: 'comment-resolved',
+      to: email,
+      meta: error.message
+    })
+  })
+}
+
+exports.sendDocumentEdited = (emails, comment, author, title) => {
+  emails.forEach((email) => {
+    let payload = {
+      'type': 'document-edited',
+      'info': {
+        'to': email,
+        'document': {
+          'title': title,
+          'author': author,
+          'comment': comment
+        }
+      }
+    }
+    http.post(NOTIFIER_URL, payload).then((response) => {
+      log.info(response.data.message, {
+        type: 'document-edited',
+        to: email
+      })
+    }).catch((error) => {
+      log.error('ERROR Sending Email', {
+        type: 'document-edited',
+        to: email,
+        meta: error.message
+      })
+    })
   })
 }
