@@ -195,19 +195,22 @@ router.route('/:id')
           const versionCreated = await DocumentVersion.create(newVersionData, customForm)
           // Set the lastVersion recently created
           newDataDocument.currentVersion = versionCreated._id
+          // Get the users that contributed
+          let idsArray = req.body.contributions.map((id) => {
+            return ObjectId(id)
+          })
+          let query = {
+            _id: { $in: idsArray }
+          }
+          const comments = await Comment.getAll(query)
+          // Send email
+          notifier.sendDocumentEdited(comments, document.author.fullname, document.currentVersion.content.title)
         } else {
           // Update the version document
           await DocumentVersion.update(document.currentVersion._id, req.body.content, customForm)
         }
         // Update the document, with the correct customForm
         const updatedDocument = await Document.update(req.params.id, newDataDocument)
-        // If this update closes the document
-        if (newDataDocument.closed) {
-          // Get the users of the contributors
-
-          // Send email
-          
-        }
         res.status(status.OK).json(updatedDocument)
       } catch (err) {
         next(err)
@@ -393,11 +396,7 @@ router.route('/:id/comments/:idComment/resolve')
           throw errors.ErrForbidden // User is not the author
         }
         // Update the comment
-        const commentResolved = await Comment.resolve({
-          _id: req.params.idComment,
-          document: req.params.id,
-          resolved: true
-        })
+        const commentResolved = await Comment.resolve({ _id: req.params.idComment })
         notifier.sendResolvedNotification(theComment.user.email, theComment.content, document.author.fullname, document.currentVersion.content.title)
         res.status(status.OK).json(commentResolved)
       } catch (err) {
