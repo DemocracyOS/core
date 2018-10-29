@@ -24,7 +24,7 @@ exports.update = async function update (id, content, customForm) {
     })
 }
 
-exports.create = function create (documentData, customForm) {
+exports.create = async function create (documentData, customForm) {
   validator.isDataValid(
     customForm.fields,
     documentData.content
@@ -37,7 +37,7 @@ exports.create = function create (documentData, customForm) {
     contributions: documentData.contributions
   }
 
-  return new DocumentVersion(versionToSave).save()
+  return (new DocumentVersion(versionToSave)).save()
 }
 
 // Update document
