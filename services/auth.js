@@ -33,7 +33,7 @@ const getEmail = (req) => {
     return null
   }
 }
-const getUsernames = (req) => {
+const getSurnames = (req) => {
   if (req.kauth && req.kauth.grant) {
     return req.kauth.grant.access_token.content.family_name
   } else {
@@ -89,6 +89,6 @@ module.exports = {
   getUsername,
   getNames,
   getEmail,
-  getUsernames,
+  getSurnames,
   getFullname
 }
