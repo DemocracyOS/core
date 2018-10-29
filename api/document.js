@@ -201,89 +201,18 @@ router.route('/:id')
         }
         // Update the document, with the correct customForm
         const updatedDocument = await Document.update(req.params.id, newDataDocument)
+        // If this update closes the document
+        if (newDataDocument.closed) {
+          // Get the users of the contributors
+
+          // Send email
+          
+        }
         res.status(status.OK).json(updatedDocument)
       } catch (err) {
         next(err)
       }
     })
-
-router.route('/:id/comments/:idComment/resolve')
-  /**
-       * @api {post} /documents/:idDocument/comments/:idComment/resolve Resolve a comment of a document
-       * @apiName resolveComment
-       * @apiGroup Comments
-       * @apiDescription Resolves a comment of a document. This only sets the value <code>resolved</code> of a comment
-       *
-       * The only one who can do this is the author of the document.
-       *
-       * @apiPermission accountable
-       */
-  .post(
-    auth.keycloak.protect('realm:accountable'),
-    async (req, res, next) => {
-      try {
-        const document = await Document.get({ _id: req.params.id })
-        // Check if the user is the author of the document
-        if (!req.session.user._id.equals(document.author)) {
-          throw errors.ErrForbidden // User is not the author
-        }
-        // Update the comment
-        const commentResolved = Comment.resolve({
-          _id: req.params.idComment,
-          document: req.params.id,
-          resolved: false
-        })
-        res.status(status.OK).json(commentResolved)
-      } catch (err) {
-        next(err)
-      }
-    }
-  )
-
-router.route('/:id/comments/:idComment/like')
-  /**
-   * @api {post} /documents/:idDocument/comments/:idComment/like Like a comment of a document
-   * @apiName likeComment
-   * @apiGroup Comments
-   * @apiDescription Likes a comment of a document
-   * @apiPermission accountable
-   *
-   */
-  .post(
-    auth.keycloak.protect(),
-    async (req, res, next) => {
-      try {
-        const userId = req.session.user._id
-        const { idComment } = req.params
-
-        const like = await Like.get({
-          user: userId,
-          comment: idComment
-        })
-
-        if (!like) {
-          const document = await Document.get({ _id: req.params.id })
-          const isTheAuthor = req.session.user ? req.session.user._id.equals(document.author._id) : false
-          const createdLike = await Like.create({
-            user: userId,
-            comment: idComment
-          })
-          if (isTheAuthor) {
-            const document = await Document.get({ _id: req.params.id })
-            const theComment = await Comment.get({ _id: req.params.idComment })
-            notifier.sendLikeNotification(theComment.user.email, theComment.content, document.author.fullname, document.currentVersion.content.title)
-          }
-          res.json(createdLike)
-        } else {
-          await Like.remove(like._id)
-          res.json(null)
-        }
-        res.status(status.OK)
-      } catch (err) {
-        next(err)
-      }
-    }
-  )
 
 router.route('/:id/update/:field')
   /**
@@ -441,4 +370,85 @@ router.route('/:id/comments')
       }
     }
   )
+
+router.route('/:id/comments/:idComment/resolve')
+  /**
+       * @api {post} /documents/:idDocument/comments/:idComment/resolve Resolve a comment of a document
+       * @apiName resolveComment
+       * @apiGroup Comments
+       * @apiDescription Resolves a comment of a document. This only sets the value <code>resolved</code> of a comment
+       *
+       * The only one who can do this is the author of the document.
+       *
+       * @apiPermission accountable
+       */
+  .post(
+    auth.keycloak.protect('realm:accountable'),
+    async (req, res, next) => {
+      try {
+        const document = await Document.get({ _id: req.params.id })
+        const theComment = await Comment.get({ _id: req.params.idComment })
+        // Check if the user is the author of the document
+        if (!req.session.user._id.equals(document.author._id)) {
+          throw errors.ErrForbidden // User is not the author
+        }
+        // Update the comment
+        const commentResolved = await Comment.resolve({
+          _id: req.params.idComment,
+          document: req.params.id,
+          resolved: true
+        })
+        notifier.sendResolvedNotification(theComment.user.email, theComment.content, document.author.fullname, document.currentVersion.content.title)
+        res.status(status.OK).json(commentResolved)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+router.route('/:id/comments/:idComment/like')
+  /**
+   * @api {post} /documents/:idDocument/comments/:idComment/like Like a comment of a document
+   * @apiName likeComment
+   * @apiGroup Comments
+   * @apiDescription Likes a comment of a document
+   * @apiPermission accountable
+   *
+   */
+  .post(
+    auth.keycloak.protect(),
+    async (req, res, next) => {
+      try {
+        const userId = req.session.user._id
+        const { idComment } = req.params
+
+        const like = await Like.get({
+          user: userId,
+          comment: idComment
+        })
+
+        if (!like) {
+          const document = await Document.get({ _id: req.params.id })
+          const isTheAuthor = req.session.user ? req.session.user._id.equals(document.author._id) : false
+          const createdLike = await Like.create({
+            user: userId,
+            comment: idComment
+          })
+          if (isTheAuthor) {
+            const document = await Document.get({ _id: req.params.id })
+            const theComment = await Comment.get({ _id: req.params.idComment })
+            notifier.sendLikeNotification(theComment.user.email, theComment.content, document.author.fullname, document.currentVersion.content.title)
+          }
+          res.json(createdLike)
+        } else {
+          await Like.remove(like._id)
+          res.json(null)
+        }
+        res.status(status.OK)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
 module.exports = router
