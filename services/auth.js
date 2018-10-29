@@ -19,6 +19,35 @@ const getUsername = (req) => {
     return null
   }
 }
+const getNames = (req) => {
+  if (req.kauth && req.kauth.grant) {
+    return req.kauth.grant.access_token.content.given_name
+  } else {
+    return null
+  }
+}
+const getEmail = (req) => {
+  if (req.kauth && req.kauth.grant) {
+    return req.kauth.grant.access_token.content.email
+  } else {
+    return null
+  }
+}
+const getSurnames = (req) => {
+  if (req.kauth && req.kauth.grant) {
+    return req.kauth.grant.access_token.content.family_name
+  } else {
+    return null
+  }
+}
+
+const getFullname = (req) => {
+  if (req.kauth && req.kauth.grant) {
+    return req.kauth.grant.access_token.content.name
+  } else {
+    return null
+  }
+}
 
 const isAuthenticated = (req) => {
   if (req.kauth && req.kauth.grant) {
@@ -57,5 +86,9 @@ module.exports = {
   hasRealmRole,
   getUserId,
   getPermissions,
-  getUsername
+  getUsername,
+  getNames,
+  getEmail,
+  getSurnames,
+  getFullname
 }

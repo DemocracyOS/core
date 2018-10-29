@@ -61,6 +61,7 @@ router.route('/me')
       try {
         // console.log(req.kauth.grant)
         res.status(status.OK).json(req.session.user)
+        // res.status(status.OK).json(req.kauth.grant)
       } catch (err) {
         next(err)
       }

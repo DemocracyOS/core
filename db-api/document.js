@@ -1,5 +1,5 @@
 const { Types: { ObjectId } } = require('mongoose')
-const { merge, omit } = require('lodash/object')
+const { merge } = require('lodash/object')
 const Document = require('../models/document')
 const DocumentVersion = require('../models/documentVersion')
 const Comment = require('../models/comment')

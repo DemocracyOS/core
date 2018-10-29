@@ -9,6 +9,11 @@ exports.create = async function create (comment) {
   return (new Comment(comment)).save()
 }
 
+exports.get = function get (query) {
+  return Comment
+    .findOne(query).populate('user')
+}
+
 exports.getAll = function getAll (query) {
   return Comment
     .find(query).populate('user')

@@ -1,4 +1,5 @@
 const { Types: { ObjectId } } = require('mongoose')
+const { merge } = require('lodash/object')
 const { ErrNotFound } = require('../services/errors')
 const User = require('../models/user')
 const CommunityDB = require('./community')
@@ -45,7 +46,8 @@ exports.update = async function update (id, user) {
           user.fields
         )
       }
-      return Object.assign(_user, user).save()
+      let userToSave = Object.assign(_user, user)
+      return userToSave.save()
     })
 }
 
