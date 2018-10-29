@@ -56,28 +56,28 @@ exports.sendResolvedNotification = async (email, comment, author, title) => {
   })
 }
 
-exports.sendDocumentEdited = (emails, comment, author, title) => {
-  emails.forEach((email) => {
+exports.sendDocumentEdited = (comments, author, title) => {
+  comments.forEach((comment) => {
     let payload = {
       'type': 'document-edited',
       'info': {
-        'to': email,
+        'to': comment.user.email,
         'document': {
           'title': title,
           'author': author,
-          'comment': comment
+          'comment': comment.content
         }
       }
     }
     http.post(NOTIFIER_URL, payload).then((response) => {
       log.info(response.data.message, {
         type: 'document-edited',
-        to: email
+        to: comment.user.email
       })
     }).catch((error) => {
       log.error('ERROR Sending Email', {
         type: 'document-edited',
-        to: email,
+        to: comment.user.email,
         meta: error.message
       })
     })
