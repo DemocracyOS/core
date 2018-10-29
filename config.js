@@ -15,7 +15,7 @@ const CONFIG = {
 
   SESSION_SECRET: process.env.SESSION_SECRET || null,
 
-  // ROOT_URL: 'http://' + process.env.HOST + ':' + process.env.PORT,
+  NOTIFIER_URL: process.env.NOTIFIER_URL,
 
   // ------------------------------------------------------------------------------
   //  Keycloak configuration
