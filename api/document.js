@@ -137,7 +137,7 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         const document = await Document.get({ _id: req.params.id })
-        const isTheAuthor = req.session.user ? req.session.user._id.equals(document.author) : false
+        const isTheAuthor = req.session.user ? req.session.user._id.equals(document.author._id) : false
         // No document?
         if (!document) throw errors.ErrNotFound('Document not found or doesn\'t exist')
         // Check if it is published or not (draft)
