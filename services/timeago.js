@@ -1,6 +1,6 @@
 const timeago = require('timeago.js')
 
-const es_AR = function es_AR(number, index, total_sec) {
+const es_AR = function es_AR (number, index, total_sec) {
   return [
     ['poco tiempo', 'dentro de poco tiempo'],
     ['poco tiempo', 'dentro de poco tiempo'],
@@ -16,7 +16,7 @@ const es_AR = function es_AR(number, index, total_sec) {
     ['%s meses', 'en %s meses'],
     ['1 año', 'en 1 año'],
     ['%s años', 'en %s años']
-  ][index];
+  ][index]
 }
 
 timeago.register('es_AR', es_AR)
