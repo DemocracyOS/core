@@ -256,14 +256,13 @@ router.route('/:id/update/:field')
         // Create a new hash of the document, that will be used to check the text consistency
         let hashTextSaved = utils.hashDocumentText(document.currentVersion.content[req.params.field])
         let hashTextState = utils.hashDocumentText(req.body)
-        console.log(hashTextSaved + '==' + hashTextState)
         if (hashTextSaved !== hashTextState) {
           // If the text of the field is being changed, throw an error
           throw errors.ErrBadRequest(`The content of the field is being changed`)
         }
         // We need to check if the change is indeed a commentary
         // First we get an object with the Diff
-        let fieldChanges = utils.getJsonDiffs(document.currentVersion.content[req.params.field], req.body)
+        let fieldChanges = utils.getJsonDiffs(req.body,document.currentVersion.content[req.params.field])
         // Now we get *ALL* the changes
         let theChanges = utils.getObjects(fieldChanges, 'type', '')
         // There has to be only one change, and it should be the comments
