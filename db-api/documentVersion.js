@@ -44,17 +44,19 @@ exports.create = async function create (documentData, customForm) {
 exports.updateField = async function updateField (id, field, content, customForm) {
   // First, find if the document exists
   return DocumentVersion.findOne({ _id: id })
-    .then((_version) => {
+    .then((version) => {
       // Found?
-      if (!_version) throw errors.ErrNotFound('DocumentVersion to update not found')
-      // Deep merge the change(s) with the document
-      _version.content[field] = content
+      if (!version) throw errors.ErrNotFound('DocumentVersion to update not found')
+      // Change the content of the fied
+      version.content[field] = content
       // Validate the data
       validator.isDataValid(
         customForm.fields,
-        _version.content
+        version.content
       )
-      // Save!  
-      return _version.save()
+      // Marked that this changed!
+      version.markModified('content')
+      // Save!
+      return version.save()
     })
 }
