@@ -21,6 +21,7 @@ exports.update = async function update (id, content, customForm) {
         version.content
       )
       // Save!
+      version.markModified('content')
       return version.save()
     })
 }
