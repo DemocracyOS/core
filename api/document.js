@@ -172,6 +172,9 @@ router.route('/:id')
       try {
         // Get the document
         const document = await Document.get({ _id: req.params.id })
+        if (!document) {
+          throw errors.ErrNotFound('Document not found')
+        }
         // Check if the user is the author of the document
         if (!req.session.user._id.equals(document.author._id)) {
           throw errors.ErrForbidden // User is not the author
@@ -262,7 +265,7 @@ router.route('/:id/update/:field')
         }
         // We need to check if the change is indeed a commentary
         // First we get an object with the Diff
-        let fieldChanges = utils.getJsonDiffs(req.body,document.currentVersion.content[req.params.field])
+        let fieldChanges = utils.getJsonDiffs(req.body, document.currentVersion.content[req.params.field])
         // Now we get *ALL* the changes
         let theChanges = utils.getObjects(fieldChanges, 'type', '')
         // There has to be only one change, and it should be the comments
