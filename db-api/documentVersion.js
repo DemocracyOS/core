@@ -14,7 +14,7 @@ exports.update = async function update (id, content, customForm) {
       // Not found? Throw error
       if (!version) throw errors.ErrNotFound('Version document to update not found')
       // Merge content into version
-      version.content = merge(version.content, content)
+      version.content = Object.assign(version.content, content)
       // Validate!
       validator.isDataValid(
         customForm.fields,
