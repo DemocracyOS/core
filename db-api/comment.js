@@ -14,6 +14,10 @@ exports.get = function get (query) {
     .findOne(query).populate('user')
 }
 
+exports.count = function count (query) {
+  return Comment.countDocuments(query)
+}
+
 exports.getAll = function getAll (query) {
   return Comment
     .find(query).populate('user')

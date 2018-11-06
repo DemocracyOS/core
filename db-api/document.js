@@ -84,6 +84,20 @@ exports.update = async function update (id, document) {
     })
 }
 
+// Update document
+exports.addComment = async function addComment (id) {
+  // First, find if the document exists
+  return Document.findOne({ _id: id })
+    .then((_document) => {
+      // Founded?
+      if (!_document) throw errors.ErrNotFound('Document to update not found')
+      // Deep merge the change(s) with the document
+      _document.commentsCount = _document.commentsCount + 1
+      // Save!
+      return _document.save()
+    })
+}
+
 exports.remove = function remove (id) {
   return Document.findOne({ _id: id })
     .then((document) => {

@@ -137,9 +137,10 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         const document = await Document.get({ _id: req.params.id })
-        const isTheAuthor = req.session.user ? req.session.user._id.equals(document.author._id) : false
         // No document?
         if (!document) throw errors.ErrNotFound('Document not found or doesn\'t exist')
+        // Check if the user is the author
+        const isTheAuthor = req.session.user ? req.session.user._id.equals(document.author._id) : false
         // Check if it is published or not (draft)
         if (!document.published) {
           // It's a draft, check if the author is the user who requested it.
@@ -368,6 +369,7 @@ router.route('/:id/comments')
         // Field is commentable
         // Save the comment
         const newComment = await Comment.create(commentBody)
+        await Document.addComment({ _id: req.params.id })
         // Return the comment with the ID
         res.status(status.CREATED).send(newComment)
       } catch (err) {
