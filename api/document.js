@@ -352,13 +352,6 @@ router.route('/:id/comments')
           // Document not found
           throw errors.ErrNotFound('Document not found')
         }
-        let commentBody = {
-          user: req.session.user._id,
-          document: document._id,
-          version: document.currentVersion._id,
-          field: req.body.field,
-          content: req.body.content
-        }
         // Document Found
         // Get the customForm
         const customForm = await CustomForm.get({ _id: document.customForm })
@@ -367,6 +360,15 @@ router.route('/:id/comments')
           throw errors.ErrInvalidParam(`The field ${req.body.field} is not commentable`)
         }
         // Field is commentable
+        // Create the body of the new comment
+        let commentBody = {
+          user: req.session.user._id,
+          document: document._id,
+          version: document.currentVersion._id,
+          field: req.body.field,
+          content: req.body.content,
+          decoration: req.body.decoration || null
+        }
         // Save the comment
         const newComment = await Comment.create(commentBody)
         await Document.addComment({ _id: req.params.id })

@@ -9,6 +9,7 @@ const Comment = new mongoose.Schema({
   field: { type: String },
   content: { type: String },
   resolved: { type: Boolean, default: false },
+  decoration: { type: mongoose.Schema.Types.Mixed },
   when: { type: String }
 }, { timestamps: true })
 
