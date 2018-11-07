@@ -9,6 +9,7 @@ const User = new mongoose.Schema({
   names: { type: String },
   surnames: { type: String },
   email: { type: String },
+  roles: [{ type: String }],
   avatar: { type: String },
   fields: { type: mongoose.Schema.Types.Mixed }
 }, { timestamps: true })

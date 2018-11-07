@@ -16,6 +16,10 @@ const Comment = new mongoose.Schema({
 Comment.post('find', function (doc) {
   doc = doc.map((d) => {
     d.when = timeago().format(d.createdAt, 'es_AR')
+    if (d.decoration) {
+      d.decoration.mark.data = {}
+      d.decoration.mark.data.id = d._id
+    }
     return d
   })
 })

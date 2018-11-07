@@ -33,6 +33,7 @@ exports.bindUserToSession = async (req, res, next) => {
               names: auth.getNames(req),
               surnames: auth.getSurnames(req),
               email: auth.getEmail(req),
+              roles: auth.getRoles(req),
               avatar: null,
               fields: null
             })
@@ -43,7 +44,8 @@ exports.bindUserToSession = async (req, res, next) => {
               fullname: auth.getFullname(req),
               names: auth.getNames(req),
               surnames: auth.getSurnames(req),
-              email: auth.getEmail(req)
+              email: auth.getEmail(req),
+              roles: auth.getRoles(req)
             })
           }
         }
@@ -60,7 +62,8 @@ exports.bindUserToSession = async (req, res, next) => {
             fullname: auth.getFullname(req),
             names: auth.getNames(req),
             surnames: auth.getSurnames(req),
-            email: auth.getEmail(req)
+            email: auth.getEmail(req),
+            roles: auth.getRoles(req)
           })
           req.session.user = user
           next()
@@ -73,6 +76,7 @@ exports.bindUserToSession = async (req, res, next) => {
             names: auth.getNames(req),
             surnames: auth.getSurnames(req),
             email: auth.getEmail(req),
+            roles: auth.getRoles(req),
             avatar: null,
             fields: null
           })

@@ -49,6 +49,14 @@ const getFullname = (req) => {
   }
 }
 
+const getRoles = (req) => {
+  if (req.kauth && req.kauth.grant) {
+    return req.kauth.grant.access_token.content.realm_access.roles
+  } else {
+    return null
+  }
+}
+
 const isAuthenticated = (req) => {
   if (req.kauth && req.kauth.grant) {
     return true
@@ -89,6 +97,7 @@ module.exports = {
   getUsername,
   getNames,
   getEmail,
+  getRoles,
   getSurnames,
   getFullname
 }
