@@ -322,6 +322,7 @@ router.route('/:id/comments')
         // If there is a "field" querystring.. add it
         if (req.query.field) {
           query.field = req.query.field
+          query.resolved = false
         }
         const results = await Comment.getAll(query)
         res.status(status.OK).json(results)
