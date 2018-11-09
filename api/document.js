@@ -208,7 +208,22 @@ router.route('/:id')
           }
           const comments = await Comment.getAll(query)
           // Send email
-          notifier.sendDocumentEdited(comments, document.author.fullname, document.currentVersion.content.title)
+          comments.forEach((comment) => {
+            notifier.sendDocumentEdited({
+              type: 'comment-contribution',
+              comment: comment.content,
+              participant: {
+                email: comment.user.email,
+                name: comment.user.fullname,
+                avatar: comment.user.avatar
+              },
+              accountable: {
+                gender: document.author.fields.gender,
+                fullname: document.author.fields.fullname
+              }
+            })
+
+          })
         } else {
           // Update the version document
           await DocumentVersion.update(document.currentVersion._id, req.body.content, customForm)
@@ -403,7 +418,19 @@ router.route('/:id/comments/:idComment/resolve')
         }
         // Update the comment
         const commentResolved = await Comment.resolve({ _id: req.params.idComment })
-        notifier.sendResolvedNotification(theComment.user.email, theComment.content, document.author.fullname, document.currentVersion.content.title)
+        notifier.sendCommentNotification({
+          type: 'comment-resolved',
+          comment: theComment.content,
+          participant: {
+            email: theComment.user.email,
+            name: theComment.user.fullname,
+            avatar: theComment.user.avatar
+          },
+          accountable: {
+            gender: document.author.fields.gender,
+            fullname: document.author.fields.fullname
+          }
+        })
         res.status(status.OK).json(commentResolved)
       } catch (err) {
         next(err)
@@ -442,7 +469,19 @@ router.route('/:id/comments/:idComment/like')
           if (isTheAuthor) {
             const document = await Document.get({ _id: req.params.id })
             const theComment = await Comment.get({ _id: req.params.idComment })
-            notifier.sendLikeNotification(theComment.user.email, theComment.content, document.author.fullname, document.currentVersion.content.title)
+            notifier.sendCommentNotification({
+              type: 'comment-liked',
+              comment: theComment.content,
+              participant: {
+                email: theComment.user.email,
+                name: theComment.user.fullname,
+                avatar: theComment.user.avatar
+              },
+              accountable: {
+                gender: document.author.fields.gender,
+                fullname: document.author.fields.fullname
+              }
+            })
           }
           res.json(createdLike)
         } else {
