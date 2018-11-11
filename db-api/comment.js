@@ -34,3 +34,34 @@ exports.resolve = function resolve (query) {
       return _comment.save()
     })
 }
+
+exports.updateDecorations = async function updateDecorations (version, decorations) {
+  let query = {
+    version: version,
+    resolved: false
+  }
+  let decorationsMap = {}
+  decorations.forEach((deco) => {
+    decorationsMap[deco.mark.data.id] = deco
+  })
+  let decorationsIds = Object.keys(decorationsMap)
+  return Comment.find(query)
+    .then(async (comments) => {
+      // Found?
+      if (!comments) throw errors.ErrNotFound('Error retrieving comments')
+      // Do stuff
+      console.log(query)
+      await Promise.all(comments.map(async (comment) => {
+        console.log(decorationsIds.includes(comment._id.toString()))
+        if (decorationsIds.includes(comment._id.toString())) {
+          comment.decoration.anchor = decorationsMap[comment._id].anchor
+          comment.decoration.focus = decorationsMap[comment._id].focus
+          comment.markModified('decoration')
+        } else {
+          comment.resolved = true
+        }
+        return comment.save()
+      }))
+      // Save!
+    })
+}
