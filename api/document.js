@@ -319,8 +319,34 @@ router.route('/:id/comments')
         if (req.query.field) {
           query.field = req.query.field
         }
-        const results = await Comment.getAll(query)
-        res.status(status.OK).json(results)
+
+        const mapPromises = (fn) => (array) => Promise.all(array.map(fn))
+
+        let comments = await Comment.getAll(query)
+          .then(mapPromises(
+            async (comment) => {
+              const likes = await Like.getAll({
+                comment: ObjectId(comment._id)
+              })
+
+              return { ...comment.toJSON(), likes: (likes ? likes.length : 0) }
+            }
+          ))
+
+        if (req.session.user) {
+          comments = await mapPromises(
+            async (comment) => {
+              const like = await Like.get({
+                user: ObjectId(req.session.user._id),
+                comment: ObjectId(comment._id)
+              })
+
+              return { ...comment, isLiked: !!like }
+            }
+          )(comments)
+        }
+
+        return res.status(status.OK).json(comments)
       } catch (err) {
         next(err)
       }

@@ -5,6 +5,10 @@ exports.get = function get (query) {
   return Like.findOne(query)
 }
 
+exports.getAll = function get (query) {
+  return Like.find(query)
+}
+
 exports.create = function create (likeData) {
   return (new Like(likeData)).save()
 }
