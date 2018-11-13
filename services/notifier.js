@@ -19,12 +19,12 @@ exports.sendCommentNotification = async ({ type, comment, participant, accountab
   http.post(NOTIFIER_URL, payload).then((response) => {
     log.info(response.data.message, {
       type: type,
-      to: email
+      to: participant.email
     })
   }).catch((error) => {
     log.error('ERROR Sending Email', {
       type: type,
-      to: email,
+      to: participant.email,
       meta: error.message
     })
   })

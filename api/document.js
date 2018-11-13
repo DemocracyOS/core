@@ -225,7 +225,7 @@ router.route('/:id')
               },
               accountable: {
                 gender: document.author.fields.gender,
-                fullname: document.author.fields.fullname
+                fullname: document.author.fullname
               }
             })
 
@@ -472,7 +472,7 @@ router.route('/:id/comments/:idComment/resolve')
           },
           accountable: {
             gender: document.author.fields.gender,
-            fullname: document.author.fields.fullname
+            fullname: document.author.fullname
           }
         })
         res.status(status.OK).json(commentResolved)
@@ -525,7 +525,7 @@ router.route('/:id/comments/:idComment/like')
               },
               accountable: {
                 gender: document.author.fields.gender,
-                fullname: document.author.fields.fullname
+                fullname: document.author.fullname
               }
             })
           }
