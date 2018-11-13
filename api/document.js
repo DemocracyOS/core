@@ -405,6 +405,15 @@ router.route('/:id/comments')
           // If the field is not inside the "allowComments" array, throw error
           throw errors.ErrInvalidParam(`The field ${req.body.field} is not commentable`)
         }
+
+        if (document.currentVersion.content.closingDate) {
+          const closingDate = new Date(document.currentVersion.content.closingDate)
+          const nowDate = new Date()
+          if (closingDate < nowDate) {
+            // The document is closed, no more comments allowed
+            throw errors.ErrClosed
+          }
+        }
         // Field is commentable
         // Create the body of the new comment
         let commentBody = {

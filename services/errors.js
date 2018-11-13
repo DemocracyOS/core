@@ -77,6 +77,11 @@ const ErrForbidden = new APIError('Resource not available', {
   status: FORBIDDEN
 })
 
+const ErrClosed = new APIError('The document is closed', {
+  translationKey: 'DOCUMENT_CLOSED',
+  status: FORBIDDEN
+})
+
 const ErrNotAuthorized = (message) => new APIError(message, {
   translationKey: 'NOT_AUTHORIZED',
   status: FORBIDDEN
@@ -122,6 +127,7 @@ module.exports = {
   ErrNotAdmin,
   ErrNotAdminNorOwner,
   ErrForbidden,
+  ErrClosed,
   ErrInvalidJSONSchema,
   ErrInvalidData
 }
