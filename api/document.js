@@ -216,9 +216,10 @@ router.route('/:id')
             notifier.sendCommentNotification({
               type: 'comment-contribution',
               comment: comment.content,
+              title: document.currentVersion.content.title,
               participant: {
                 email: comment.user.email,
-                name: comment.user.fullname,
+                fullname: comment.user.fullname,
                 avatar: comment.user.avatar,
                 occupation: theComment.user.fields.occupation
               },
@@ -462,9 +463,10 @@ router.route('/:id/comments/:idComment/resolve')
         notifier.sendCommentNotification({
           type: 'comment-resolved',
           comment: theComment.content,
+          title: document.currentVersion.content.title,
           participant: {
             email: theComment.user.email,
-            name: theComment.user.fullname,
+            fullname: theComment.user.fullname,
             avatar: theComment.user.avatar,
             occupation: theComment.user.fields.occupation
           },
@@ -514,9 +516,10 @@ router.route('/:id/comments/:idComment/like')
             notifier.sendCommentNotification({
               type: 'comment-liked',
               comment: theComment.content,
+              title: document.currentVersion.content.title,
               participant: {
                 email: theComment.user.email,
-                name: theComment.user.fullname,
+                fullname: theComment.user.fullname,
                 avatar: theComment.user.avatar,
                 occupation: theComment.user.fields.occupation
               },
