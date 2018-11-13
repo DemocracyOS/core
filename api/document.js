@@ -213,13 +213,14 @@ router.route('/:id')
           const comments = await Comment.getAll(query)
           // Send email
           comments.forEach((comment) => {
-            notifier.sendDocumentEdited({
+            notifier.sendCommentNotification({
               type: 'comment-contribution',
               comment: comment.content,
               participant: {
                 email: comment.user.email,
                 name: comment.user.fullname,
-                avatar: comment.user.avatar
+                avatar: comment.user.avatar,
+                occupation: theComment.user.fields.occupation
               },
               accountable: {
                 gender: document.author.fields.gender,
@@ -464,7 +465,8 @@ router.route('/:id/comments/:idComment/resolve')
           participant: {
             email: theComment.user.email,
             name: theComment.user.fullname,
-            avatar: theComment.user.avatar
+            avatar: theComment.user.avatar,
+            occupation: theComment.user.fields.occupation
           },
           accountable: {
             gender: document.author.fields.gender,
@@ -515,7 +517,8 @@ router.route('/:id/comments/:idComment/like')
               participant: {
                 email: theComment.user.email,
                 name: theComment.user.fullname,
-                avatar: theComment.user.avatar
+                avatar: theComment.user.avatar,
+                occupation: theComment.user.fields.occupation
               },
               accountable: {
                 gender: document.author.fields.gender,
