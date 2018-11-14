@@ -4,12 +4,13 @@ const log = require('./logger')
 
 const http = axios.create()
 
-exports.sendCommentNotification = async ({ type, comment, participant, accountable }) => {
+exports.sendCommentNotification = async ({ type, comment, participant, accountable, title }) => {
   let payload = {
     'type': type,
     'info': {
       'to': participant.email,
       'document': {
+        'title': title,
         'participant': participant,
         'accountable': accountable,
         'comment': comment
