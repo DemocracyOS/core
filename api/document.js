@@ -76,7 +76,11 @@ router.route('/')
           throw errors.ErrNotAuthorized(`Cannot create more documents (Creation limit reached: ${community.permissions.accountable.documentCreationLimit})`)
         }
         req.body.author = req.session.user._id
-        const customForm = await CustomForm.get({ _id: req.body.customForm })
+        // In the body of the request customForm will be a slug. It will be an id later.
+        const customForm = await CustomForm.get({ slug: req.body.customForm })
+        if (!customForm) {
+          throw errors.ErrBadRequest('customForm')
+        }
         const newDocument = await Document.create(req.body, customForm)
         res.status(status.CREATED).send(newDocument)
       } catch (err) {
@@ -228,7 +232,6 @@ router.route('/:id')
                 fullname: document.author.fullname
               }
             })
-
           })
         } else {
           // Update the version document

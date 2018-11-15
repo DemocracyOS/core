@@ -4,6 +4,7 @@ const ignoredPaths = ['name', 'icon', 'description', 'updatedAt']
 
 const CustomForm = new mongoose.Schema({
   name: { type: String, required: true },
+  slug: { type: String, required: true },
   icon: { type: String },
   description: { type: String, required: true },
   version: { type: Number },

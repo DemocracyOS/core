@@ -24,6 +24,7 @@ let communityData = {
 
 let userProfileCustomForm = {
   name: 'User Profile',
+  slug: 'user-profile',
   icon: 'fas fa-user',
   description: 'Template for a user profile',
   version: 0,
@@ -124,6 +125,7 @@ let projectCustomForm = {
     ]
   },
   name: 'Project',
+  slud: 'project-form',
   icon: 'far fa-files',
   description: 'This is the template of fields for projects',
   version: 0
