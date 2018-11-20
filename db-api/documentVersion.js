@@ -62,3 +62,20 @@ exports.updateField = async function updateField (id, field, content, customForm
       return version.save()
     })
 }
+
+// Count contributions
+exports.countContributions = async function countContributions (query) {
+  // First, find if the document exists
+  let count = 0
+  return DocumentVersion.find(query)
+    .then(async (versions) => {
+    // Found?
+      if (!versions) throw errors.ErrNotFound('Error retrieving versions')
+      // Do stuff
+      await Promise.all(versions.map(async (v) => {
+        console.log(v.contributions.length)
+        count += v.contributions.length
+      }))
+      return count
+    })
+}

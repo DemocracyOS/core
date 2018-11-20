@@ -153,11 +153,17 @@ router.route('/:id')
             throw errors.ErrForbidden
           }
         }
-        // Deliver the document
-        res.status(status.OK).json({
+        let payload = {
           document: document,
           isAuthor: isTheAuthor
-        })
+        }
+        // If the document is closed
+        if (document.closed) {
+          const contributionsCount = await DocumentVersion.countContributions({ document: req.params.id })
+          payload.contributionsCount = contributionsCount
+        }
+        // Deliver the document
+        res.status(status.OK).json(payload)
       } catch (err) {
         next(err)
       }
@@ -538,6 +544,26 @@ router.route('/:id/comments/:idComment/like')
           res.json(null)
         }
         res.status(status.OK)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+router.route('/:id/comments/:idComment/reply')
+  .post(
+    middlewares.checkId,
+    auth.keycloak.protect('realm:accountable'),
+    async (req, res, next) => {
+      try {
+        const document = await Document.get({ _id: req.params.id })
+        // Check if the user is the author of the document
+        if (!req.session.user._id.equals(document.author._id)) {
+          throw errors.ErrForbidden // User is not the author
+        }
+        // Update the comment
+        const commentUpdated = await Comment.reply({ _id: req.params.idComment }, req.body.reply)
+        res.status(status.OK).json(commentUpdated)
       } catch (err) {
         next(err)
       }

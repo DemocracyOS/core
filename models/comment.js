@@ -10,6 +10,7 @@ const Comment = new mongoose.Schema({
   content: { type: String },
   resolved: { type: Boolean, default: false },
   decoration: { type: mongoose.Schema.Types.Mixed },
+  reply: { type: String },
   when: { type: String }
 }, { timestamps: true })
 

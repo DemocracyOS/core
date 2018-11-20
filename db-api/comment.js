@@ -34,6 +34,17 @@ exports.resolve = function resolve (query) {
       return _comment.save()
     })
 }
+exports.reply = function reply (query, reply) {
+  return Comment.findOne(query)
+    .then((_comment) => {
+      // Found?
+      if (!_comment) throw errors.ErrNotFound('Comment to update not found')
+      // Do stuff
+      _comment.reply = reply
+      // Save!
+      return _comment.save()
+    })
+}
 
 exports.updateDecorations = async function updateDecorations (version, decorations) {
   let query = {
