@@ -1,5 +1,6 @@
 const { Types: { ObjectId } } = require('mongoose')
 const { merge } = require('lodash/object')
+const { union } = require('lodash/array')
 const DocumentVersion = require('../models/documentVersion')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
@@ -67,15 +68,19 @@ exports.updateField = async function updateField (id, field, content, customForm
 exports.countContributions = async function countContributions (query) {
   // First, find if the document exists
   let count = 0
+  let contributors = []
   return DocumentVersion.find(query)
     .then(async (versions) => {
     // Found?
       if (!versions) throw errors.ErrNotFound('Error retrieving versions')
       // Do stuff
       await Promise.all(versions.map(async (v) => {
-        console.log(v.contributions.length)
+        contributors = union(contributors, v.contributions)
         count += v.contributions.length
       }))
-      return count
+      return {
+        contributionsCount: count,
+        contributorsCount: contributors.length
+      }
     })
 }

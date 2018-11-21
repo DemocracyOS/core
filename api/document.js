@@ -159,8 +159,11 @@ router.route('/:id')
         }
         // If the document is closed
         if (document.closed) {
-          const contributionsCount = await DocumentVersion.countContributions({ document: req.params.id })
-          payload.contributionsCount = contributionsCount
+          const contributionsData = await DocumentVersion.countContributions({ document: req.params.id })
+          const contextualCommentsCount = await Comment.count({ document: req.params.id, decoration: { $ne: null } })
+          payload.contributionsCount = contributionsData.contributionsCount
+          payload.contributorsCount = contributionsData.contributorsCount
+          payload.contextualCommentsCount = contextualCommentsCount
         }
         // Deliver the document
         res.status(status.OK).json(payload)
