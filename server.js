@@ -8,18 +8,12 @@ const { keycloak } = require('./services/auth')
 const mongoStore = require('./services/sessions')
 const config = require('./config')
 const log = require('./services/logger')
+const init = require('./scripts/init')
 const { NODE_ENV } = process.env
 const loggerMiddleware = expressWinston.logger({ winstonInstance: log })
 
 module.exports = (async () => {
   try {
-    if (NODE_ENV === 'dev') {
-      console.log('================================================')
-      console.log(`Starting server [${NODE_ENV}] with the following config`)
-      console.log('================================================')
-      console.log(config)
-      console.log('================================================')
-    }
     const server = express()
     // Apply middlewares
     server.use(helmet())
@@ -37,7 +31,7 @@ module.exports = (async () => {
     server.use(keycloak.middleware())
     // Apply API routes
     server.use('/', require('./api'))
-
+    await init.checkInit()
     return server.listen(config.PORT, (err) => {
       if (err) {
         throw err

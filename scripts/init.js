@@ -23,16 +23,18 @@ let communityData = {
 }
 
 let userProfileCustomForm = {
-  name: 'User Profile',
-  slug: 'user-profile',
-  icon: 'fas fa-user',
-  description: 'Template for a user profile',
-  version: 0,
-  fields: {
+  'fields': {
+    'required': [],
+    'richText': [],
+    'allowComments': [],
     'blocks': [
       {
         'fields': [
-          'occupation'
+          'party',
+          'occupation',
+          'birthday',
+          'gender',
+          'province'
         ],
         'name': 'About the user'
       }
@@ -40,17 +42,47 @@ let userProfileCustomForm = {
     'properties': {
       'occupation': {
         'type': 'string',
-        'title': 'User occupation'
+        'title': "User's occupation"
+      },
+      'party': {
+        'type': 'string',
+        'title': "User's party"
+      },
+      'gender': {
+        'type': 'string',
+        'title': "User's gender"
+      },
+      'birthday': {
+        'type': 'string',
+        'title': "User's birthday"
+      },
+      'province': {
+        'type': 'string',
+        'title': "User's province"
       }
-    },
-    'required': [],
-    'richText': [],
-    'allowComments': []
-  }
+    }
+  },
+  'name': 'User Profile',
+  'slug': 'user-profile',
+  'icon': 'fas fa-user',
+  'description': 'Template for a user profile'
 }
 
 let projectCustomForm = {
-  fields: {
+  'fields': {
+    'required': [
+      'fundation',
+      'articles',
+      'title'
+    ],
+    'richText': [
+      'fundation',
+      'articles'
+    ],
+    'allowComments': [
+      'fundation',
+      'articles'
+    ],
     'blocks': [
       {
         'fields': [
@@ -59,7 +91,7 @@ let projectCustomForm = {
           'youtubeId',
           'fundation'
         ],
-        'name': 'Project\'s basic info'
+        'name': "Project's basic info"
       },
       {
         'fields': [
@@ -71,18 +103,22 @@ let projectCustomForm = {
     'properties': {
       'title': {
         'type': 'string',
-        'title': 'Project\'s title'
+        'title': "Project's title"
       },
       'imageCover': {
         'anyof': [
-          { 'type': 'null' },
-          { 'type': 'string' }
+          {
+            'type': 'null'
+          },
+          {
+            'type': 'string'
+          }
         ],
         'title': 'URL for the cover of the image'
       },
       'fundation': {
         'type': 'object',
-        'title': 'Project\'s fundations'
+        'title': "Project's fundations"
       },
       'articles': {
         'type': 'object',
@@ -90,45 +126,45 @@ let projectCustomForm = {
       },
       'youtubeId': {
         'anyof': [
-          { 'type': 'null' },
-          { 'type': 'String' }
+          {
+            'type': 'null'
+          },
+          {
+            'type': 'String'
+          }
         ],
         'title': 'Youtube Video ID'
       },
       'closingDate': {
         'oneOf': [
-          { 'type': 'null' },
-          { 'type': 'string' }
+          {
+            'type': 'null'
+          },
+          {
+            'type': 'string',
+            'format': 'date-time'
+          }
         ],
         'title': 'Closing date (to participate)'
       },
       'closure': {
         'anyof': [
-          { 'type': 'null' },
-          { 'type': 'object' }
+          {
+            'type': 'null'
+          },
+          {
+            'type': 'object'
+          }
         ],
         'title': 'Closure of the document'
       }
-    },
-    'required': [
-      'title',
-      'fundation',
-      'articles'
-    ],
-    'richText': [
-      'fundation',
-      'articles'
-    ],
-    'allowComments': [
-      'fundation',
-      'articles'
-    ]
+    }
   },
-  name: 'Project',
-  slud: 'project-form',
-  icon: 'far fa-files',
-  description: 'This is the template of fields for projects',
-  version: 0
+  'name': 'Project',
+  'slug': 'project-form',
+  'icon': 'far fa-files',
+  'description': 'This is the template of fields for projects',
+  'version': 0
 }
 
 class DatabaseNotEmpty extends Error { }
@@ -136,58 +172,48 @@ class DatabaseNotEmpty extends Error { }
 async function checkDB () {
   log.debug('* Checking if database has data on it')
   let community = await Community.findOne({})
-  if (community) throw new DatabaseNotEmpty('ERROR There is at least one community already on the DB')
+  if (community) throw new DatabaseNotEmpty('There is at least one community already on the DB. Skipping init')
   let customForm = await CustomForm.findOne({})
-  if (customForm) throw new DatabaseNotEmpty('ERROR There is at least one document type already on the DB')
+  if (customForm) throw new DatabaseNotEmpty('There is at least one document type already on the DB. Skipping init')
   log.debug('--> OK')
 }
 
 async function startSetup () {
   try {
     await checkDB()
-    log.debug('* Creating user profile custom form...')
+    log.info('* Creating user profile custom form...')
     let profileSchema = await dbCustomForm.create(userProfileCustomForm)
-    log.debug('* Creating community...')
+    log.info('* Creating community...')
     communityData.userProfileSchema = profileSchema._id
     await dbCommunity.create(communityData)
-    log.debug('--> OK')
-    log.debug('* Creating document type custom form...')
+    log.info('--> OK')
+    log.info('* Creating document type custom form...')
     await dbCustomForm.create(projectCustomForm)
-    log.debug('--> OK')
-    log.debug('--> Setup finished!')
-    process.exit(0) // Success
+    log.info('--> OK')
+    log.info('--> Setup finished!')
   } catch (err) {
-    log.error(err.message)
-    log.error('ERROR Setup stopped unexpectly')
-    process.exit(1) // Error
-  }
-}
-
-async function execute () {
-  try {
-    // await checkEnv()
-    log.debug(`* Connecting to the database...`)
-    mongoose
-      .connect(config.MONGO_URL, { useNewUrlParser: true })
-      .then(() => {
-        log.debug('--> OK')
-        startSetup()
-      })
-      .catch((err) => {
-        log.error(err)
-        log.error('ERROR Setup stopped unexpectly')
-        process.exit(1)
-      })
-  } catch (err) {
-    log.debug(err.message)
-    log.error('ERROR Setup stopped unexpectly')
-    process.exit(1) // Error
+    log.warn(err.message)
   }
 }
 
 mongoose.Promise = global.Promise
 
-log.debug(`DemocracyOS - core`)
-log.debug(`Seeding mongodb with init values.`)
-log.debug('================================================')
-execute()
+exports.checkInit = async function checkInit () {
+  try {
+    // await checkEnv()
+    log.info(`Seeding mongodb with init values`)
+    mongoose
+      .connect(config.MONGO_URL, { useNewUrlParser: true })
+      .then(() => {
+        log.info('--> OK')
+        startSetup()
+      })
+      .catch((err) => {
+        log.error(err)
+        log.warn('Init stopped unexpectly')
+      })
+  } catch (err) {
+    log.info(err.message)
+    log.warn('Init stopped unexpectly')
+  }
+}
