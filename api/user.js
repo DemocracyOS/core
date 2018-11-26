@@ -4,7 +4,6 @@ const router = express.Router()
 const User = require('../db-api/user')
 const auth = require('../services/auth')
 const middlewares = require('../services/middlewares')
-// const errors = require('../services/errors')
 
 router.route('/')
 /**
@@ -18,7 +17,7 @@ router.route('/')
         const results = await User.list({}, {
           limit: req.query.limit,
           page: req.query.page
-        })
+        }, false)
         res.status(status.OK).json({
           results: results.docs,
           pagination: {
@@ -67,32 +66,58 @@ router.route('/me')
       }
     })
 
-router.route('/:id')
+router.route('/:id/avatar')
 /**
- * @api {get} /users/:id Gets a user
- * @apiName getUser
- * @apiGroup User
- *
- * @apiParam {Number} id Users ID.
- */
+   * @api {get} /users/:id Gets a user
+   * @apiName getUser
+   * @apiGroup User
+   *
+   * @apiParam {Number} id Users ID.
+   */
   .get(
     middlewares.checkId,
     async (req, res, next) => {
       try {
         // TODO
-        const results = await User.get({ _id: req.params.id })
-        res.status(status.OK).json(results)
+        const user = await User.get({ _id: req.params.id }, true)
+        const b64 = user.avatar.split(',')[1]
+        let img = Buffer.from(b64, 'base64')
+        res.writeHead(200, {
+          'Content-Type': 'image/jpeg',
+          'Content-Length': img.length
+        })
+        res.end(img)
+      } catch (err) {
+        next(err)
+      }
+    })
+
+router.route('/:id')
+/**
+     * @api {get} /users/:id Gets a user
+     * @apiName getUser
+     * @apiGroup User
+     *
+     * @apiParam {Number} id Users ID.
+     */
+  .get(
+    middlewares.checkId,
+    async (req, res, next) => {
+      try {
+        // TODO
+        const result = await User.get({ _id: req.params.id }, false)
+        res.status(status.OK).json(result)
       } catch (err) {
         next(err)
       }
     })
 /**
- * @api {delete} /users/:id Delets a user
- * @apiName deleteUser
- * @apiGroup User
- *
- * @apiParam {Number} id Users ID.
- */
+     * @api {delete} /users/:id Delets a user
+     * @apiName deleteUser
+     * @apiGroup User
+     *
+     * @apiParam {Number} id Users ID.
+     */
   .delete(
     middlewares.checkId,
     auth.keycloak.protect('realm:admin'),

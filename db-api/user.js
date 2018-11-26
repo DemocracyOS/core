@@ -6,6 +6,13 @@ const CommunityDB = require('./community')
 const validator = require('../services/jsonSchemaValidator')
 const log = require('../services/logger')
 
+const exposeAll = (expose) => {
+  if (expose) return null // expose == true then show all
+  else return '-avatar -email -username' // hide sensitive info
+}
+
+exports.exposeAll = exposeAll
+
 // Create uset
 
 exports.create = function create (user) {
@@ -14,8 +21,8 @@ exports.create = function create (user) {
 
 // Get user
 
-exports.get = function get (query) {
-  return User.findOne(query)
+exports.get = function get (query, expose) {
+  return User.findOne(query).select(exposeAll(expose))
 }
 
 // List users
@@ -28,9 +35,9 @@ exports.isEmpty = function isEmpty () {
     })
 }
 
-exports.list = function list (query, { limit, page }) {
+exports.list = function list (query, { limit, page }, expose) {
   return User
-    .paginate(query, { limit, page })
+    .paginate(query, { limit, page, select: exposeAll(expose) })
 }
 
 // Update user

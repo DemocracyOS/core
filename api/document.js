@@ -223,7 +223,7 @@ router.route('/:id')
           let query = {
             _id: { $in: idsArray }
           }
-          const comments = await Comment.getAll(query)
+          const comments = await Comment.getAll(query, true)
           // Send email
           comments.forEach((comment) => {
             notifier.sendCommentNotification({
@@ -234,7 +234,7 @@ router.route('/:id')
                 email: comment.user.email,
                 fullname: comment.user.fullname,
                 avatar: comment.user.avatar,
-                occupation: theComment.user.fields.occupation
+                occupation: comment.user.fields.occupation
               },
               accountable: {
                 gender: document.author.fields.gender,
@@ -356,7 +356,7 @@ router.route('/:id/comments')
 
         const mapPromises = (fn) => (array) => Promise.all(array.map(fn))
 
-        let comments = await Comment.getAll(query)
+        let comments = await Comment.getAll(query, false)
           .then(mapPromises(
             async (comment) => {
               const likes = await Like.getAll({
@@ -465,7 +465,7 @@ router.route('/:id/comments/:idComment/resolve')
     async (req, res, next) => {
       try {
         const document = await Document.get({ _id: req.params.id })
-        const theComment = await Comment.get({ _id: req.params.idComment })
+        const theComment = await Comment.get({ _id: req.params.idComment }, true)
         // Check if the user is the author of the document
         if (!req.session.user._id.equals(document.author._id)) {
           throw errors.ErrForbidden // User is not the author
@@ -524,7 +524,7 @@ router.route('/:id/comments/:idComment/like')
           })
           if (isTheAuthor) {
             const document = await Document.get({ _id: req.params.id })
-            const theComment = await Comment.get({ _id: req.params.idComment })
+            const theComment = await Comment.get({ _id: req.params.idComment }, true)
             notifier.sendCommentNotification({
               type: 'comment-liked',
               comment: theComment.content,
