@@ -6,10 +6,12 @@ const CommunityDB = require('./community')
 const validator = require('../services/jsonSchemaValidator')
 const log = require('../services/logger')
 
-exports.exposeAll = (expose) => {
+const exposeAll = (expose) => {
   if (expose) return null // expose == true then show all
   else return '-avatar -email -username' // hide sensitive info
 }
+
+exports.exposeAll = exposeAll
 
 // Create uset
 

@@ -17,7 +17,7 @@ router.route('/')
         const results = await User.list({}, {
           limit: req.query.limit,
           page: req.query.page
-        })
+        }, false)
         res.status(status.OK).json({
           results: results.docs,
           pagination: {
@@ -79,7 +79,7 @@ router.route('/:id/avatar')
     async (req, res, next) => {
       try {
         // TODO
-        const user = await User.get({ _id: req.params.id })
+        const user = await User.get({ _id: req.params.id }, true)
         const b64 = user.avatar.split(',')[1]
         let img = Buffer.from(b64, 'base64')
         res.writeHead(200, {
@@ -105,8 +105,8 @@ router.route('/:id')
     async (req, res, next) => {
       try {
         // TODO
-        const results = await User.get({ _id: req.params.id })
-        res.status(status.OK).json(results)
+        const result = await User.get({ _id: req.params.id }, false)
+        res.status(status.OK).json(result)
       } catch (err) {
         next(err)
       }
