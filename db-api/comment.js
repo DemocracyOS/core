@@ -3,24 +3,25 @@ const { Types: { ObjectId } } = require('mongoose')
 const Comment = require('../models/comment')
 // const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
+const dbUser = require('./user')
 
 // Create comment
 exports.create = async function create (comment) {
   return (new Comment(comment)).save()
 }
 
-exports.get = function get (query) {
+exports.get = function get (query, expose) {
   return Comment
-    .findOne(query).populate('user')
+    .findOne(query).populate('user', dbUser.exposeAll(expose))
 }
 
 exports.count = function count (query) {
   return Comment.countDocuments(query)
 }
 
-exports.getAll = function getAll (query) {
+exports.getAll = function getAll (query, expose) {
   return Comment
-    .find(query).populate('user')
+    .find(query).populate('user', dbUser.exposeAll(expose))
 }
 
 exports.resolve = function resolve (query) {

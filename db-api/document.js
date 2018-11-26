@@ -2,7 +2,7 @@ const { Types: { ObjectId } } = require('mongoose')
 const { merge } = require('lodash/object')
 const Document = require('../models/document')
 const DocumentVersion = require('../models/documentVersion')
-const Comment = require('../models/comment')
+const dbUser = require('../db-api/user')
 const validator = require('../services/jsonSchemaValidator')
 const errors = require('../services/errors')
 
@@ -49,13 +49,13 @@ exports.create = async function create (documentData, customForm) {
 
 // Get document (with its last version)
 exports.get = async function get (query) {
-  let document = await Document.findOne(query).populate('author').populate('currentVersion')
+  let document = await Document.findOne(query).populate({ path: 'author', select: dbUser.exposeAll(false) }).populate('currentVersion')
   return document
 }
 
 // List documents
 exports.list = async function list (query, { limit, page }) {
-  let documentList = await Document.paginate(query, { page, limit, lean: true, populate: ['author', 'currentVersion'] })
+  let documentList = await Document.paginate(query, { page, limit, lean: true, populate: [{ path: 'author', select: dbUser.exposeAll(false) }, 'currentVersion'] })
   // let promisesPopulate = documentList.docs.map(async (doc) => {
   //   let theVersion = await DocumentVersion.findOne({
   //     document: doc._id,
